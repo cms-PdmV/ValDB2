@@ -110,4 +110,29 @@ class TestModel(TestCase):
         self.assertEqual(len(queried_data1), 1)
         self.assertEqual(queried_data1[0]._id, data1._id)
 
+    def test_unlink(self):
+        db = MongoDatabase()
+
+        data1 = NewModel()
+        data1.name = 'test_name_to_be_deleted'
+        data1.amount = 5
+        data1.active = True
+        data1.save()
+
+        data1_id = data1._id
+        db_data1 = db.database[collection_name_1].find_one({'_id': data1_id})
+        self.assertEqual(db_data1['_id'],  data1._id)
+
+        data1.unlink()
+        db_data1 = db.database[collection_name_1].find_one({'_id': data1_id})
+        self.assertEqual(db_data1,  None)
+        self.assertEqual(data1._id,  None)
+        self.assertEqual(data1.name,  'test_name_to_be_deleted')
+
+        data1.save()
+        self.assertTrue(isinstance(data1._id, ObjectId))
+        self.assertNotEqual(data1._id, data1_id)
+        db_data1 = db.database[collection_name_1].find_one({'_id': data1._id})
+        self.assertEqual(db_data1['_id'],  data1._id)
+        self.assertEqual(db_data1['name'],  'test_name_to_be_deleted')
 

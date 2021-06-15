@@ -10,6 +10,7 @@ class MongoDatabase():
         return cls.instance
 
     def __init__(self):
+        # TODO: read connection string from env
         client = MongoClient('localhost', 27017)
         database = client['testdb']
         self.client = client

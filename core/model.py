@@ -3,8 +3,7 @@ from typing import TypeVar, Union
 from bson.objectid import ObjectId
 from .database import MongoDatabase
 
-_default_database = MongoDatabase()
-_filter_out_object_key = ['_name', 'database']
+_filter_out_object_key = ['_id', '_name', 'database']
 
 T = TypeVar('T')
 
@@ -12,8 +11,8 @@ class Model:
     _name: str
     _id: ObjectId
 
-    def __init__(self, data: dict=None, database=_default_database):
-        self.database = database
+    def __init__(self, data: dict=None):
+        self.database = MongoDatabase()
         if data:
             self._set_value_from_data(data)
 
@@ -38,3 +37,7 @@ class Model:
 
     def query(self: T, query: dict) -> list[T]:
         return [self.__class__(record) for record in self.database.query(self._name, query)]
+
+    def unlink(self):
+        self.database.delete(self._name, self._id)
+        self._id = None
