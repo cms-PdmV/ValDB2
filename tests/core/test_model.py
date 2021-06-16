@@ -136,3 +136,96 @@ class TestModel(TestCase):
         self.assertEqual(db_data1['_id'],  data1._id)
         self.assertEqual(db_data1['name'],  'test_name_to_be_deleted')
 
+    def test_model_reference_save(self):
+        parent_collection_name = 'test_parent'
+        class NewParentModel(Model):
+            _name = parent_collection_name
+            name: str
+            childs: list[NewModel]
+
+        db = MongoDatabase()
+
+        child1 = NewModel({'name': 'c1'}).save()
+        child2 = NewModel({'name': 'c2'}).save()
+        child3 = NewModel({'name': 'c3'}).save()
+
+        parent = NewParentModel({
+            'name': 'test_parent_1',
+            'childs': [child1, child2, child3],
+        }).save()
+
+        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        self.assertTrue(isinstance(parent._id, ObjectId))
+        self.assertTrue(len(db_parent['childs']), 3)
+        self.assertTrue(db_parent['childs'][0], child1._id)
+        self.assertTrue(db_parent['childs'][1], child2._id)
+        self.assertTrue(db_parent['childs'][2], child3._id)
+
+        # test unsaved child, should save when parent is saved
+        child4 = NewModel({'name': 'c4'})
+        parent.childs.append(child4)
+
+        parent.save()
+        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        self.assertTrue(len(db_parent['childs']), 4)
+        self.assertTrue(db_parent['childs'][3], child4._id)
+
+        # TODO: test mix type child, should raise exception
+        # class OtherChildModel(Model):
+        #     _name = 'other_child_model'
+        #     name: str
+
+        # other_child = OtherChildModel({
+        #     'name': 'other_child'
+        # }).save()
+        # parent.childs.append(other_child)
+
+        # with self.assertRaises(Exception):
+        #     parent.save()
+
+    def test_model_non_reference_save(self):
+        parent_collection_name = 'test_parent'
+        class NewParentModel(Model):
+            _name = parent_collection_name
+            name: str
+            childs: list[str]
+
+        parent = NewParentModel({
+            'name': 'test_parent_non_reference',
+            'childs': ['a', 'b', 'c'],
+        })
+
+        parent.save()
+
+        db = MongoDatabase()
+        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        self.assertEqual(db_parent['childs'], ['a', 'b', 'c'])
+
+    def test_model_reference_get(self):
+        parent_collection_name = 'test_parent'
+        class NewParentModel(Model):
+            _name = parent_collection_name
+            name: str
+            childs: list[NewModel]
+
+        db = MongoDatabase()
+
+        child1 = NewModel({'name': 'c1'}).save()
+        child2 = NewModel({'name': 'c2'}).save()
+        child3 = NewModel({'name': 'c3'}).save()
+
+        parent = NewParentModel({
+            'name': 'test_parent_1',
+            'childs': [child1, child2, child3],
+        }).save()
+
+        fetched_parent = NewParentModel().get(parent._id)
+        self.assertEqual(len(fetched_parent.childs), 3)
+        self.assertEqual(fetched_parent.childs[0]._id, child1._id)
+        self.assertEqual(fetched_parent.childs[1]._id, child2._id)
+        self.assertEqual(fetched_parent.childs[2]._id, child3._id)
+
+        self.assertTrue(isinstance(fetched_parent.childs[0], NewModel))
+        self.assertTrue(isinstance(fetched_parent.childs[1], NewModel))
+        self.assertTrue(isinstance(fetched_parent.childs[2], NewModel))
+        

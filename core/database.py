@@ -19,12 +19,6 @@ class MongoDatabase():
     def create(self, collection_name: str, data: object) -> ObjectId:
         return self.database[collection_name].insert_one(data).inserted_id
 
-    def read(self, collection_name: str):
-        data = []
-        for record in self.database[collection_name]:
-            data.append(record)
-        return data
-
     def query(self, collection_name: str, query: dict):
         data = []
         for record in self.database[collection_name].find(query):
