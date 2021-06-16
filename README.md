@@ -6,10 +6,10 @@ None
 
 ## Run Development
 ```
-./start
+./run dev
 ```
 
 ## Run Test
 ```
-python -m unittest
+./run test
 ```

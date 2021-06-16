@@ -1,6 +1,9 @@
 from typing import Union
+import os
+
 from bson.objectid import ObjectId
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
 class MongoDatabase():
     # ensure single instance of database
@@ -10,9 +13,12 @@ class MongoDatabase():
         return cls.instance
 
     def __init__(self):
-        # TODO: read connection string from env
-        client = MongoClient('localhost', 27017)
-        database = client['testdb']
+        load_dotenv()
+        database_host = os.getenv('DATABASE_HOST')
+        database_port = int(os.getenv('DATABASE_PORT'))
+        database_name = os.getenv('DATABASE_NAME')
+        client = MongoClient(database_host, database_port)
+        database = client[database_name]
         self.client = client
         self.database = database
 
@@ -35,3 +41,12 @@ class MongoDatabase():
 
     def delete(self, collection_name: str, id: ObjectId):
         self.database[collection_name].find_one_and_delete({'_id': id})
+
+database_connector = {
+    'mongo': MongoDatabase
+}
+
+def get_database():
+    load_dotenv()
+    database_connector_type = os.getenv('DATABASE_CONNECTOR')
+    return database_connector[database_connector_type]

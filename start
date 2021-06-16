@@ -1,7 +1,0 @@
-# load .env variable if exists
-if [ -f .env ]
-then
-    export $(cat .env | sed 's/#.*//g' | xargs)
-fi
-
-python main.py

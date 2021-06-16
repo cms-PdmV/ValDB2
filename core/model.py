@@ -1,6 +1,6 @@
 from typing import TypeVar, Union, get_args
 from bson.objectid import ObjectId
-from .database import MongoDatabase
+from .database import get_database
 
 _filter_out_load_object_key = ['_name', '_database']
 _filter_out_store_object_key = _filter_out_load_object_key + ['_id']
@@ -12,7 +12,8 @@ class Model:
     _id: ObjectId
 
     def __init__(self, data: dict=None):
-        self._database = MongoDatabase()
+        database = get_database()
+        self._database = database()
         if data:
             self._set_value_from_data(data)
 

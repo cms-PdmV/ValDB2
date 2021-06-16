@@ -1,7 +1,6 @@
-from unittest import TestCase
-
 from bson.objectid import ObjectId
 from core.database import MongoDatabase
+from core.test import TestCase
 
 collection_name = 'test_database_collection'
 
