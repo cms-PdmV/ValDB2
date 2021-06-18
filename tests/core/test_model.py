@@ -257,5 +257,21 @@ class TestModel(TestCase):
         self.assertEqual(fetched_todo1.status, Status.DONE)
         self.assertEqual(db_todo1['status'], 3)
 
+    def test_type_many2one_reference(self):
+        class Category(Model):
+            name: str
 
-        
+        class Restaurant(Model):
+            name: str
+            category: Category
+
+        thai_food_category = Category({'name': 'thai'}).save()
+        restaurant = Restaurant()
+        restaurant.name = 'restaurant1'
+        restaurant.category = thai_food_category
+        restaurant.save()
+
+        fetched_restaurant = Restaurant.get(restaurant._id)
+        self.assertTrue(isinstance(fetched_restaurant.category, Category))
+        self.assertEqual(fetched_restaurant.category._id, thai_food_category._id)
+        self.assertEqual(fetched_restaurant.category.name, 'thai')

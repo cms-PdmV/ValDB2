@@ -36,8 +36,10 @@ class Model:
                 elements = []
                 reference_model = self._get_reference_model_of_field(key)
                 for element in value:
-                    elements.append(reference_model().get(element))
+                    elements.append(reference_model.get(element))
                 data_load_object[key] = elements
+            elif self.__annotations__[key].__base__ is Model: # is many2one reference
+                data_load_object[key] = self.__annotations__[key].get(value)
             elif self.__annotations__[key].__base__ is Enum: # is enum
                 data_load_object[key] = self.__annotations__[key](value)
             else: # is general type
@@ -58,6 +60,10 @@ class Model:
                         element.save()
                     element_ids.append(element._id)
                 data_store_object[key] = element_ids
+            elif isinstance(value, Model): # is many2one reference
+                if not value._is_saved():
+                    value.save()
+                data_store_object[key] = value._id
             elif isinstance(value, Enum): # is enum
                 data_store_object[key] = value.value
             else: # is general type
