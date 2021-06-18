@@ -1,14 +1,14 @@
 from typing import TypeVar, Union, get_args
+import re
 from bson.objectid import ObjectId
 from .database import get_database
 
-_filter_out_load_object_key = ['_name', '_database']
+_filter_out_load_object_key = ['_database']
 _filter_out_store_object_key = _filter_out_load_object_key + ['_id']
 
 T = TypeVar('T')
 
 class Model:
-    _name: str
     _id: ObjectId
 
     def __init__(self, data: dict=None):
@@ -68,23 +68,33 @@ class Model:
 
     def save(self: T) -> T:
         if self._is_saved():
-            self._database.update(self._name, self._id, self._get_data_store_object())
+            self._database.update(self._get_collection_name(), self._id, self._get_data_store_object())
         else:
-            saved_data_id = self._database.create(self._name, self._get_data_store_object())
+            saved_data_id = self._database.create(self._get_collection_name(), self._get_data_store_object())
             self._id = saved_data_id
         return self
 
-    def get(self: T, id: Union[str, ObjectId]) -> T:
-        return self.__class__(self._get_data_load_object(self._database.get(self._name, id)))
+    @classmethod
+    def _get_collection_name(cls: T):
+        object_name = cls.__name__
+        snake_case_name = re.sub(r'(?<!^)(?=[A-Z])', '_', object_name).lower()
+        return snake_case_name
+    
+    @classmethod
+    def get(cls: T, id: Union[str, ObjectId]) -> T:
+        class_instance = cls()
+        return cls(class_instance._get_data_load_object(class_instance._database.get(cls._get_collection_name(), id)))
 
-    def query(self: T, query: dict) -> list[T]:
-        return [self.__class__(self._get_data_load_object(record)) for record in self._database.query(self._name, query)]
+    @classmethod
+    def query(cls: T, query: dict) -> list[T]:
+        class_instance = cls()
+        return [cls(class_instance._get_data_load_object(record)) for record in class_instance._database.query(cls._get_collection_name(), query)]
 
     def unlink(self):
-        self._database.delete(self._name, self._id)
+        self._database.delete(self._get_collection_name(), self._id)
         self._id = None
 
     def __repr__(self) -> str:
         field_data_keys = [key for key in self.__dict__ if key not in _filter_out_load_object_key]
         sorted_field_data = {key: self.__dict__[key] for key in sorted(field_data_keys)}
-        return f"<{self._name} {sorted_field_data}>"
+        return f"<{self._get_collection_name()} {sorted_field_data}>"

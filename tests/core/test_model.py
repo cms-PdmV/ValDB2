@@ -4,10 +4,9 @@ from core.database import MongoDatabase
 from core.test import TestCase
 import os
 
-collection_name_1 = 'test_collection_1'
+new_model_collection_name = 'new_model'
 
 class NewModel(Model):
-    _name = collection_name_1
     name: str
     amount: int
     active: bool
@@ -16,7 +15,7 @@ class TestModel(TestCase):
 
     def __init__(self, *args, **kwargs):
         db = MongoDatabase()
-        db.database.drop_collection(collection_name_1)
+        db.database.drop_collection(new_model_collection_name)
         super().__init__(*args, **kwargs)
 
     def test_save_get(self):
@@ -34,13 +33,13 @@ class TestModel(TestCase):
         data2.save()
 
         self.assertTrue(isinstance(data1._id, ObjectId))
-        db_data1 = db.database[collection_name_1].find_one({'_id': data1._id})
+        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1._id})
         self.assertEqual(db_data1['name'], 'test_name')
         self.assertEqual(db_data1['amount'], 5)
         self.assertEqual(db_data1['active'], True)
 
         self.assertTrue(isinstance(data2._id, ObjectId))
-        db_data2 = db.database[collection_name_1].find_one({'_id': data2._id})
+        db_data2 = db.database[new_model_collection_name].find_one({'_id': data2._id})
         self.assertEqual(db_data2['name'], 'test_name2')
         self.assertEqual(db_data2['amount'], 10)
         self.assertEqual(db_data2['active'], False)
@@ -52,7 +51,7 @@ class TestModel(TestCase):
         }).save()
 
         self.assertTrue(isinstance(data3._id, ObjectId))
-        db_data3 = db.database[collection_name_1].find_one({'_id': data3._id})
+        db_data3 = db.database[new_model_collection_name].find_one({'_id': data3._id})
         self.assertEqual(db_data3['name'], 'test_name3')
         self.assertEqual(db_data3['amount'], 20)
         self.assertEqual(db_data3['active'], True)
@@ -60,7 +59,7 @@ class TestModel(TestCase):
         data1.amount = 50
         data1.save()
 
-        db_data1 = db.database[collection_name_1].find_one({'_id': data1._id})
+        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1._id})
         self.assertEqual(db_data1['amount'], 50)
 
     def test_get(self):
@@ -78,8 +77,8 @@ class TestModel(TestCase):
 
         self.assertTrue(isinstance(data1._id, ObjectId))
         self.assertTrue(isinstance(data2._id, ObjectId))
-        db_data1 = NewModel().get(data1._id)
-        db_data2 = NewModel().get(data2._id)
+        db_data1 = NewModel.get(data1._id)
+        db_data2 = NewModel.get(data2._id)
         self.assertEqual(db_data1.name, 'test_name')
         self.assertEqual(db_data2.name, 'test_name2')
         self.assertEqual(db_data1.amount, 5)
@@ -89,9 +88,9 @@ class TestModel(TestCase):
 
     def test_query(self):
         db = MongoDatabase()
-        db.database.drop_collection(collection_name_1)
+        db.database.drop_collection(new_model_collection_name)
 
-        self.assertEqual(len(NewModel().query({})), 0)
+        self.assertEqual(len(NewModel.query({})), 0)
 
         data1 = NewModel()
         data1.name = 'test_name'
@@ -105,8 +104,8 @@ class TestModel(TestCase):
         data2.active = False
         data2.save()
 
-        self.assertEqual(len(NewModel().query({})), 2)
-        queried_data1 = NewModel().query({'name': 'test_name'})
+        self.assertEqual(len(NewModel.query({})), 2)
+        queried_data1 = NewModel.query({'name': 'test_name'})
         self.assertEqual(len(queried_data1), 1)
         self.assertEqual(queried_data1[0]._id, data1._id)
 
@@ -120,11 +119,11 @@ class TestModel(TestCase):
         data1.save()
 
         data1_id = data1._id
-        db_data1 = db.database[collection_name_1].find_one({'_id': data1_id})
+        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1_id})
         self.assertEqual(db_data1['_id'],  data1._id)
 
         data1.unlink()
-        db_data1 = db.database[collection_name_1].find_one({'_id': data1_id})
+        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1_id})
         self.assertEqual(db_data1,  None)
         self.assertEqual(data1._id,  None)
         self.assertEqual(data1.name,  'test_name_to_be_deleted')
@@ -132,14 +131,13 @@ class TestModel(TestCase):
         data1.save()
         self.assertTrue(isinstance(data1._id, ObjectId))
         self.assertNotEqual(data1._id, data1_id)
-        db_data1 = db.database[collection_name_1].find_one({'_id': data1._id})
+        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1._id})
         self.assertEqual(db_data1['_id'],  data1._id)
         self.assertEqual(db_data1['name'],  'test_name_to_be_deleted')
 
     def test_model_reference_save(self):
-        parent_collection_name = 'test_parent'
+        new_parent_collection_name = 'new_parent_model'
         class NewParentModel(Model):
-            _name = parent_collection_name
             name: str
             childs: list[NewModel]
 
@@ -154,7 +152,7 @@ class TestModel(TestCase):
             'childs': [child1, child2, child3],
         }).save()
 
-        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent._id})
         self.assertTrue(isinstance(parent._id, ObjectId))
         self.assertTrue(len(db_parent['childs']), 3)
         self.assertTrue(db_parent['childs'][0], child1._id)
@@ -166,7 +164,7 @@ class TestModel(TestCase):
         parent.childs.append(child4)
 
         parent.save()
-        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent._id})
         self.assertTrue(len(db_parent['childs']), 4)
         self.assertTrue(db_parent['childs'][3], child4._id)
 
@@ -184,9 +182,8 @@ class TestModel(TestCase):
         #     parent.save()
 
     def test_model_non_reference_save(self):
-        parent_collection_name = 'test_parent'
+        new_parent_collection_name = 'new_parent_model'
         class NewParentModel(Model):
-            _name = parent_collection_name
             name: str
             childs: list[str]
 
@@ -198,17 +195,13 @@ class TestModel(TestCase):
         parent.save()
 
         db = MongoDatabase()
-        db_parent = db.database[parent_collection_name].find_one({'_id': parent._id})
+        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent._id})
         self.assertEqual(db_parent['childs'], ['a', 'b', 'c'])
 
     def test_model_reference_get(self):
-        parent_collection_name = 'test_parent'
         class NewParentModel(Model):
-            _name = parent_collection_name
             name: str
             childs: list[NewModel]
-
-        db = MongoDatabase()
 
         child1 = NewModel({'name': 'c1'}).save()
         child2 = NewModel({'name': 'c2'}).save()
@@ -219,7 +212,7 @@ class TestModel(TestCase):
             'childs': [child1, child2, child3],
         }).save()
 
-        fetched_parent = NewParentModel().get(parent._id)
+        fetched_parent = NewParentModel.get(parent._id)
         self.assertEqual(len(fetched_parent.childs), 3)
         self.assertEqual(fetched_parent.childs[0]._id, child1._id)
         self.assertEqual(fetched_parent.childs[1]._id, child2._id)
@@ -228,4 +221,7 @@ class TestModel(TestCase):
         self.assertTrue(isinstance(fetched_parent.childs[0], NewModel))
         self.assertTrue(isinstance(fetched_parent.childs[1], NewModel))
         self.assertTrue(isinstance(fetched_parent.childs[2], NewModel))
+
+    def test_get_collection_name(self):
+        self.assertEqual(NewModel._get_collection_name(), new_model_collection_name)
         
