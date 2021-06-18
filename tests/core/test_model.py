@@ -2,7 +2,7 @@ from bson.objectid import ObjectId
 from core.model import Model
 from core.database import MongoDatabase
 from core.test import TestCase
-import os
+from enum import Enum
 
 new_model_collection_name = 'new_model'
 
@@ -224,4 +224,38 @@ class TestModel(TestCase):
 
     def test_get_collection_name(self):
         self.assertEqual(NewModel._get_collection_name(), new_model_collection_name)
+
+    def test_type_enum(self):
+        class Status(Enum):
+            TODO = 1
+            IN_PROGRESS = 2
+            DONE = 3
+
+        class Todo(Model):
+            name: str
+            status: Status
+
+        db = MongoDatabase()
+
+        todo1 = Todo()
+        todo1.name = 'todo_1'
+        todo1.status = Status.TODO
+        todo1.save()
+
+        fetched_todo1 = Todo.get(todo1._id)
+        db_todo1 = db.database['todo'].find_one({'_id': todo1._id})
+        self.assertTrue(isinstance(fetched_todo1.status, Status))
+        self.assertEqual(fetched_todo1.status, Status.TODO)
+        self.assertEqual(db_todo1['status'], 1)
+
+        todo1.status = Status.DONE
+        todo1.save()
+
+        fetched_todo1 = Todo.get(todo1._id)
+        db_todo1 = db.database['todo'].find_one({'_id': todo1._id})
+        self.assertTrue(isinstance(fetched_todo1.status, Status))
+        self.assertEqual(fetched_todo1.status, Status.DONE)
+        self.assertEqual(db_todo1['status'], 3)
+
+
         

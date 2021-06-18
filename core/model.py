@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
@@ -29,13 +30,17 @@ class Model:
                 continue
 
             value = data[key]
-            if self._is_reference_field(key):
+            if key == '_id': # is _id
+                data_load_object[key] = value
+            elif self._is_reference_field(key): # is one2many reference
                 elements = []
                 reference_model = self._get_reference_model_of_field(key)
                 for element in value:
                     elements.append(reference_model().get(element))
                 data_load_object[key] = elements
-            else:
+            elif self.__annotations__[key].__base__ is Enum: # is enum
+                data_load_object[key] = self.__annotations__[key](value)
+            else: # is general type
                 data_load_object[key] = value
         return data_load_object
 
@@ -46,14 +51,16 @@ class Model:
                 continue
 
             value = self.__dict__[key]
-            if self._is_reference_field(key):
+            if self._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
                     if not element._is_saved():
                         element.save()
                     element_ids.append(element._id)
                 data_store_object[key] = element_ids
-            else:
+            elif isinstance(value, Enum): # is enum
+                data_store_object[key] = value.value
+            else: # is general type
                 data_store_object[key] = value
         return data_store_object
 
