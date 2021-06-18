@@ -7,7 +7,19 @@
 CMD=$1
 
 if [ "$CMD" = "dev" ]; then
-    python main.py
+    trap "exit" INT TERM ERR
+    trap "kill 0" EXIT
+    echo "Starting DEV python server"
+    python3 main.py &
+    python_pid=$!
+    echo "Starting DEV node server"
+    cd react_frontend/
+    yarn start &
+    npm_pid=$!
+    cd ..
+    echo "python pid $python_pid"
+    echo "npm pid $npm_pid"
+    wait
 fi
 
 if [ "$CMD" = "prod" ]; then
