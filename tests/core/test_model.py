@@ -10,6 +10,7 @@ class NewModel(Model):
     name: str
     amount: int
     active: bool
+    numbers: list[int]
 
 class TestModel(TestCase):
 
@@ -275,3 +276,18 @@ class TestModel(TestCase):
         self.assertTrue(isinstance(fetched_restaurant.category, Category))
         self.assertEqual(fetched_restaurant.category._id, thai_food_category._id)
         self.assertEqual(fetched_restaurant.category.name, 'thai')
+
+    def test_partial_set_object(self):
+        new_model1 = NewModel({
+            'name': 'new name'
+        }).save()
+
+        self.assertTrue(hasattr(new_model1, 'name'))
+        self.assertTrue(hasattr(new_model1, 'amount'))
+        self.assertTrue(hasattr(new_model1, 'active'))
+        self.assertTrue(hasattr(new_model1, 'numbers'))
+        self.assertIsNotNone(new_model1.name)
+        self.assertIsNone(new_model1.amount)
+        self.assertIsNone(new_model1.active)
+        self.assertIsNotNone(new_model1.numbers)
+        self.assertEqual(len(new_model1.numbers), 0)

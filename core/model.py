@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypeVar, Union, get_args
+from typing import TypeVar, Union, get_args, get_origin
 import re
 from bson.objectid import ObjectId
 from .database import get_database
@@ -19,9 +19,13 @@ class Model:
             self._set_value_from_data(data)
 
     def _set_value_from_data(self, data: dict):
-        for key, value in data.items():
-            if key in self.__annotations__ or key == '_id':
-                setattr(self, key, value)
+        if '_id' in data:
+            setattr(self, '_id', data.get('_id'))
+        for key in self.__annotations__:
+            if get_origin(self.__annotations__[key]) is list and key not in data: # if list is none -> set as empty list
+                setattr(self, key, [])
+                continue
+            setattr(self, key, data.get(key))
 
     def _get_data_load_object(self, data: dict) -> dict:
         data_load_object = {}
