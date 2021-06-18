@@ -291,3 +291,33 @@ class TestModel(TestCase):
         self.assertIsNone(new_model1.active)
         self.assertIsNotNone(new_model1.numbers)
         self.assertEqual(len(new_model1.numbers), 0)
+
+    def test_update(self):
+        new_model1 = NewModel()
+
+        self.assertIsNone(new_model1.name)
+        self.assertIsNone(new_model1.active)
+
+        new_model1.name = 'name'
+        new_model1.save()
+        new_model1_id = new_model1._id
+
+        self.assertIsNotNone(new_model1.name)
+        self.assertIsNone(new_model1.active)
+
+        fetched_new_model1 = NewModel.get(new_model1_id)
+        self.assertEqual(fetched_new_model1.name, 'name')
+        self.assertIsNone(fetched_new_model1.active)
+
+        new_model1.update({
+            'name': 'altered_name',
+            'active': True,
+        })
+
+        self.assertIsNotNone(new_model1.name)
+        self.assertIsNotNone(new_model1.active)
+        self.assertEqual(new_model1._id, new_model1_id)
+
+        fetched_new_model1 = NewModel.get(new_model1_id)
+        self.assertEqual(fetched_new_model1.name, 'altered_name')
+        self.assertEqual(fetched_new_model1.active, True)

@@ -12,11 +12,10 @@ T = TypeVar('T')
 class Model:
     _id: ObjectId
 
-    def __init__(self, data: dict=None):
+    def __init__(self, data: dict=dict()):
         database = get_database()
         self._database = database()
-        if data:
-            self._set_value_from_data(data)
+        self._set_value_from_data(data)
 
     def _set_value_from_data(self, data: dict):
         if '_id' in data:
@@ -89,6 +88,13 @@ class Model:
         else:
             saved_data_id = self._database.create(self._get_collection_name(), self._get_data_store_object())
             self._id = saved_data_id
+        return self
+
+    def update(self: T, data: dict) -> T:
+        for key in data:
+            if key in self.__annotations__:
+                setattr(self, key, data[key])
+        self.save()
         return self
 
     @classmethod
