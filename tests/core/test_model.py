@@ -1,5 +1,8 @@
+from datetime import datetime
 from bson.objectid import ObjectId
-from core.model import Model
+from flask_restx import fields
+from flask_restx.inputs import date
+from core.model import CustomField, Model
 from core.database import MongoDatabase
 from core.test import TestCase
 from enum import Enum
@@ -10,6 +13,24 @@ class NewModel(Model):
     name: str
     amount: int
     active: bool
+    numbers: list[int]
+
+class Status(Enum):
+    TODO = 1
+    DONE = 2
+
+class Child(Model):
+    name: str
+
+class AllTypeModel(Model):
+    name: str
+    number: int
+    value: float
+    active: bool
+    time_at: datetime
+    status: Status
+    child: Child
+    childs: list[Child]
     numbers: list[int]
 
 class TestModel(TestCase):
@@ -277,6 +298,17 @@ class TestModel(TestCase):
         self.assertEqual(fetched_restaurant.category._id, thai_food_category._id)
         self.assertEqual(fetched_restaurant.category.name, 'thai')
 
+    def test_type_datetime(self):
+        class DateTimeModel(Model):
+            field: datetime
+
+        current_time = datetime.utcnow()
+
+        data = DateTimeModel({'field': current_time}).save()
+        self.assertTrue(isinstance(data.field, datetime))
+        fetched_data = DateTimeModel.get(data._id)
+        self.assertTrue(isinstance(fetched_data.field, datetime))
+
     def test_partial_set_object(self):
         new_model1 = NewModel({
             'name': 'new name'
@@ -289,8 +321,7 @@ class TestModel(TestCase):
         self.assertIsNotNone(new_model1.name)
         self.assertIsNone(new_model1.amount)
         self.assertIsNone(new_model1.active)
-        self.assertIsNotNone(new_model1.numbers)
-        self.assertEqual(len(new_model1.numbers), 0)
+        self.assertIsNone(new_model1.numbers)
 
     def test_update(self):
         new_model1 = NewModel()
@@ -321,3 +352,74 @@ class TestModel(TestCase):
         fetched_new_model1 = NewModel.get(new_model1_id)
         self.assertEqual(fetched_new_model1.name, 'altered_name')
         self.assertEqual(fetched_new_model1.active, True)
+
+    def test_created_updated_field(self):
+        data = NewModel().save()
+
+        self.assertTrue(isinstance(data.created_at, datetime))
+        self.assertTrue(isinstance(data.updated_at, datetime))
+
+        data_created_at = data.created_at
+        data2 = data.save()
+
+        self.assertTrue(isinstance(data2.created_at, datetime))
+        self.assertTrue(isinstance(data2.updated_at, datetime))
+        self.assertTrue(data2.updated_at > data_created_at)
+        self.assertTrue(data2.created_at == data.created_at)
+
+    def test_dict_serialize(self):
+        child1 = Child({'name': 'child1'}).save()
+        child2 = Child({'name': 'child2'}).save()
+        child3 = Child({'name': 'child3'}).save()
+
+        data = AllTypeModel()
+        data.name = 'test'
+        data.number = 1
+        data.value = 3.14
+        data.active = True
+        data.time_at = datetime.utcnow()
+        data.status = Status.TODO
+        data.child = child1
+        data.childs = [child1, child2, child3]
+        data.numbers = [1, 2, 3]
+
+        data.save()
+        serialized_data = data.dict()
+
+        self.assertTrue(isinstance(serialized_data['_id'], str))
+        self.assertTrue(isinstance(serialized_data['created_at'], str))
+        self.assertTrue(isinstance(serialized_data['updated_at'], str))
+        self.assertTrue(isinstance(serialized_data['number'], int))
+        self.assertTrue(isinstance(serialized_data['value'], float))
+        self.assertTrue(isinstance(serialized_data['active'], bool))
+        self.assertTrue(isinstance(serialized_data['time_at'], str))
+        self.assertTrue(isinstance(serialized_data['status'], int))
+        self.assertTrue(isinstance(serialized_data['child'], dict))
+        self.assertTrue(isinstance(serialized_data['childs'], list))
+        self.assertTrue(isinstance(serialized_data['childs'][0], dict))
+        self.assertTrue(isinstance(serialized_data['childs'][0]['_id'], str))
+        self.assertTrue(isinstance(serialized_data['childs'][0]['name'], str))
+        self.assertTrue(isinstance(serialized_data['childs'][1], dict))
+        self.assertTrue(isinstance(serialized_data['childs'][1]['_id'], str))
+        self.assertTrue(isinstance(serialized_data['childs'][1]['name'], str))
+        self.assertTrue(isinstance(serialized_data['childs'][2], dict))
+        self.assertTrue(isinstance(serialized_data['childs'][2]['_id'], str))
+        self.assertTrue(isinstance(serialized_data['childs'][2]['name'], str))
+        self.assertTrue(isinstance(serialized_data['numbers'], list))
+        self.assertTrue(isinstance(serialized_data['numbers'][0], int))
+        self.assertTrue(isinstance(serialized_data['numbers'][1], int))
+        self.assertTrue(isinstance(serialized_data['numbers'][2], int))
+
+    def test_get_restx_fields(self):
+        restx_fields = AllTypeModel.get_flask_restx_fields()
+        self.assertTrue(restx_fields['_id'] is fields.String)
+        self.assertTrue(restx_fields['created_at'] is fields.DateTime)
+        self.assertTrue(restx_fields['updated_at'] is fields.DateTime)
+        self.assertTrue(restx_fields['number'] is fields.Integer)
+        self.assertTrue(restx_fields['value'] is fields.Float)
+        self.assertTrue(restx_fields['active'] is fields.Boolean)
+        self.assertTrue(restx_fields['time_at'] is fields.DateTime)
+        self.assertTrue(restx_fields['status'], fields.Integer)
+        self.assertTrue(isinstance(restx_fields['child'], CustomField))
+        self.assertTrue(isinstance(restx_fields['childs'], fields.List))
+        self.assertTrue(isinstance(restx_fields['numbers'], fields.List))
