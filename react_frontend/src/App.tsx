@@ -4,6 +4,8 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import { TodoPage } from "./pages/todo"
+import { ReportPage } from './pages/report';
 
 function App() {
   return (
@@ -14,6 +16,12 @@ function App() {
         </Route>
         <Route path="/users">
           users
+        </Route>
+        <Route path="/todo">
+          <TodoPage />
+        </Route>
+        <Route path="/report">
+          <ReportPage />
         </Route>
         <Route path="/">
           home

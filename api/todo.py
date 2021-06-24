@@ -1,5 +1,3 @@
-from datetime import datetime
-from tests.core.test_model import AllTypeModel
 from models.todo import Todo
 from flask_restx import Resource
 from core import Namespace
@@ -7,7 +5,6 @@ from core import Namespace
 api = Namespace('todo', description='todo list from the system')
 
 todo_model = api.model(Todo)
-mixed_model = api.model(AllTypeModel)
 
 @api.route('/')
 class TodoListAPI(Resource):

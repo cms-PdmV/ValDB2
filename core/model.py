@@ -40,7 +40,7 @@ class Model():
     def _get_data_load_object(self, data: dict) -> dict:
         data_load_object = {}
         for key in data:
-            if key in _filter_out_load_object_key or key not in data:
+            if key in _filter_out_load_object_key or key not in data or key not in self._fields:
                 continue
 
             value = data[key]
@@ -182,7 +182,7 @@ class Model():
         elif type_of_field is float:
             restx_field = fields.Float
         elif type_of_field is datetime:
-            restx_field = fields.DateTime
+            restx_field = fields.String
         elif type_of_field is bool:
             restx_field = fields.Boolean
         elif is_list:
@@ -202,8 +202,8 @@ class Model():
         '''
         restx_fields = {}
         restx_fields['_id'] = fields.String
-        restx_fields['created_at'] = fields.DateTime
-        restx_fields['updated_at'] = fields.DateTime
+        restx_fields['created_at'] = fields.String
+        restx_fields['updated_at'] = fields.String
         for key in cls.__annotations__:
             type_of_field = cls.__annotations__[key]
             restx_fields[key] = cls._get_flask_restx_field(type_of_field)
