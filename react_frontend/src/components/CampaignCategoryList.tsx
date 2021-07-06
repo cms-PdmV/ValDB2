@@ -1,14 +1,14 @@
 import { Box, Accordion, AccordionDetails, AccordionSummary, Button, Divider, List, ListItem, Checkbox, FormControlLabel, IconButton } from "@material-ui/core";
-import { CampaignCategory, CampaignSubCategory } from "../types";
+import { Category } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faCaretDown, faBullseye, faPenSquare } from '@fortawesome/free-solid-svg-icons';
 import { useState } from "react";
 
 
 interface CamapignCategoryListProp {
-  categories: CampaignCategory[]
+  categories: Category[]
   selectable?: boolean
-  editable?: boolean
+  onChange?: (selectedCategories: string[]) => void
 }
 
 const checkboxStyle = {
@@ -19,94 +19,72 @@ const checkboxStyle = {
   }
 }
 
-type CampaignSubCategoryItem = CampaignSubCategory & {
-  selected: boolean
-}
-
-type CampaignCategoryItem = CampaignCategory & {
-  selected: boolean
-  indeterminated: boolean
-  subcategories: CampaignSubCategoryItem[]
-}
-
-const generateItem = (categories: CampaignCategory[]): CampaignCategoryItem[] => (
-  categories.map((category) => ({
-    selected: false,
-    indeterminated: false,
-    ...category,
-    subcategories: category.subcategories.map((subcategory) => ({
-      ...subcategory,
-      selected: false,
-    })) as CampaignSubCategoryItem[],
-  }))
+const generateSubItemArray = (categories: Category[]): boolean[][] => (
+  categories.map(category => category.subcategories.map(_ => false))
+)
+const generateItemArray = (categories: Category[]): boolean[] => (
+  categories.map(_ => false)
 )
 
-export function CamapignCategoryList(prop: CamapignCategoryListProp) {
+export function CampaignCategoryList(prop: CamapignCategoryListProp) {
 
-  const [categories, setCategories] = useState<CampaignCategoryItem[]>(generateItem(prop.categories))
+  const [subItems, setSubItems] = useState<boolean[][]>(generateSubItemArray(prop.categories))
+  const [items, setItems] = useState<boolean[]>(generateItemArray(prop.categories))
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>, index: number, checked: boolean) => {
     e.stopPropagation()
-    console.log(checked)
-    console.log(categories[index].selected)
-    if (categories[index].indeterminated && checked) {
-      categories[index].selected = false
-      categories[index].indeterminated = false
-      categories[index].subcategories.forEach((subcatagory: CampaignSubCategoryItem) => { subcatagory.selected = false })
-    } else {
-      categories[index].selected = checked
-      categories[index].indeterminated = false
-      categories[index].subcategories.forEach((subcatagory: CampaignSubCategoryItem) => { subcatagory.selected = checked })
-    }
-    updateCategories()
+    items[index] = checked
+    subItems[index] = subItems[index].map(_ => checked)
+    updateItems()
   }
 
-  const updateCategories = () => {
-    const newCategory = [...categories]
-    setCategories(newCategory)
+  const updateItems = () => {
+    const newItems = [...items]
+    const newSubItems = [...subItems]
+    setItems(newItems)
+    setSubItems(newSubItems)
+    if (prop.onChange) {
+      const selectedCategoryPaths: string[] = []
+      newSubItems.forEach((item, index) => {
+        item.forEach((e, subindex) => {
+          if (e === true) {
+            selectedCategoryPaths.push(`${prop.categories[index].name}.${prop.categories[index].subcategories[subindex].name}`)
+          }
+        })
+      })
+      prop.onChange(selectedCategoryPaths)
+    }
   }
 
   const handleSubCheck = (e: React.ChangeEvent<HTMLInputElement>, index: number, subindex: number, checked: boolean) => {
     e.stopPropagation()
-    categories[index].subcategories[subindex].selected = checked
-    categories[index].indeterminated = categories[index].subcategories.some((subcategory: CampaignSubCategoryItem) => subcategory.selected)
-    categories[index].selected = categories[index].subcategories.every((subcategory: CampaignSubCategoryItem) => subcategory.selected)
-    updateCategories()
+    subItems[index][subindex] = checked
+    items[index] = subItems[index].every(e => e === true)
+    updateItems()
   }
 
   return (
     <Box width="100%">
-      { prop.editable && <>
-        <Button variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create</Button>
-        <Box height="1rem"/> 
-      </>}
-      { categories.map((category, index) => <Accordion>
+      { prop.categories.map((category, index) => <Accordion>
         <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown}/>}>
           { prop.selectable && <FormControlLabel
             onClick={(event) => event.stopPropagation()}
-            control={ prop.selectable ? <Checkbox checked={categories[index].selected} indeterminate={!categories[index].selected && categories[index].indeterminated} onChange={(e, checked) => handleCheck(e, index, checked)} size="small" {...checkboxStyle}/> : <div />}
+            control={ prop.selectable ? <Checkbox checked={items[index]} indeterminate={subItems[index].some(e => e === true) && !subItems[index].every(e => e === true) } onChange={(e, checked) => handleCheck(e, index, checked)} size="small" {...checkboxStyle}/> : <div />}
             label={category.name}
           /> }
-          { prop.editable && <>{category.name}&nbsp;&nbsp;<IconButton onClick={(e) => e.stopPropagation()} size="small"><FontAwesomeIcon icon={faPenSquare}/></IconButton></> }
-          { (!prop.selectable && !prop.editable) && category.name }
+          { !prop.selectable && category.name }
         </AccordionSummary>
         <AccordionDetails style={{padding: 0}}>
-          <Box width="100%">
-            { prop.editable && <Box padding="1rem">
-              <Button variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create Sub Category</Button>
-            </Box>}
-          
+          <Box width="100%">          
             <List style={{padding: 0}}>
               <Divider />
               { category.subcategories.map((subcategory, subindex) => 
                 <ListItem divider style={{padding: '1rem 2rem'}}>
-                  { prop.selectable && <Checkbox checked={categories[index].subcategories[subindex].selected} size="small" onChange={(e, checked) => handleSubCheck(e, index, subindex, checked)} {...checkboxStyle}/>}
+                  { prop.selectable && <Checkbox checked={subItems[index][subindex]} size="small" onChange={(e, checked) => handleSubCheck(e, index, subindex, checked)} {...checkboxStyle}/>}
                   {subcategory.name}
-                  { prop.editable && <>&nbsp;&nbsp;<IconButton onClick={(e) => e.stopPropagation()} size="small"><FontAwesomeIcon icon={faPenSquare}/></IconButton></> }
                 </ListItem>
               )}
             </List>
-
           </Box>
         </AccordionDetails>
       </Accordion>)}

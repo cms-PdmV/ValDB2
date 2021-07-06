@@ -21,6 +21,14 @@
   font-size: 26px;
 }
 
+.MuiChip-root {
+  height: 26px !important;
+}
+
+.MuiInputBase-root {
+  background: #ffffff !important;
+}
+
 input {
   background: #ffffff !important;
 }

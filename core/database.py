@@ -25,10 +25,15 @@ class MongoDatabase():
     def create(self, collection_name: str, data: object) -> ObjectId:
         return self.database[collection_name].insert_one(data).inserted_id
 
-    def query(self, collection_name: str, query: dict):
+    def query(self, collection_name: str, query: dict, sort):
         data = []
-        for record in self.database[collection_name].find(query):
-            data.append(record)
+        print(sort)
+        if sort:
+            for record in self.database[collection_name].find(query).sort(sort):
+                data.append(record)
+        else:
+            for record in self.database[collection_name].find(query):
+                data.append(record)
         return data
     
     def get(self, collection_name: str, id: Union[str, ObjectId]):
@@ -41,6 +46,9 @@ class MongoDatabase():
 
     def delete(self, collection_name: str, id: ObjectId):
         self.database[collection_name].find_one_and_delete({'_id': id})
+
+    def count(self, collection_name: str, filter: dict = {}) -> int:
+        return self.database[collection_name].count_documents(filter)
 
 database_connector = {
     'mongo': MongoDatabase

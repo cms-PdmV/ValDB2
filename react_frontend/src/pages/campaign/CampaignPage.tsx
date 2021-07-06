@@ -1,52 +1,96 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box } from "@material-ui/core";
-import { useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router";
 import { Container } from "../../components/Container";
+import { HorizontalLine } from "../../components/HorizontalLine";
 import { NavBar } from "../../components/NavBar";
+import { ReportCompactGroupTable } from "../../components/ReportCompactTable";
+import { Spacer } from "../../components/Spacer";
+import { VerticleLine } from "../../components/VerticleLine";
+import { campaignService, reportService } from "../../services";
+import { Campaign, CampaignGroup } from "../../types";
 
-function createData(name: any, calories: any, fat: any, carbs: any, protein: any) {
-  return { name, calories, fat, carbs, protein };
-}
+export function CampaignPage() {
+  const { id }: any = useParams();
+  const [campaign, setCampaign] = useState<Campaign>()
+  const [groups, setGroups] = useState<CampaignGroup[]>()
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-]
+  const history = useHistory()
 
-export function CampaignPage () {
-  
+  useEffect(() => {
+    campaignService.get(id).then(response => {
+      if (response.status) {
+        console.log(response.data)
+        setCampaign(response.data.campaign)
+        setGroups(response.data.groups)
+      } else {
+        alert('ops')
+      }
+    }).catch((error) => {
+      alert(error.message)
+    })
+  }, [])
+
+  const handleOpenReport = (groupPath: string, query: string='') => {
+    if (campaign) {
+      history.push(`/campaigns/${campaign.name}/report/${groupPath}${query}`)
+    }
+  }
+
+  const handleCreateReport = (groupPath: string) => {
+    // console.log(groupPath)
+    if (campaign) {
+      reportService.create({
+        campaign_name: campaign.name,
+        group: groupPath,
+      }).then(result => {
+        if (result.status) {
+          console.log(result.data)
+          handleOpenReport(groupPath, '?&edit')
+        } else {
+          alert('ops')
+        }
+      }).catch(error => alert(error))
+    }
+  }
 
   return (
     <>
       <NavBar />
       <Container>
-        <h1>Campaigns</h1>
-        <Button variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create</Button>
-        <Box height="1rem" />
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead style={{fontWeight: 'bold'}}>
-              <TableRow>
-                <TableCell>Campaign Name</TableCell>
-                <TableCell align="left">Categories</TableCell>
-                <TableCell align="right">Create Date</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell component="th" scope="row">{row.name}</TableCell>
-                  <TableCell align="left"><Chip label="HTL" /> </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {campaign && <>
+          {/* <Box marginTop="1rem" color="#707070">{id}</Box> */}
+          <Box fontWeight="bold" fontSize="2rem">{campaign.name}</Box>
+          <Box height="1rem" />
+          <Box fontSize="1rem" color="#505050">{campaign.description}</Box>
+          <Spacer rem={2} />
+          <Chip label={`Target Release: ${campaign.target_release}`} />
+          <Spacer inline />
+          <Chip label={`Reference Release: ${campaign.reference_release}`} />
+          <Spacer />
+          <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Created: {campaign.created_at && campaign.created_at.split(' ')[0]}</Box>
+          {/* <VerticleLine /> */}
+          <Spacer rem={0.5} />
+          <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign.deadline && campaign.deadline.split(' ')[0]}</Box>
+          {/* <Spacer />
+          <Button variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create Report</Button> */}
+          <Box height="2rem" />
+          <HorizontalLine />
+          <Box height="2rem" />
+          <Box fontSize="1.5rem" fontWeight="bold">Reports</Box>
+          <Box height="1rem" />
+          {groups?.map((group, index) =>
+            <Box>
+              <h3>{group.category}</h3>
+              {group.subcategories.map((subcategory, index) => <>
+                <h4>{subcategory.subcategory}</h4>
+                <ReportCompactGroupTable onGroupCreate={handleCreateReport} onGroupOpen={handleOpenReport} groups={subcategory.groups} />
+              </>)}
+            </Box>
+          )}
+        </>}
       </Container>
     </>
   )

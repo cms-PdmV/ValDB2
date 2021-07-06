@@ -1,13 +1,13 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 
-const getAllTodo = (): Promise<Todo[]> => axios.get('http://localhost:5000/todo').then(result => result.data)
-const createTodo = (label: string): Promise<void> => axios.post('http://localhost:5000/todo/', {
+const getAllTodo = (): Promise<Todo[]> => axios.get('http://localhost:5000/api/todo').then(result => result.data)
+const createTodo = (label: string): Promise<void> => axios.post('http://localhost:5000/api/todo/', {
   name: label,
   is_done: false,
 })
-const deleteTodo = (id: string): Promise<void> => axios.delete(`http://localhost:5000/todo/${id}`)
-const updateTodo = (id: string, body: object): Promise<void> => axios.put(`http://localhost:5000/todo/${id}`, body)
+const deleteTodo = (id: string): Promise<void> => axios.delete(`http://localhost:5000/api/todo/${id}`)
+const updateTodo = (id: string, body: object): Promise<void> => axios.put(`http://localhost:5000/api/todo/${id}`, body)
 
 interface TodoListProp {
   id: string,

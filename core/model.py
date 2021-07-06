@@ -39,6 +39,8 @@ class Model():
 
     def _get_data_load_object(self, data: dict) -> dict:
         data_load_object = {}
+        if not data:
+            return data_load_object
         for key in data:
             if key in _filter_out_load_object_key or key not in data or key not in self._fields:
                 continue
@@ -67,6 +69,8 @@ class Model():
                 continue
 
             value = self.__dict__[key]
+            if value is None:
+                    continue
             if self._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
@@ -128,9 +132,10 @@ class Model():
         return cls(class_instance._get_data_load_object(class_instance._database.get(cls._get_collection_name(), id)))
 
     @classmethod
-    def query(cls: T, query: dict) -> list[T]:
+    def query(cls: T, query: dict, sort=None) -> list[T]:
+        print(sort)
         class_instance = cls()
-        return [cls(class_instance._get_data_load_object(record)) for record in class_instance._database.query(cls._get_collection_name(), query)]
+        return [cls(class_instance._get_data_load_object(record)) for record in class_instance._database.query(cls._get_collection_name(), query, sort)]
 
     def unlink(self):
         self._database.delete(self._get_collection_name(), self._id)
@@ -146,6 +151,12 @@ class Model():
             value = getattr(self, key)
             data_as_dict[key] = self._serialize(value)
         return data_as_dict
+
+    def parse_datetime(self, format="%Y-%m-%d"):
+        for field in self._fields:
+            if hasattr(self, field) and self.__annotations__.get(field) is datetime and isinstance(getattr(self, field), str):
+                datetime_object = datetime.strptime(getattr(self, field), format)
+                setattr(self, field, datetime_object)
 
     def _serialize(self, value):
         serialized_data = None

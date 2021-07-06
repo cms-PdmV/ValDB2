@@ -72,7 +72,7 @@ class TestDatabase(TestCase):
             },
             'boolean_field': False,
         }
-        query_result = self.database.query(collection_name, query_string)
+        query_result = self.database.query(collection_name, query_string, None)
         db_query_result = self.database_client[collection_name].find(query_string)
         
         list_db_query_result = list(db_query_result)

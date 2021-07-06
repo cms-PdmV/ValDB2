@@ -9,9 +9,10 @@ import { ReportPage } from './pages/ReportPage';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { primaryColor } from './utils/css';
 import { AdministratorPage } from './pages/AdministratorPage';
-import { CampaignPage } from './pages/campaign/CampaignPage';
+import { AllCampaignPage } from './pages/campaign/AllCampaignPage';
 import { CampaignFormPage } from './pages/campaign/CampaignFormPage';
-import { CampaignViewPage } from './pages/campaign/CampaignViewPage';
+import { CampaignPage } from './pages/campaign/CampaignPage';
+import { ReportCreatePage } from './pages/ReportCreatePage';
 
 const originalTheme = createMuiTheme();
 
@@ -47,18 +48,21 @@ function App() {
           <Route path="/campaigns/new">
             <CampaignFormPage />
           </Route>
+          <Route path="/campaigns/:campaign/report/:group">
+            <ReportPage />
+          </Route>
           <Route path="/campaigns/:id/edit">
             <CampaignFormPage />
           </Route>
           <Route path="/campaigns/:id">
-            <CampaignViewPage />
-          </Route>
-          <Route path="/campaigns">
             <CampaignPage />
           </Route>
-          <Route path="/reports">
-            <ReportPage />
+          <Route path="/campaigns">
+            <AllCampaignPage />
           </Route>
+          {/* <Route path="/reports/new">
+            <ReportCreatePage />
+          </Route> */}
           <Route path="/admin">
             <AdministratorPage />
           </Route>
