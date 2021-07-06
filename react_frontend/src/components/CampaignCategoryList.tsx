@@ -1,7 +1,7 @@
-import { Box, Accordion, AccordionDetails, AccordionSummary, Button, Divider, List, ListItem, Checkbox, FormControlLabel, IconButton } from "@material-ui/core";
+import { Box, Accordion, AccordionDetails, AccordionSummary, Divider, List, ListItem, Checkbox, FormControlLabel } from "@material-ui/core";
 import { Category } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faCaretDown, faBullseye, faPenSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { useState } from "react";
 
 

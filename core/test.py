@@ -1,4 +1,3 @@
-from logging import log
 import unittest
 from dotenv import load_dotenv
 from .database import get_database

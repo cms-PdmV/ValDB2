@@ -1,21 +1,16 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box, TextField } from "@material-ui/core";
+import { Button, Box, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { CampaignCategoryList } from "../../components/CampaignCategoryList";
-import { Container } from "../../components/Container";
-import { NavBar } from "../../components/NavBar";
-import { VerticleLine } from "../../components/VerticleLine";
-// import { mockCampaignCategories } from "../../utils/mock";
-import { campaignService, categoryService } from "../../services"
-import { Campaign, Category } from "../../types";
+import { CampaignCategoryList } from "../components/CampaignCategoryList";
+import { Container } from "../components/Container";
+import { NavBar } from "../components/NavBar";
+import { campaignService, categoryService } from "../services"
+import { Campaign, Category } from "../types";
 import { useForm } from 'react-hook-form';
-import { Spacer } from "../../components/Spacer";
+import { Spacer } from "../components/Spacer";
 import { useHistory } from "react-router";
 
-function createData(name: any, calories: any, fat: any, carbs: any, protein: any) {
-  return { name, calories, fat, carbs, protein };
-}
 
 export function CampaignFormPage () {
 

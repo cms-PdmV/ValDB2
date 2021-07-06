@@ -11,7 +11,6 @@ class TodoListAPI(Resource):
     @api.marshal_list_with(todo_model)
     def get(self):
         todos = Todo.query({})
-        print(todos)
         return [todo.dict() for todo in todos]
 
     @api.marshal_with(todo_model)

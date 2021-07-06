@@ -4,13 +4,15 @@ from api.campaign import CampaignAPI
 
 class CampaignTest(TestCase):
 
-    def test_get(self):
+    def test_get_return_correct_groups(self):
         campaign = Campaign({
             'subcategories': ['Reconstruction.Data', 'Reconstruction.FullSim', 'GEN.Gen'],
             'reports': []
-        }).create()
+        }).save()
         api = CampaignAPI()
-        result = api.get(campaign.id)
+        result = api.get(campaign.name)
 
-        print(result)
-        # TODO: assert
+        self.assertEqual(len(result['groups']), 2)
+        self.assertEqual(result['groups'][0]['category'], 'Reconstruction')
+        self.assertEqual(len(result['groups'][0]['subcategories']), 2)
+        self.assertEqual(result['groups'][0]['subcategories'][0]['subcategory'], 'Data')

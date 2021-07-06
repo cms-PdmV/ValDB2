@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 class MongoDatabase():
+
     # ensure single instance of database
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -27,7 +28,7 @@ class MongoDatabase():
 
     def query(self, collection_name: str, query: dict, sort):
         data = []
-        print(sort)
+        # TODO: add filter query
         if sort:
             for record in self.database[collection_name].find(query).sort(sort):
                 data.append(record)

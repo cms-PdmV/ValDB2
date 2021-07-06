@@ -1,7 +1,6 @@
 from datetime import datetime
 from bson.objectid import ObjectId
 from flask_restx import fields
-from flask_restx.inputs import date
 from core.model import CustomField, Model
 from core.database import MongoDatabase
 from core.test import TestCase

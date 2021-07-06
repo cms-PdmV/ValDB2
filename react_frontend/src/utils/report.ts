@@ -1,6 +1,6 @@
-import { faCheck, faExclamation, faPen, faQuestion, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faExclamation, faPen, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ReportStatus } from "../types";
-import { color, primaryColor } from "./css";
+import { color } from "./css";
 
 export const reportStatusStyle = {
     [ReportStatus.OK]: {

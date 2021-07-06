@@ -3,8 +3,7 @@ from enum import Enum
 from typing import TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
-from flask_restx import api, fields
-from flask_restx.namespace import Namespace
+from flask_restx import fields
 from .database import get_database
 
 _prefilled_fields = ['_id', 'created_at', 'updated_at']
@@ -133,11 +132,13 @@ class Model():
 
     @classmethod
     def query(cls: T, query: dict, sort=None) -> list[T]:
-        print(sort)
         class_instance = cls()
         return [cls(class_instance._get_data_load_object(record)) for record in class_instance._database.query(cls._get_collection_name(), query, sort)]
 
     def unlink(self):
+        '''
+        Remove record from the database
+        '''
         self._database.delete(self._get_collection_name(), self._id)
         self._id = None
 
@@ -153,6 +154,9 @@ class Model():
         return data_as_dict
 
     def parse_datetime(self, format="%Y-%m-%d"):
+        '''
+        Update datetime from request in the model
+        '''
         for field in self._fields:
             if hasattr(self, field) and self.__annotations__.get(field) is datetime and isinstance(getattr(self, field), str):
                 datetime_object = datetime.strptime(getattr(self, field), format)

@@ -1,8 +1,7 @@
-import { faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Tooltip } from "@material-ui/core";
-import { CampaignReportGroup, ReportStatus } from "../types";
-import { primaryColor } from "../utils/css";
+import { CampaignReportGroup } from "../types";
 import { reportStatusStyle } from "../utils/report";
 
 interface ReportCompactGroupTableProp {

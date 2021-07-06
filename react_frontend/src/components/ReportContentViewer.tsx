@@ -1,5 +1,4 @@
 import { Box } from '@material-ui/core';
-import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown'
 import gfm from 'remark-gfm'
 import { HorizontalLine } from './HorizontalLine';

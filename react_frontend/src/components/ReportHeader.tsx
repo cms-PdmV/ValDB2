@@ -1,6 +1,6 @@
-import { Avatar, Box, Button, Chip, IconButton, Menu, MenuItem, TextField, Tooltip } from "@material-ui/core";
+import { Avatar, Box, Button, Chip, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faCalendar, faSave, faTimes, faCheckCircle, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faCalendar, faSave, faTimes, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ReportEditorMode, ReportStatus } from "../types";
 import { useState } from "react";
 import { VerticleLine } from "./VerticleLine";
@@ -9,11 +9,9 @@ import { reportStatusStyle } from "../utils/report";
 
 interface ReportHeaderProp {
   mode: ReportEditorMode
-  // title: string
   campaign: string
   group: string
   status: ReportStatus
-  // description: string
   onChangeMode: (mode: ReportEditorMode) => void
   handleSave: () => void
   handleDiscard: () => void
@@ -21,11 +19,6 @@ interface ReportHeaderProp {
 }
 
 export function ReportHeader(prop: ReportHeaderProp) {
-
-  // const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false)
-  // const [editingTitle, setEditinTitle] = useState<string>(prop.title)
-  // const [isEditingDescription, setIsEditingDescription] = useState<boolean>(false)
-  // const [editingDescription, setEditingDescription] = useState<string>(prop.description)
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -51,25 +44,6 @@ export function ReportHeader(prop: ReportHeaderProp) {
     prop.onChangeMode('view')
   }
 
-  // const handleEditTitle = () => {
-  //   setEditinTitle(prop.title)
-  //   setIsEditingTitle(true)
-  // }
-
-  // const handleSaveTitle = () => {
-  //   prop.handleSaveTitle(editingTitle)
-  //   setIsEditingTitle(false)
-  // }
-  
-  // const handleEditDescription = () => {
-  //   setEditingDescription(prop.description)
-  //   setIsEditingDescription(true)
-  // }
-
-  // const handleSaveDescription = () => {
-  //   prop.handleSaveDescription(editingDescription)
-  //   setIsEditingDescription(false)
-  // }
   const statusLabel = (status: ReportStatus) => (
     <span>
       <Box display="inline-flex" width="26px" height="26px" borderRadius="4px" color="white" style={{background: reportStatusStyle[+status as ReportStatus].background_color}}><FontAwesomeIcon style={{margin: 'auto', fontSize: '14px'}} icon={reportStatusStyle[+status as ReportStatus].icon} /></Box>
@@ -107,24 +81,6 @@ export function ReportHeader(prop: ReportHeaderProp) {
       <Spacer />
       <Chip label={prop.group.split('.').join(' / ')}/>
       <Spacer />
-
-      {/* <TextField variant="outlined" size="small" fullWidth style={{height: '68px'}}/> */}
-
-      {/* <Box marginBottom="1rem">
-        { !isEditingDescription && <Tooltip title="Edit" placement="left">
-          <Button>
-            <Box lineHeight="normal" onClick={handleEditDescription} fontSize="1rem" color="#707070" textAlign="left" fontWeight="normal">
-              {prop.description || <span style={{fontStyle: 'italic'}}>Add description...</span>}
-            </Box>
-          </Button>
-        </Tooltip> }
-        { isEditingDescription &&
-          <Box display="flex">
-            <TextField size="small" multiline variant="outlined" value={editingDescription} onChange={(e) => setEditingDescription(e.target.value)} fullWidth/>
-            <IconButton color="primary" onClick={handleSaveDescription}><FontAwesomeIcon icon={faCheckCircle} /></IconButton>
-          </Box>
-        }
-      </Box> */}
       
       <Box marginBottom="1rem" display="flex" alignItems="center" color="#707070">
         <Avatar style={{width: '32px', height: '32px'}}>C</Avatar>

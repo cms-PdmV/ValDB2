@@ -5,6 +5,7 @@ from .campaign import api as campaign_namespace
 from .report import api as report_namespace
 from .group import api as group_namespace
 
+# TODO: change this to match system info
 api = Api(
     title='My Title',
     version='1.0',

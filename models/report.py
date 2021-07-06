@@ -10,11 +10,10 @@ class ReportStatus(Enum):
     IN_PROGRESS = 5
     KNOWN_ISSUE = 6
 
-
 class Report(Model):
     authors: list[User]
     group: str
     campaign_name: str
     status: ReportStatus
     content: str
-    # activities
+    # TODO: add activities

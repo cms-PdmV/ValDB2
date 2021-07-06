@@ -8,7 +8,6 @@ api = Namespace('groups', description='Show all available group in the system')
 class TodoListAPI(Resource):
 
     def get(self):
-        # print(groups)
         groups = []
         for key, value in group.items():
             groups.append({

@@ -1,19 +1,13 @@
 from models.report import Report, ReportStatus
-from api import campaign
-from core.database import get_database
-from datetime import datetime
 
-import pymongo
-from pymongo.database import Database
 from models.campaign import Campaign
 from flask_restx import Resource
-from flask_cors import cross_origin
 from core import Namespace
-from data.group import group
+
 
 api = Namespace('reports', description='Report in the system')
 
-campaign_model = api.model(Campaign)
+report_model = api.model(Report)
 
 @api.route('/')
 class ReportListAPI(Resource):
@@ -42,8 +36,8 @@ class ReportListAPI(Resource):
 @api.param('campaign', 'Campaign name')
 @api.param('group', 'Group path related to the report')
 class ReportSearchAPI(Resource):
+    @api.marshal_with(report_model)
     def get(self, campaign, group):
-        print('a')
         result = Report.query({
             'campaign_name': campaign,
             'group': group,

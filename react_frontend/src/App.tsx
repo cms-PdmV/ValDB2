@@ -1,18 +1,16 @@
-import React from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
-import { TodoPage } from "./pages/todo"
+import { TodoPage } from "./pages/Todo"
 import { ReportPage } from './pages/ReportPage';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { primaryColor } from './utils/css';
 import { AdministratorPage } from './pages/AdministratorPage';
-import { AllCampaignPage } from './pages/campaign/AllCampaignPage';
-import { CampaignFormPage } from './pages/campaign/CampaignFormPage';
-import { CampaignPage } from './pages/campaign/CampaignPage';
-import { ReportCreatePage } from './pages/ReportCreatePage';
+import { AllCampaignPage } from './pages/AllCampaignPage';
+import { CampaignFormPage } from './pages/CampaignFormPage';
+import { CampaignPage } from './pages/CampaignPage';
 
 const originalTheme = createMuiTheme();
 
@@ -60,9 +58,6 @@ function App() {
           <Route path="/campaigns">
             <AllCampaignPage />
           </Route>
-          {/* <Route path="/reports/new">
-            <ReportCreatePage />
-          </Route> */}
           <Route path="/admin">
             <AdministratorPage />
           </Route>

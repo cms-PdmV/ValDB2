@@ -2,23 +2,12 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router";
-import { Container } from "../../components/Container";
-import { NavBar } from "../../components/NavBar";
-import { campaignService } from "../../services";
-import { Campaign } from "../../types";
+import { useHistory } from "react-router";
+import { Container } from "../components/Container";
+import { NavBar } from "../components/NavBar";
+import { campaignService } from "../services";
+import { Campaign } from "../types";
 
-function createData(name: any, calories: any, fat: any, carbs: any, protein: any) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-]
 
 const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) == i) : []
 
@@ -38,13 +27,12 @@ export function AllCampaignPage () {
   useEffect(() => {
     campaignService.getAll().then(response => {
       if (response.status) {
-        // DOTHIS
         console.log(response.data)
         setCampaigns(response.data)
       } else {
-        alert('ops')
+        throw Error
       }
-    })
+    }).catch(error => alert(error))
   }, [])
 
   return (

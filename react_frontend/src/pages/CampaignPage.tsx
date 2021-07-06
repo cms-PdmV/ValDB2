@@ -1,16 +1,15 @@
-import { faCalendar, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box } from "@material-ui/core";
+import { Chip, Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { Container } from "../../components/Container";
-import { HorizontalLine } from "../../components/HorizontalLine";
-import { NavBar } from "../../components/NavBar";
-import { ReportCompactGroupTable } from "../../components/ReportCompactTable";
-import { Spacer } from "../../components/Spacer";
-import { VerticleLine } from "../../components/VerticleLine";
-import { campaignService, reportService } from "../../services";
-import { Campaign, CampaignGroup } from "../../types";
+import { Container } from "../components/Container";
+import { HorizontalLine } from "../components/HorizontalLine";
+import { NavBar } from "../components/NavBar";
+import { ReportCompactGroupTable } from "../components/ReportCompactTable";
+import { Spacer } from "../components/Spacer";
+import { campaignService, reportService } from "../services";
+import { Campaign, CampaignGroup } from "../types";
 
 export function CampaignPage() {
   const { id }: any = useParams();
@@ -26,11 +25,9 @@ export function CampaignPage() {
         setCampaign(response.data.campaign)
         setGroups(response.data.groups)
       } else {
-        alert('ops')
+        throw Error('Internal Error')
       }
-    }).catch((error) => {
-      alert(error.message)
-    })
+    }).catch(error => alert(error.message))
   }, [])
 
   const handleOpenReport = (groupPath: string, query: string='') => {
@@ -40,7 +37,6 @@ export function CampaignPage() {
   }
 
   const handleCreateReport = (groupPath: string) => {
-    // console.log(groupPath)
     if (campaign) {
       reportService.create({
         campaign_name: campaign.name,
@@ -50,7 +46,7 @@ export function CampaignPage() {
           console.log(result.data)
           handleOpenReport(groupPath, '?&edit')
         } else {
-          alert('ops')
+          throw Error('Internal Error')
         }
       }).catch(error => alert(error))
     }
@@ -61,7 +57,6 @@ export function CampaignPage() {
       <NavBar />
       <Container>
         {campaign && <>
-          {/* <Box marginTop="1rem" color="#707070">{id}</Box> */}
           <Box fontWeight="bold" fontSize="2rem">{campaign.name}</Box>
           <Box height="1rem" />
           <Box fontSize="1rem" color="#505050">{campaign.description}</Box>
@@ -74,8 +69,6 @@ export function CampaignPage() {
           {/* <VerticleLine /> */}
           <Spacer rem={0.5} />
           <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign.deadline && campaign.deadline.split(' ')[0]}</Box>
-          {/* <Spacer />
-          <Button variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create Report</Button> */}
           <Box height="2rem" />
           <HorizontalLine />
           <Box height="2rem" />
