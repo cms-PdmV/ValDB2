@@ -1,9 +1,3 @@
-
-# load .env variable if exists
-# if [ -f .env ]
-# then
-#     export $(cat .env | sed 's/#.*//g' | xargs)
-# fi
 CMD=$1
 
 if [ "$CMD" = "dev" ]; then

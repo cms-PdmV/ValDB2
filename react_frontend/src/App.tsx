@@ -12,8 +12,6 @@ import { AllCampaignPage } from './pages/AllCampaignPage';
 import { CampaignFormPage } from './pages/CampaignFormPage';
 import { CampaignPage } from './pages/CampaignPage';
 
-const originalTheme = createMuiTheme();
-
 const theme = createMuiTheme({      
   typography: {
     fontSize: 14,
