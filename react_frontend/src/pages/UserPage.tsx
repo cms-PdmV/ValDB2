@@ -19,17 +19,19 @@ export function UserPage() {
       <p><strong>Role:</strong> {userRoleLabel[user.role as UserRole]}</p>
       <p><strong>Email:</strong> {user.email}</p>
       <HorizontalLine />
-      <h2>Permission Group</h2>
-      {getCategoryGroupFromGroups(user.groups).map(category =>
-        category.subcategories.map(subcategory =>
-          <Box>
-            <h4>{category.category} / {subcategory.subcategory}</h4>
+      { user.role !== UserRole.USER && <Box>
+        <h2>Permission Group</h2>
+        {getCategoryGroupFromGroups(user.groups).map(category =>
+          category.subcategories.map(subcategory =>
             <Box>
-              {subcategory.groups.map(group => <Chip label={group.name} style={{margin: '0 0.5rem 0.5rem 0'}}/>)}
+              <h4>{category.category} / {subcategory.subcategory}</h4>
+              <Box>
+                {subcategory.groups.map(group => <Chip label={group.name} style={{margin: '0 0.5rem 0.5rem 0'}}/>)}
+              </Box>
             </Box>
-          </Box>
-        )
-      )}
+          )
+        )}
+      </Box>}
     </Container>
   )
 }

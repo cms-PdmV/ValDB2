@@ -49,6 +49,8 @@ function App() {
     console.log('hi')
   })
 
+  const require = (roles: UserRole[]) => user && roles.includes(user.role)
+
   return (
     <ThemeProvider theme={theme}>
       { user &&
@@ -57,13 +59,13 @@ function App() {
             <NavBar user={user}/>
             <Switch>
               <Route path="/campaigns/new">
-                <CampaignFormPage />
+                { require([UserRole.ADMIN]) && <CampaignFormPage /> }
               </Route>
               <Route path="/campaigns/:campaign/report/:group">
                 <ReportPage />
               </Route>
               <Route path="/campaigns/:id/edit">
-                <CampaignFormPage />
+                { require([UserRole.ADMIN]) && <CampaignFormPage /> }
               </Route>
               <Route path="/campaigns/:id">
                 <CampaignPage />
@@ -72,16 +74,16 @@ function App() {
                 <AllCampaignPage />
               </Route>
               <Route path="/reports">
-                <MyReportPage />
+                { require([UserRole.ADMIN, UserRole.VALIDATOR]) && <MyReportPage /> }
               </Route>
               <Route path="/admin/users/:id">
-                <AdminPage />
+                { require([UserRole.ADMIN]) && <AdminPage /> }
               </Route>
               <Route path="/admin/users">
-                <AllUserAdminPage />
+                { require([UserRole.ADMIN]) && <AllUserAdminPage /> }
               </Route>
               <Route path="/admin">
-                <AdminPage />
+                { require([UserRole.ADMIN]) && <AdminPage /> }
               </Route>
               <Route path="/user">
                 <UserPage />
@@ -90,7 +92,7 @@ function App() {
                 <TodoPage />
               </Route>
               <Route path="/">
-                home
+                <AllCampaignPage />
               </Route>
             </Switch>
           </Router>

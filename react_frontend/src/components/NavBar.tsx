@@ -27,8 +27,10 @@ export function NavBar(prop: NavBarProp) {
       <Box marginLeft="auto" display="flex">
         <Button onClick={() => history.push('/campaigns')} style={currentPath === 'campaigns' ? selectedPathStyle : {}}>Campaigns</Button>
         <Box width="1rem" />
-        <Button onClick={() => history.push('/reports')} style={currentPath === 'reports' ? selectedPathStyle : {}}>Reports</Button>
-        <Box width="1rem" />
+        { !(prop.user.role === UserRole.USER) && <>
+          <Button onClick={() => history.push('/reports')} style={currentPath === 'reports' ? selectedPathStyle : {}}>Reports</Button>
+          <Box width="1rem" />
+        </>}
         { prop.user.role === UserRole.ADMIN && <>
           <Button onClick={() => history.push('/admin')} style={currentPath === 'admin' ? selectedPathStyle : {}}>Administator</Button>
           <Box width="1rem" />
