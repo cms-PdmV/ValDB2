@@ -19,32 +19,30 @@ class CustomField(fields.Raw):
     def __init__(self, type: str, format: str, *args, **kwargs):
         self.__schema_type__ = type
         self.__schema_format__ = format
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 class Model():
     _id: ObjectId
     created_at: datetime
     updated_at: datetime
 
-    def __init__(self, data: dict=dict()):
-        database = get_database()
-        self._database = database()
+    def __init__(self, data: dict=None):
+        self._database = get_database()
         self._fields = self._get_fields()
         self._set_value_from_data(data)
 
     def _set_value_from_data(self, data: dict):
         for key in self._fields:
-            setattr(self, key, data.get(key))
+            setattr(self, key, data.get(key) if data else None)
 
     def _get_data_load_object(self, data: dict) -> dict:
         data_load_object = {}
         if not data:
             return data_load_object
-        for key in data:
-            if key in _filter_out_load_object_key or key not in data or key not in self._fields:
+        for key, value in data.items():
+            if key in _filter_out_load_object_key or key not in self._fields:
                 continue
 
-            value = data[key]
             if key in _prefilled_fields: # is _id
                 data_load_object[key] = value
             elif self._is_reference_field(key): # is one2many reference
@@ -53,9 +51,9 @@ class Model():
                 for element in value:
                     elements.append(reference_model.get(element))
                 data_load_object[key] = elements
-            elif self.__annotations__[key].__base__ is Model: # is many2one reference
+            elif issubclass(self.__annotations__[key], Model): # is many2one reference
                 data_load_object[key] = self.__annotations__[key].get(value)
-            elif self.__annotations__[key].__base__ is Enum: # is enum
+            elif issubclass(self.__annotations__[key], Enum): # is enum
                 data_load_object[key] = self.__annotations__[key](value)
             else: # is general type
                 data_load_object[key] = value
@@ -63,13 +61,12 @@ class Model():
 
     def _get_data_store_object(self) -> dict:
         data_store_object = {}
-        for key in self.__dict__.keys():
+        for key, value in self.__dict__.items():
             if key in _filter_out_store_object_key:
                 continue
 
-            value = self.__dict__[key]
             if value is None:
-                    continue
+                continue
             if self._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
@@ -91,7 +88,7 @@ class Model():
         return hasattr(self, '_id') and self._id
     
     def _is_reference_field(self, field: str) -> bool:
-        return field in self.__annotations__ and len(get_args(self.__annotations__[field])) == 1 and isinstance(get_args(self.__annotations__[field])[0](), Model)
+        return field in self.__annotations__ and len(get_args(self.__annotations__[field])) == 1 and issubclass(get_args(self.__annotations__[field])[0], Model)
     
     def _get_reference_model_of_field(self, field: str):
         return get_args(self.__annotations__[field])[0]
@@ -102,12 +99,11 @@ class Model():
 
     def save(self: T) -> T:
         current_utc_time = datetime.utcnow()
+        self.updated_at = current_utc_time
         if self._is_saved():
-            self.updated_at = current_utc_time
             self._database.update(self._get_collection_name(), self._id, self._get_data_store_object())
         else:
             self.created_at = current_utc_time
-            self.updated_at = current_utc_time
             saved_data_id = self._database.create(self._get_collection_name(), self._get_data_store_object())
             self._id = saved_data_id
         return self
@@ -182,13 +178,7 @@ class Model():
 
     @classmethod
     def _get_flask_restx_field(cls, type_of_field):
-        restx_field = CustomField('Unknown', '')
-        is_list = False
-        try:
-            if isinstance(type_of_field(), list):
-                is_list = True
-        except:
-            pass
+        is_list = len(get_args(type_of_field)) == 1
 
         if type_of_field is str:
             restx_field = fields.String

@@ -58,4 +58,4 @@ database_connector = {
 def get_database():
     load_dotenv()
     database_connector_type = os.getenv('DATABASE_CONNECTOR')
-    return database_connector[database_connector_type]
+    return (database_connector[database_connector_type])()

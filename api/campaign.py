@@ -19,7 +19,7 @@ class CampaignListAPI(Resource):
         # TODO: Pageination
         # TODO: fix slow ORM when fetch large data
         campaigns = list(
-            get_database()().database[Campaign._get_collection_name()]
+            get_database().database[Campaign._get_collection_name()]
             .find({}, {'reports': False})
             .sort([('created_at', pymongo.DESCENDING)])
         )

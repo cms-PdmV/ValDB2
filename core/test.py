@@ -19,7 +19,7 @@ class TestCase(unittest.TestCase):
                         raise Exception('Test database is the same as application database. Consider using different name for tests')
 
     def _clean_database(self):
-        database = get_database()()
+        database = get_database()
         database.client.drop_database(os.getenv(_database_name_key))
 
     def __init__(self, *args, **kwargs):

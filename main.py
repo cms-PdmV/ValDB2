@@ -14,11 +14,5 @@ CORS(app, supports_credentials=True, methods=["GET", "OPTIONS", "POST", "PUT", "
 # setup database indexes
 database_index_setup()
 
-
-# from core.database import get_database
-# database = get_database()()
-# database.client.drop_database('debug_valdb')
-
-
 if __name__ == '__main__':
     app.run(debug=True)
