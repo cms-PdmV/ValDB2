@@ -3,8 +3,13 @@ import { boxShadow, primaryColor } from '../utils/css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFeather } from '@fortawesome/free-solid-svg-icons';
 import { useHistory, useLocation } from 'react-router';
+import { User, UserRole } from '../types';
 
-export function NavBar() {
+interface NavBarProp {
+  user: User
+}
+
+export function NavBar(prop: NavBarProp) {
 
   const history = useHistory()
   const location = useLocation()
@@ -24,9 +29,11 @@ export function NavBar() {
         <Box width="1rem" />
         <Button onClick={() => history.push('/reports')} style={currentPath === 'reports' ? selectedPathStyle : {}}>Reports</Button>
         <Box width="1rem" />
-        <Button onClick={() => history.push('/admin')} style={currentPath === 'admin' ? selectedPathStyle : {}}>Administator</Button>
-        <Box width="1rem" />
-        <Button>Chanchana Wicha&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>C</Avatar></Button>
+        { prop.user.role === UserRole.ADMIN && <>
+          <Button onClick={() => history.push('/admin')} style={currentPath === 'admin' ? selectedPathStyle : {}}>Administator</Button>
+          <Box width="1rem" />
+        </>}
+        <Button onClick={() => history.push('/user')} style={currentPath === 'user' ? selectedPathStyle : {}}>{prop.user.fullname}&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>C</Avatar></Button>
       </Box>
     </Box>
   )

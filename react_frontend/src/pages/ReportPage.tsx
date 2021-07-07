@@ -1,7 +1,6 @@
 import { ReportContentEditor } from '../components/ReportContentEditor';
 import { ReportContentViewer } from '../components/ReportContentViewer';
 import { ReportHeader } from '../components/ReportHeader';
-import { NavBar } from '../components/NavBar';
 import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
 import { Report, ReportEditorMode, ReportStatus } from '../types'
@@ -82,15 +81,12 @@ export function ReportPage () {
   }
 
   return (
-    <>
-      <NavBar />
-      <Container>
-        { report && <Box>
-          <ReportHeader campaign={campaign} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
-          { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} />}
-          { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
-        </Box>}
-      </Container>
-    </>
+    <Container>
+      { report && <Box>
+        <ReportHeader campaign={campaign} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
+        { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} />}
+        { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
+      </Box>}
+    </Container>
   )
 }

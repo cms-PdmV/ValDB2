@@ -4,7 +4,6 @@ import { Button, Box, TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { CampaignCategoryList } from "../components/CampaignCategoryList";
 import { Container } from "../components/Container";
-import { NavBar } from "../components/NavBar";
 import { campaignService, categoryService } from "../services"
 import { Campaign, Category } from "../types";
 import { useForm } from 'react-hook-form';
@@ -53,32 +52,29 @@ export function CampaignFormPage () {
     })
   }, [])
   return (
-    <>
-      <NavBar />
-      <Container>
-        <h1>New Campaign</h1>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* General Information */}
-          <Spacer />
-          <TextField {...register('name')} variant="outlined" size="small" label="Campaign Name" style={{minWidth: '500px'}}/>
-          <Spacer />
-          <TextField {...register('description')} variant="outlined" size="small" fullWidth multiline label="Description"/>
-          <Spacer />
-          <TextField {...register('target_release')} variant="outlined" size="small" label="Target Release"/>
-          <Spacer inline />
-          <TextField {...register('reference_release')} variant="outlined" size="small" label="Reference Release"/>
-          <Spacer />
-          <TextField {...register('deadline')} variant="outlined" size="small" type="date" label="Deadline" InputLabelProps={{ shrink: true }}/>
-          
-          {/* Campaign's Categories */}
-          <Spacer rem={2} />
-          <Box fontWeight="bold">Select target categories</Box>
-          <Spacer />
-          { categories && <CampaignCategoryList selectable categories={categories} onChange={setSelectedCategories} />}
-          <Spacer rem={2} />
-          <Button type="submit" variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create</Button>
-        </form>
-      </Container>
-    </>
+    <Container>
+      <h1>New Campaign</h1>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* General Information */}
+        <Spacer />
+        <TextField {...register('name')} variant="outlined" size="small" label="Campaign Name" style={{minWidth: '500px'}}/>
+        <Spacer />
+        <TextField {...register('description')} variant="outlined" size="small" fullWidth multiline label="Description"/>
+        <Spacer />
+        <TextField {...register('target_release')} variant="outlined" size="small" label="Target Release"/>
+        <Spacer inline />
+        <TextField {...register('reference_release')} variant="outlined" size="small" label="Reference Release"/>
+        <Spacer />
+        <TextField {...register('deadline')} variant="outlined" size="small" type="date" label="Deadline" InputLabelProps={{ shrink: true }}/>
+        
+        {/* Campaign's Categories */}
+        <Spacer rem={2} />
+        <Box fontWeight="bold">Select target categories</Box>
+        <Spacer />
+        { categories && <CampaignCategoryList selectable categories={categories} onChange={setSelectedCategories} />}
+        <Spacer rem={2} />
+        <Button type="submit" variant="contained" color="primary"><FontAwesomeIcon icon={faPlus}/>&nbsp;&nbsp;Create</Button>
+      </form>
+    </Container>
   )
 }

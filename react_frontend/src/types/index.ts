@@ -19,8 +19,17 @@ export interface Report {
     name: string
 }
 
+export enum UserRole {
+    ADMIN = 1,
+    VALIDATOR = 2,
+    USER = 3,
+}
+
 export interface User {
-    name: string
+    role: UserRole
+    email: string
+    fullname: string
+    groups: string[]
 }
 
 export interface Activity {

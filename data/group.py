@@ -37,3 +37,11 @@ group = {
         'Gen': gen_groups,
     }
 }
+
+def get_all_groups():
+    groups = []
+    for category_name, category in group.items():
+        for subcategory_name, subcategory in category.items():
+            for group_name in subcategory:
+                groups.append(f"{category_name}.{subcategory_name}.{group_name}")
+    return groups
