@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 import { ReportStatusLabel } from "./ReportStatusLabel";
 
 
-interface CampaignCategoryColumnsViewProp {
+interface CategoryColumnsViewProp {
   categories: CampaignGroup[]
   reportView?: boolean
   selectableView?: boolean
   onClickGroup: (groupPathString: string) => void
 }
 
-export function CampaignCategoryColumnsView(prop: CampaignCategoryColumnsViewProp) {
+export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [availableSubcategory, setAvailableSubcategory] = useState<string[]>(['All'])

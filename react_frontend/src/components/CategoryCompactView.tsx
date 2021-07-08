@@ -6,14 +6,14 @@ import { HorizontalLine } from "./HorizontalLine";
 import { reportStatusStyle } from "../utils/report";
 
 
-interface CampaignCategoryCompactViewProp {
+interface CategoryCompactViewProp {
   categories: CampaignGroup[]
   reportView?: boolean
   selectableView?: boolean
   onClickGroup: (groupPathString: string) => void
 }
 
-export function CampaignCategoryCompactView(prop: CampaignCategoryCompactViewProp) {
+export function CategoryCompactView(prop: CategoryCompactViewProp) {
 
   const reportButton = (group: CampaignReportGroup, reportStatus: ReportStatus) => (
     <Tooltip title={reportStatusStyle[reportStatus].label}>

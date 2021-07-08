@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Chip, Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { CampaignCategoryColumnsView } from "../components/CampaignCategoryColumnsView";
-import { CampaignCategoryCompactView } from "../components/CampaignCategoryCompactView";
+import { CategoryColumnsView } from "../components/CategoryColumnsView";
+import { CategoryCompactView } from "../components/CategoryCompactView";
+import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
 import { Spacer } from "../components/Spacer";
@@ -79,10 +80,7 @@ export function CampaignPage() {
       <Box height="2rem" />
       <HorizontalLine />
       <Box height="2rem" />
-      <Box fontSize="1.5rem" fontWeight="bold">Reports</Box>
-      <Box height="1rem" />
-      {/* {campaign && <CampaignCategoryCompactView reportView categories={groups} onClickGroup={handleClickReport} />} */}
-      {groups && <CampaignCategoryColumnsView reportView categories={groups} onClickGroup={handleClickReport} />}
+      { groups && <CategoryView reportView categories={groups} onClickGroup={handleClickReport}/> }
     </Container>
   )
 }
