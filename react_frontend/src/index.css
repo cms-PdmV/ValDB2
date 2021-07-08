@@ -29,6 +29,15 @@
   background: #ffffff !important;
 }
 
+.MuiPaper-root {
+  border-radius: 8px !important;
+}
+
+.Mui-selected {
+  background: rgb(226, 234, 255) !important;
+  color: rgb(35, 77, 247) !important;
+}
+
 input {
   background: #ffffff !important;
 }

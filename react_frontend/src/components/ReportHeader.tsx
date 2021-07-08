@@ -6,6 +6,7 @@ import { useState } from "react";
 import { VerticleLine } from "./VerticleLine";
 import { Spacer } from "./Spacer";
 import { reportStatusStyle } from "../utils/report";
+import { ReportStatusLabel } from "./ReportStatusLabel";
 
 interface ReportHeaderProp {
   mode: ReportEditorMode
@@ -55,7 +56,7 @@ export function ReportHeader(prop: ReportHeaderProp) {
     <>
       <Tooltip title="Report Status" placement="top">
         <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu} style={{marginLeft: '1rem'}}>
-          {statusLabel(prop.status)}&nbsp;&nbsp;<FontAwesomeIcon icon={faCaretDown} />
+          <ReportStatusLabel status={+prop.status as ReportStatus} />&nbsp;&nbsp;<FontAwesomeIcon icon={faCaretDown} />
         </Button>
       </Tooltip>
       <Menu
@@ -67,7 +68,7 @@ export function ReportHeader(prop: ReportHeaderProp) {
       >
         {Object.keys(reportStatusStyle).map((status, index) => 
           <MenuItem onClick={() => {prop.handleChangeStatus(+status); handleClose();}}>
-            {statusLabel(+status as ReportStatus)}
+            <ReportStatusLabel status={+status as ReportStatus} />
           </MenuItem>
         )}
       </Menu>

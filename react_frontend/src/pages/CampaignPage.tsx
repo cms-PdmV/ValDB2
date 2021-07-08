@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Chip, Box } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { CampaignCategoryColumnsView } from "../components/CampaignCategoryColumnsView";
 import { CampaignCategoryCompactView } from "../components/CampaignCategoryCompactView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
@@ -14,7 +15,7 @@ import { splitPath } from "../utils/group";
 export function CampaignPage() {
   const { id }: any = useParams();
   const [campaign, setCampaign] = useState<Campaign>()
-  const [groups, setGroups] = useState<CampaignGroup[]>([])
+  const [groups, setGroups] = useState<CampaignGroup[] | null>(null)
 
   const history = useHistory()
 
@@ -32,7 +33,7 @@ export function CampaignPage() {
 
   const handleClickReport = (groupPath: string) => {
     const { category, subcategory, group } = splitPath(groupPath)
-    const reportExisted = Boolean(groups.find(e => e.category === category)?.subcategories.find(e => e.subcategory === subcategory)?.groups.find(e => e.name === groupPath)?.report)
+    const reportExisted = Boolean(groups?.find(e => e.category === category)?.subcategories.find(e => e.subcategory === subcategory)?.groups.find(e => e.name === groupPath)?.report)
     if (reportExisted) {
       openReport(groupPath)
     } else {
@@ -80,7 +81,8 @@ export function CampaignPage() {
       <Box height="2rem" />
       <Box fontSize="1.5rem" fontWeight="bold">Reports</Box>
       <Box height="1rem" />
-      {campaign && <CampaignCategoryCompactView reportView categories={groups} onClickGroup={handleClickReport} />}
+      {/* {campaign && <CampaignCategoryCompactView reportView categories={groups} onClickGroup={handleClickReport} />} */}
+      {groups && <CampaignCategoryColumnsView reportView categories={groups} onClickGroup={handleClickReport} />}
     </Container>
   )
 }
