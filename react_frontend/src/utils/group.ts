@@ -1,5 +1,13 @@
 import { CampaignGroup } from '../types'
 
+export const splitPath = (groupString: string) => {
+    const splittedString = groupString.split('.');
+    const category = splittedString[0];
+    const subcategory = splittedString[1];
+    const group = splittedString[2];
+    return { category, subcategory, group }
+}
+
 export const getCategoryGroupFromGroups = (groups: string[]) => {
     let campaignGroups: CampaignGroup[] = [];
 

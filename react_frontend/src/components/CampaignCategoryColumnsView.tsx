@@ -84,14 +84,6 @@ export function CampaignCategoryCompactView(prop: CampaignCategoryCompactViewPro
                   <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
                     <Box padding="0.5rem 0">{group.name.split('.')[2]}</Box>
                     <Box padding="0 0 0.5rem" display="flex">
-                    {prop.reportView && <>
-                      {!group.report && <Tooltip title="create">
-                        <Box onClick={() => prop.onGroupCreate(group.name)} display="flex" width="24px" height="24px" margin="auto" borderRadius="4px" style={{background: '#e0e0e0', cursor: 'pointer'}}><FontAwesomeIcon icon={faPlus} style={{margin: 'auto', color: '#808080'}}/></Box>
-                      </Tooltip>}
-                      {group.report && <Tooltip title={reportStatusStyle[group.report.status].label}>
-                        <Box onClick={() => prop.onGroupOpen(group.name)} display="flex" width="24px" height="24px" margin="auto" borderRadius="4px" style={{color: 'white', background: reportStatusStyle[group.report.status].background_color, cursor: 'pointer'}}><FontAwesomeIcon icon={reportStatusStyle[group.report.status].icon} style={{margin: 'auto'}}/></Box>
-                      </Tooltip>}
-                    </>}
                     </Box>
                   </Box>
                 )}

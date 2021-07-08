@@ -46,7 +46,7 @@ export function ReportHeader(prop: ReportHeaderProp) {
 
   const statusLabel = (status: ReportStatus) => (
     <span>
-      <Box display="inline-flex" width="26px" height="26px" borderRadius="4px" color="white" style={{background: reportStatusStyle[+status as ReportStatus].background_color}}><FontAwesomeIcon style={{margin: 'auto', fontSize: '14px'}} icon={reportStatusStyle[+status as ReportStatus].icon} /></Box>
+      <Box display="inline-flex" width="26px" height="26px" borderRadius="4px" color="white" style={reportStatusStyle[+status as ReportStatus].style}><FontAwesomeIcon style={{margin: 'auto', fontSize: '14px'}} icon={reportStatusStyle[+status as ReportStatus].icon} /></Box>
       &nbsp;&nbsp;{reportStatusStyle[+status as ReportStatus].label}
     </span>
   )
