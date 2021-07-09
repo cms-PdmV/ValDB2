@@ -73,7 +73,7 @@ class CampaignAPI(Resource):
             category = category_subcategory.split('.')[0]
             if category not in campaign_group:
                 campaign_group[category] = {
-                    'category': category,
+                    'name': category,
                     'subcategories': [],
                 }
             subcategory = category_subcategory.split('.')[1]
@@ -81,9 +81,9 @@ class CampaignAPI(Resource):
                 for each_group in group[category][subcategory]
             ]
             campaign_group[category]['subcategories'].append({
-                'subcategory': subcategory,
+                'name': subcategory,
                 'groups': [{
-                    'name': g,
+                    'path': g,
                     'report': report_table.get(g).dict() if g in report_table else None,
                 } for g in groups],
             })

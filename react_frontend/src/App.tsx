@@ -18,6 +18,7 @@ import { UserContext } from "./context/user";
 import { UserPage } from "./pages/UserPage";
 import { MyReportPage } from "./pages/MyReportPage";
 import { AllUserAdminPage } from "./pages/AllUserAdminPage";
+import { UserFormAdminPage } from "./pages/UserFormAdminPage";
 
 const theme = createMuiTheme({
   typography: {
@@ -77,7 +78,7 @@ function App() {
                 { require([UserRole.ADMIN, UserRole.VALIDATOR]) && <MyReportPage /> }
               </Route>
               <Route path="/admin/users/:id">
-                { require([UserRole.ADMIN]) && <AdminPage /> }
+                { require([UserRole.ADMIN]) && <UserFormAdminPage /> }
               </Route>
               <Route path="/admin/users">
                 { require([UserRole.ADMIN]) && <AllUserAdminPage /> }

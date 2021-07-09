@@ -10,13 +10,13 @@ import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
 import { Spacer } from "../components/Spacer";
 import { campaignService, reportService } from "../services";
-import { Campaign, CampaignGroup } from "../types";
+import { Campaign, Category } from "../types";
 import { splitPath } from "../utils/group";
 
 export function CampaignPage() {
   const { id }: any = useParams();
   const [campaign, setCampaign] = useState<Campaign>()
-  const [groups, setGroups] = useState<CampaignGroup[] | null>(null)
+  const [groups, setGroups] = useState<Category[] | null>(null)
 
   const history = useHistory()
 
@@ -34,7 +34,7 @@ export function CampaignPage() {
 
   const handleClickReport = (groupPath: string) => {
     const { category, subcategory, group } = splitPath(groupPath)
-    const reportExisted = Boolean(groups?.find(e => e.category === category)?.subcategories.find(e => e.subcategory === subcategory)?.groups.find(e => e.name === groupPath)?.report)
+    const reportExisted = Boolean(groups?.find(e => e.name === category)?.subcategories.find(e => e.name === subcategory)?.groups.find(e => e.path === groupPath)?.report)
     if (reportExisted) {
       openReport(groupPath)
     } else {

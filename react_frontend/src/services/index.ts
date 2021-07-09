@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios'
-import { Campaign, CampaignGroup, Category, Report } from '../types'
+import { Campaign, Category, Report } from '../types'
 
 // TODO: change this to env var
 const serverUrl = "http://localhost:5000/api"
 
 export interface CampaignResponse {
     campaign: Campaign
-    groups: CampaignGroup[]
+    groups: Category[]
 }
 
 export interface CreateReportRequest {

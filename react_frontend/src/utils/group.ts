@@ -1,4 +1,4 @@
-import { CampaignGroup } from '../types'
+import { Category } from '../types'
 
 export const splitPath = (groupString: string) => {
     const splittedString = groupString.split('.');
@@ -9,7 +9,7 @@ export const splitPath = (groupString: string) => {
 }
 
 export const getCategoryGroupFromGroups = (groups: string[]) => {
-    let campaignGroups: CampaignGroup[] = [];
+    let campaignGroups: Category[] = [];
 
     groups.forEach(groupString => {
         const splittedString = groupString.split('.');
@@ -17,27 +17,27 @@ export const getCategoryGroupFromGroups = (groups: string[]) => {
         const subcategory = splittedString[1];
         const group = splittedString[2];
 
-        let targetCategory = campaignGroups.find(e => e.category === category);
+        let targetCategory = campaignGroups.find(e => e.name === category);
         if (!targetCategory) {
             targetCategory = {
-                category: category,
+                name: category,
                 subcategories: [],
-            } as CampaignGroup;
+            } as Category;
             campaignGroups.push(targetCategory);
         }
 
         const subcategories = targetCategory.subcategories;
-        let targetSubcategory = subcategories.find(e => e.subcategory === subcategory);
+        let targetSubcategory = subcategories.find(e => e.name === subcategory);
         if (!targetSubcategory) {
             targetSubcategory = {
-                subcategory: subcategory,
+                name: subcategory,
                 groups: [],
             }
             targetCategory.subcategories.push(targetSubcategory);
         }
 
         targetSubcategory.groups.push({
-            name: group
+            path: group
         })
     })
 

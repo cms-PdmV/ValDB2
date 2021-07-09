@@ -1,17 +1,9 @@
 export type ReportEditorMode = 'edit' | 'view' | 'readonly'
 
-export interface Response <T> {
+export interface Response<T> {
     status: 'ok' | 'error'
     message?: string
     data?: T
-} 
-
-export interface Category {
-    name: string
-    subcategories: {
-        name: string
-        groups: string[]
-    }[]
 }
 
 export interface Report {
@@ -36,16 +28,16 @@ export interface Activity {
     content: string
 }
 
-export interface CampaignReportGroup {
-    name: string
+export interface Group {
+    path: string
     report?: Report
 }
 
-export interface CampaignGroup {
-    category: string
+export interface Category {
+    name: string
     subcategories: {
-        subcategory: string
-        groups: CampaignReportGroup[]
+        name: string
+        groups: Group[]
     }[]
 }
 
