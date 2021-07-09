@@ -9,3 +9,19 @@ export const color = {
     yellow: '#fa8c16',
     purple: '#722ed1',
 }
+
+export const buttonStyle = {
+    display: 'flex',
+    width: '24px',
+    height: '24px',
+    margin: 'auto',
+    borderRadius: '4px',
+}
+
+export const buttonIconStyle = {
+    style: {
+        width: '1rem',
+        height: '1rem',
+        margin: 'auto'
+    }
+}

@@ -33,7 +33,7 @@
   background: #ffffff !important;
 }
 
-.MuiPaper-root {
+.MuiPaper-root :not(.MuiAccordion-root){
   border-radius: 8px !important;
 }
 

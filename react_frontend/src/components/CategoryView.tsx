@@ -1,4 +1,4 @@
-import { faBorderAll, faColumns, faTh } from "@fortawesome/free-solid-svg-icons";
+import { faColumns, faTh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, ButtonGroup } from "@material-ui/core";
 import { useState } from "react";
@@ -7,10 +7,12 @@ import { CategoryColumnsView } from "./CategoryColumnsView";
 import { CategoryCompactView } from "./CategoryCompactView";
 
 interface CategoryView {
+  title?: string
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup: (groupPathString: string) => void
+  onClickGroup?: (groupPathString: string) => void
+  onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
 export function CategoryView(prop: CategoryView) {
@@ -24,7 +26,7 @@ export function CategoryView(prop: CategoryView) {
   return (
     <>
       <Box fontSize="1.5rem" fontWeight="bold" display="flex">
-        Reports
+        {prop.title || 'Reports'}
         <ButtonGroup style={{marginLeft: 'auto'}}>
           <Button onClick={() => setNewMode('compact')} color={mode === 'compact' ? 'primary' : 'default'}><FontAwesomeIcon icon={faTh} />&nbsp;&nbsp;Compact</Button>
           <Button onClick={() => setNewMode('columns')} color={mode === 'columns' ? 'primary' : 'default'}><FontAwesomeIcon icon={faColumns} />&nbsp;&nbsp;Columns</Button>

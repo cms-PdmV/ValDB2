@@ -31,6 +31,7 @@ export interface Activity {
 export interface Group {
     path: string
     report?: Report
+    selected?: boolean
 }
 
 export interface Category {

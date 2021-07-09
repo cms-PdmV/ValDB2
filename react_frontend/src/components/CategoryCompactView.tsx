@@ -1,25 +1,32 @@
 import { Box, Accordion, AccordionDetails, AccordionSummary, Tooltip } from "@material-ui/core";
 import { Category, Group, ReportStatus } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCheck, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { HorizontalLine } from "./HorizontalLine";
 import { reportStatusStyle } from "../utils/report";
+import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 
 
 interface CategoryCompactViewProp {
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup: (groupPathString: string) => void
+  onClickGroup?: (groupPathString: string) => void
+  onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
 export function CategoryCompactView(prop: CategoryCompactViewProp) {
 
   const reportButton = (group: Group, reportStatus: ReportStatus) => (
     <Tooltip title={reportStatusStyle[reportStatus].label}>
-      <Box onClick={() => prop.onClickGroup(group.path)} display="flex" width="24px" height="24px" margin="auto" borderRadius="4px" style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}><FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} style={{margin: 'auto'}}/></Box>
+      <Box onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} {...buttonStyle} style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}><FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/></Box>
     </Tooltip>
   )
+
+  const selectButton = (group: Group, selected: boolean) => (<>
+    { selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)} {...buttonStyle} style={{cursor: 'pointer', background: color.blue, color: 'white'}}><FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/></Box>}
+    { !selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
+  </>)
 
   return (
     <Box width="100%">
@@ -38,6 +45,7 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
                     <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
                     <Box padding="0 0 0.5rem" display="flex">
                       {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
+                      {prop.selectableView && selectButton(group, group.selected || false)}
                     </Box>
                   </Box>
                 )}

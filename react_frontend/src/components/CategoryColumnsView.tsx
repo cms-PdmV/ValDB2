@@ -1,16 +1,18 @@
 import { Box, List, ListItem, Paper, ListItemText, ListItemSecondaryAction } from "@material-ui/core";
 import { Category, ReportStatus } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronRight, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from "react";
 import { ReportStatusLabel } from "./ReportStatusLabel";
+import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 
 
 interface CategoryColumnsViewProp {
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup: (groupPathString: string) => void
+  onClickGroup?: (groupPathString: string) => void
+  onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
 export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
@@ -41,7 +43,7 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
   }, [selectedCategory, selectedSubcategory])
 
   return (
-    <Paper>
+    <Paper style={{borderRadius: '8px'}}>
       <Box width="100%" display="flex" height="600px">
         <Box width="220px" padding="1rem 0.5rem 1rem 1rem">
           <List style={{padding: 0}}>
@@ -72,13 +74,18 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
             {availableList.map((category, index) =>
               category.subcategories.map((subcategory, subindex) => <>
                 <Box padding="0.5rem 1rem" style={{background: '#e0e0e0'}} fontWeight="bold" borderRadius="8px" >{category.name} / {subcategory.name}</Box>
-                {subcategory.groups.map((group, groupindex) => (
-                  <ListItem onClick={() => prop.onClickGroup(group.path)} button style={{height: '48px'}}>
+                {subcategory.groups.map((group, groupindex) => (<>
+                  { prop.reportView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} button style={{height: '48px'}}>
                     {group.path.split('.')[2]}
                     <Box position="absolute" left="200px"><ReportStatusLabel status={group.report ? group.report.status : ReportStatus.NOT_YET_DONE} /></Box>
                     <Box position="absolute" right="1rem"><FontAwesomeIcon icon={faChevronRight} /></Box>
-                  </ListItem>
-                ))}
+                  </ListItem>}
+                  { prop.selectableView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} style={{height: '48px'}}>
+                    { group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: color.blue, color: 'white'}}><FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/></Box>}
+                    { !group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
+                    {group.path.split('.')[2]}
+                  </ListItem>}
+                </>))}
               </>)
             )}
           </List>
