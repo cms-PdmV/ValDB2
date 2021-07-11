@@ -12,7 +12,7 @@ export function UserPage() {
 
   useEffect(() => {
     if (user) console.log(getCategoryGroupFromGroups(user.groups))
-  })
+  }, [])
   return (
     user && <Container>
       <h1>{user.fullname}</h1>

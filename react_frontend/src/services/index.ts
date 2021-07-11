@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
-import { Campaign, Category, Report } from '../types'
+import { Campaign, Category, Report, User } from '../types'
 
 // TODO: change this to env var
 const serverUrl = "http://localhost:5000/api"
@@ -29,4 +29,10 @@ export const reportService = {
 
 export const categoryService = {
     getAll: (): Promise<Category[]>  => axios.get(`${serverUrl}/groups/`).then(response => response.data),
+}
+
+export const userService = {
+    getAll: (): Promise<User[]> => axios.get(`${serverUrl}/users/`).then(response => response.data).catch(error => { throw error }),
+    get: (id: string): Promise<User> => axios.get(`${serverUrl}/users/${id}/`).then(response => response.data).catch(error => { throw error }),
+    update: (id: string, body: Partial<User>): Promise<void> => axios.put(`${serverUrl}/users/${id}/`, body).then(response => response.data).catch(error => { throw error }),
 }

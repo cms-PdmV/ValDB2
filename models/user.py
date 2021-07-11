@@ -1,10 +1,20 @@
 '''
 User model
 '''
+from enum import Enum
+
 from core import Model
+
+class UserRole(Enum):
+    ADMIN = 1
+    VALIDATOR = 2
+    USER = 3
 
 class User(Model):
     '''
     User model
     '''
-    name: str
+    role: UserRole
+    email: str
+    fullname: str
+    groups: list[str]
