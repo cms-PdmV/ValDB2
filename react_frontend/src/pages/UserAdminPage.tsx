@@ -4,7 +4,9 @@ import { Box, Button, Chip } from "@material-ui/core";
 import { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Container } from "../components/Container";
+import { GroupList } from "../components/GroupList";
 import { HorizontalLine } from "../components/HorizontalLine";
+import { Label } from "../components/Label";
 import { Spacer } from "../components/Spacer";
 import { UserContext } from "../context/user";
 import { userService } from "../services";
@@ -27,23 +29,14 @@ export function UserAdminPage() {
   return (
     <Container>
       <h1>{user?.fullname}</h1>
-      <p><strong>Role:</strong> {userRoleLabel[user?.role as UserRole]}</p>
-      <p><strong>Email:</strong> {user?.email}</p>
+      <Label label="Role" value={userRoleLabel[user?.role as UserRole]} />
+      <Label label="Email" value={user?.email} />
       <Button variant="contained" color="primary" onClick={() => { history.push(`/admin/users/${user?._id}/edit`) }}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
       <Spacer />
       <HorizontalLine />
       { user?.role !== UserRole.USER && <Box>
         <h2>Permission Group</h2>
-        {getCategoryGroupFromGroups(user?.groups || []).map(category =>
-          category.subcategories.map(subcategory =>
-            <Box>
-              <h4>{category.name} / {subcategory.name}</h4>
-              <Box>
-                {subcategory.groups.map(group => <Chip label={group.path} style={{margin: '0 0.5rem 0.5rem 0'}}/>)}
-              </Box>
-            </Box>
-          )
-        )}
+        <GroupList groups={user?.groups || []} />
       </Box>}
     </Container>
   )

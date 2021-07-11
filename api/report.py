@@ -46,7 +46,6 @@ class ReportSearchAPI(Resource):
     '''
     Report search API
     '''
-    @api.marshal_with(report_model)
     def get(self, campaign, group):
         '''
         Search report by campaign name and group name

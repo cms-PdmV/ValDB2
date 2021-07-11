@@ -2,6 +2,7 @@
 Report model
 '''
 from enum import Enum
+from models.activity import Activity
 from models.user import User
 from core import Model
 

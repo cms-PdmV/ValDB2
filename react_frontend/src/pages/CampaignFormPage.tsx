@@ -1,3 +1,4 @@
+import 'date-fns';
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Box, TextField } from "@material-ui/core";
@@ -9,12 +10,20 @@ import { Campaign, Category } from "../types";
 import { useForm } from 'react-hook-form';
 import { Spacer } from "../components/Spacer";
 import { useHistory } from "react-router";
+import { Modal } from "antd"
+import { LabelGroup } from "../components/LabelGroup";
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import moment from 'moment';
+
+const { confirm } = Modal;
 
 
 export function CampaignFormPage () {
 
   const [categories, setCategories] = useState<Category[]>()
   const [selectedCategories, setSelectedCategories] = useState<string[]>()
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(Date.now()));
 
   const history = useHistory()
 
@@ -24,24 +33,46 @@ export function CampaignFormPage () {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data: object) => {
-    console.log(data)
-    console.log(selectedCategories)
-    const body: Partial<Campaign> = {
-      ...data,
-      subcategories: selectedCategories,
-    }
-    console.log(body)
-    campaignService.create(body).then(response => {
-      if (response.status) {
-        console.log(response.data)
-        if (response.data.id) {
-          console.log('success !')
-          history.push(`/campaigns/${response.data.name}`)
+  const onSubmit = (data: any) => {
+    console.log('test')
+    confirm({
+      title: 'New Campaign Confirmation',
+      content: <>
+        <LabelGroup data={{
+          Name: data.name,
+          'Target Release': data.target_release,
+          'Reference Release': data.reference_release,
+          Deadline: moment(selectedDate).format('YYYY-MM-DD'),
+          Description: data.description,
+          Relmon: data.relmon,
+          Categories: selectedCategories?.join(', '),
+        }} />
+      </>,
+      onOk() {
+        console.log('OK');
+        console.log(data)
+        console.log(selectedCategories)
+        const body: Partial<Campaign> = {
+          ...data,
+          deadline: moment(selectedDate).format('YYYY-MM-DD'),
+          subcategories: selectedCategories,
         }
-      } else {
-        alert('ops')
-      }
+        console.log(body)
+        campaignService.create(body).then(response => {
+          if (response.status) {
+            console.log(response.data)
+            if (response.data.id) {
+              console.log('success !')
+              history.push(`/campaigns/${response.data.name}`)
+            }
+          } else {
+            alert('ops')
+          }
+        })
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
     })
   }
 
@@ -51,6 +82,11 @@ export function CampaignFormPage () {
       setCategories(data)
     })
   }, [])
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+  };
+
   return (
     <Container>
       <h1>New Campaign</h1>
@@ -59,13 +95,17 @@ export function CampaignFormPage () {
         <Spacer />
         <TextField {...register('name')} variant="outlined" size="small" label="Campaign Name" style={{minWidth: '500px'}}/>
         <Spacer />
-        <TextField {...register('description')} variant="outlined" size="small" fullWidth multiline label="Description"/>
-        <Spacer />
         <TextField {...register('target_release')} variant="outlined" size="small" label="Target Release"/>
         <Spacer inline />
         <TextField {...register('reference_release')} variant="outlined" size="small" label="Reference Release"/>
         <Spacer />
-        <TextField {...register('deadline')} variant="outlined" size="small" type="date" label="Deadline" InputLabelProps={{ shrink: true }}/>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker disableToolbar format="yyyy-MM-dd" size="small" label="Deadline" value={selectedDate} inputVariant="outlined" onChange={handleDateChange} />
+        </MuiPickersUtilsProvider>
+        <Spacer />
+        <TextField {...register('description')} variant="outlined" size="small" fullWidth multiline rows={3} label="Description"/>
+        <Spacer />
+        <TextField {...register('relmon')} variant="outlined" size="small" label="Relmon" style={{width: '280px'}} />
         
         {/* Campaign's Categories */}
         <Spacer rem={2} />

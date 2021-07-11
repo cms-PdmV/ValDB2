@@ -10,7 +10,7 @@ interface ReportContentViewerProp {
 export function ReportContentViewer (prop: ReportContentViewerProp) {
   return <>
   <HorizontalLine />
-    { prop.content !== '' && <ReactMarkdown remarkPlugins={[gfm]} children={prop.content} />}
+    { prop.content !== '' && <Box margin="1rem 0"><ReactMarkdown remarkPlugins={[gfm]} children={prop.content} /></Box>}
     { prop.content === '' && <Box fontStyle="italic" color="#808080" margin="1rem 0">Empty Content</Box> }
   <HorizontalLine />
   </>;

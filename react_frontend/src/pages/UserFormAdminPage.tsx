@@ -6,6 +6,7 @@ import { useHistory, useParams } from "react-router";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
+import { Label } from "../components/Label";
 import { Spacer } from "../components/Spacer";
 import { categoryService, userService } from "../services";
 import { Category, User, UserRole } from "../types";
@@ -109,7 +110,7 @@ export function UserFormAdminPage() {
   return (
     <Container>
       <h1>{user?.fullname}</h1>
-      <p><strong>Email:</strong> {user?.email}</p>
+      <Label label="Email" value={user?.email}/>
       <Box display="flex">
         <Button variant="contained" color="primary" onClick={handleSave}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
         <Button variant="contained" onClick={handleDiscard} style={{marginLeft: 'auto'}}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>

@@ -74,6 +74,8 @@ class Model():
                     elements.append(reference_model.get(element))
                 data_load_object[key] = elements
             elif issubclass(cls.get_annotations()[key], Model): # is many2one reference
+                if isinstance(value, dict):
+                    value = value['id'] if 'id' in value else value['_id']
                 data_load_object[key] = cls.get_annotations()[key].get(value)
             elif issubclass(cls.get_annotations()[key], Enum): # is enum
                 data_load_object[key] = cls.get_annotations()[key](value)
@@ -96,9 +98,13 @@ class Model():
             if cls._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
-                    if not element.is_saved():
-                        element.save()
-                    element_ids.append(element.id)
+                    if isinstance(element, dict):
+                        if 'id' in element:
+                            element_ids.append(element['id'])
+                    else:
+                        if not element.is_saved():
+                            element.save()
+                        element_ids.append(element.id)
                 data_store_object[key] = element_ids
             elif isinstance(value, Model): # is many2one reference
                 if not value.is_saved():

@@ -1,18 +1,22 @@
 import { Avatar, Box, Button, Chip, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faCalendar, faSave, faTimes, faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import { ReportEditorMode, ReportStatus } from "../types";
+import { ReportEditorMode, ReportStatus, User } from "../types";
 import { useState } from "react";
 import { VerticleLine } from "./VerticleLine";
 import { Spacer } from "./Spacer";
 import { reportStatusStyle } from "../utils/report";
 import { ReportStatusLabel } from "./ReportStatusLabel";
+import { Label } from "./Label";
+import moment from "moment";
 
 interface ReportHeaderProp {
   editable?: boolean
+  authors: User[]
   mode: ReportEditorMode
   campaign: string
   group: string
+  date: string
   status: ReportStatus
   onChangeMode: (mode: ReportEditorMode) => void
   handleSave: () => void
@@ -84,10 +88,10 @@ export function ReportHeader(prop: ReportHeaderProp) {
       <Chip label={prop.group.split('.').join(' / ')}/>
       <Spacer />
       
-      <Box marginBottom="1rem" display="flex" alignItems="center" color="#707070">
-        Authors:&nbsp;<strong><span style={{color: '#505050'}}>None</span></strong>
-        <VerticleLine />
-        <FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;10 Nov, 2021
+      <Box marginBottom="1rem" alignItems="center" color="#707070">
+        <strong>Authors: </strong>{prop.authors ? prop.authors.map((e, index) => <a>{e.fullname}{index === prop.authors.length - 1 ? '' : ', '}</a>) : 'None'}
+        <Spacer rem={0.5} />
+        <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;<strong>Created:</strong>&nbsp;{moment(prop.date, 'YYYY-MM-DD').fromNow()}</p>
       </Box>
       { prop.mode === 'view' && 
         <Box>

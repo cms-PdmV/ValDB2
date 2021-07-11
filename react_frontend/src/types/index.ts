@@ -60,6 +60,8 @@ export interface Report {
     status: ReportStatus
     content: string
     activity: Activity[]
+    created_at: string // 2020-21-2
+    updated_at: string // 2020-21-2
 }
 
 export interface Campaign {
@@ -76,4 +78,16 @@ export interface Campaign {
     active: boolean
     created_at: string // 2020-21-2
     updated_at: string // 2020-21-2
+}
+
+export enum ActivityType {
+    ACTIVITY = 1,
+    COMMENT = 2,
+}
+
+export interface Activity {
+    type: ActivityType
+    user: User
+    content: string
+    created_at?: string // 2020-21-2
 }
