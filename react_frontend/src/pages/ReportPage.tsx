@@ -4,31 +4,33 @@ import { ReportHeader } from '../components/ReportHeader';
 import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
 import { Report, ReportEditorMode, ReportStatus } from '../types'
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
-import queryString from 'querystring'
+// import queryString from 'querystring'
 import { reportService } from '../services';
+import { UserContext } from '../context/user';
 
 export function ReportPage () {
 
   const { campaign, group }: any = useParams()
-  const { search } = useLocation()
+  // const { search } = useLocation()
 
   const [content, setContent] = useState<string>('');
   const [status, setStatus] = useState<ReportStatus>(ReportStatus.IN_PROGRESS);
   const [report, setReport] = useState<Report>();
   const [editingContent, setEditingContent] = useState<string>('');
   const [mode, setMode] = useState<ReportEditorMode>('view');
+  const user = useContext(UserContext)
 
   const history = useHistory()
 
   useEffect(() => {
     console.log(campaign)
     console.log(group)
-    const query = queryString.parse(search)
-    if ('edit' in query) {
-      setMode('edit')
-    }
+    // const query = queryString.parse(search)
+    // if ('edit' in query) {
+    //   setMode('edit')
+    // }
     reportService.seach(campaign, group).then(response => {
       if (response.status) {
         setReport(response.data)
@@ -83,7 +85,7 @@ export function ReportPage () {
   return (
     <Container>
       { report && <Box>
-        <ReportHeader campaign={campaign} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
+        <ReportHeader campaign={campaign} editable={user?.groups.includes(group)} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
         { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} />}
         { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
       </Box>}

@@ -20,6 +20,7 @@ import { MyReportPage } from "./pages/MyReportPage";
 import { AllUserAdminPage } from "./pages/AllUserAdminPage";
 import { UserFormAdminPage } from "./pages/UserFormAdminPage";
 import { UserAdminPage } from "./pages/UserAdminPage";
+import { AuthPage } from "./pages/Auth";
 
 const theme = createMuiTheme({
   typography: {
@@ -46,16 +47,17 @@ const mockUser: User = {
 
 function App() {
 
-  const [user, setUser] = useState<User>(mockUser)
+  const [user, setUser] = useState<User>()
 
   useEffect(() => {
-    console.log('hi')
-  })
+    // TODO: check for logged in user token
+  }, [])
 
   const require = (roles: UserRole[]) => user && roles.includes(user.role)
 
   return (
     <ThemeProvider theme={theme}>
+      { !user && <AuthPage setUser={setUser} />}
       { user &&
         <UserContext.Provider value={user}>
           <Router>

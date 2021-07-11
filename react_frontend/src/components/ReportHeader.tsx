@@ -9,6 +9,7 @@ import { reportStatusStyle } from "../utils/report";
 import { ReportStatusLabel } from "./ReportStatusLabel";
 
 interface ReportHeaderProp {
+  editable?: boolean
   mode: ReportEditorMode
   campaign: string
   group: string
@@ -24,7 +25,7 @@ export function ReportHeader(prop: ReportHeaderProp) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleOpenStatusMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
+    prop.editable && setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
@@ -55,8 +56,8 @@ export function ReportHeader(prop: ReportHeaderProp) {
   const statusButton = (
     <>
       <Tooltip title="Report Status" placement="top">
-        <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu} style={{marginLeft: '1rem'}}>
-          <ReportStatusLabel status={+prop.status as ReportStatus} />&nbsp;&nbsp;<FontAwesomeIcon icon={faCaretDown} />
+        <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu}>
+          <ReportStatusLabel status={+prop.status as ReportStatus} />&nbsp;&nbsp;{prop.editable && <FontAwesomeIcon icon={faCaretDown} />}
         </Button>
       </Tooltip>
       <Menu
@@ -84,20 +85,19 @@ export function ReportHeader(prop: ReportHeaderProp) {
       <Spacer />
       
       <Box marginBottom="1rem" display="flex" alignItems="center" color="#707070">
-        <Avatar style={{width: '32px', height: '32px'}}>C</Avatar>
-        &nbsp;&nbsp;by&nbsp;<strong><span style={{color: '#505050'}}>Chanchana Wicha</span></strong>
+        Authors:&nbsp;<strong><span style={{color: '#505050'}}>None</span></strong>
         <VerticleLine />
         <FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;10 Nov, 2021
       </Box>
       { prop.mode === 'view' && 
         <Box>
-          <Button variant="contained" color="primary" onClick={handleEdit}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
+          { prop.editable && <Button variant="contained" color="primary" onClick={handleEdit} style={{marginRight: '1rem'}}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>}
           {statusButton}
         </Box>
       }
       { prop.mode === 'edit' && 
         <Box display="flex">
-          <Button variant="contained" color="primary" onClick={handleSave}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
+          <Button variant="contained" color="primary" onClick={handleSave} style={{marginRight: '1rem'}}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
           {statusButton}
           <Button variant="contained" onClick={handleDiscard} style={{marginLeft: 'auto'}}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>
         </Box>
