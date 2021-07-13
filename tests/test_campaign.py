@@ -13,6 +13,6 @@ class CampaignTest(TestCase):
         result = api.get(campaign.name)
 
         self.assertEqual(len(result['groups']), 2)
-        self.assertEqual(result['groups'][0]['category'], 'Reconstruction')
+        self.assertEqual(result['groups'][0]['name'], 'Reconstruction')
         self.assertEqual(len(result['groups'][0]['subcategories']), 2)
-        self.assertEqual(result['groups'][0]['subcategories'][0]['subcategory'], 'Data')
+        self.assertEqual(result['groups'][0]['subcategories'][0]['name'], 'Data')
