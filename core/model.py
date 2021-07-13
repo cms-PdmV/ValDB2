@@ -7,8 +7,9 @@ from flask_restx import fields
 from .database import get_database
 
 _prefilled_fields = ['_id', 'created_at', 'updated_at']
-_filter_out_load_object_key = ['_database', '_fields']
+_filter_out_load_object_key = ['_fields']
 _filter_out_store_object_key = _filter_out_load_object_key + ['_id']
+_database = get_database()
 
 T = TypeVar('T')
 
@@ -27,7 +28,6 @@ class Model():
     updated_at: datetime
 
     def __init__(self, data: dict=None):
-        self._database = get_database()
         self._fields = self._get_fields()
         self._set_fields_from_data(data)
 
@@ -35,39 +35,41 @@ class Model():
         for key in self._fields:
             setattr(self, key, data.get(key) if data else None)
 
-    def _get_data_load_object(self, data: dict) -> dict:
+    @classmethod
+    def _get_data_load_object(cls, data: dict) -> dict:
         data_load_object = {}
         if not data:
             return data_load_object
         for key, value in data.items():
-            if key in _filter_out_load_object_key or key not in self._fields:
+            if key in _filter_out_load_object_key or key not in cls._get_fields():
                 continue
 
             if key in _prefilled_fields: # is _id
                 data_load_object[key] = value
-            elif self._is_reference_field(key): # is one2many reference
+            elif cls._is_reference_field(key): # is one2many reference
                 elements = []
-                reference_model = self._get_reference_model_of_field(key)
+                reference_model = cls._get_reference_model_of_field(key)
                 for element in value:
                     elements.append(reference_model.get(element))
                 data_load_object[key] = elements
-            elif issubclass(self.__annotations__[key], Model): # is many2one reference
-                data_load_object[key] = self.__annotations__[key].get(value)
-            elif issubclass(self.__annotations__[key], Enum): # is enum
-                data_load_object[key] = self.__annotations__[key](value)
+            elif issubclass(cls.__annotations__[key], Model): # is many2one reference
+                data_load_object[key] = cls.__annotations__[key].get(value)
+            elif issubclass(cls.__annotations__[key], Enum): # is enum
+                data_load_object[key] = cls.__annotations__[key](value)
             else: # is general type
                 data_load_object[key] = value
         return data_load_object
 
-    def _get_data_store_object(self) -> dict:
+    @classmethod
+    def _get_data_store_object(cls, data: dict) -> dict:
         data_store_object = {}
-        for key, value in self.__dict__.items():
+        for key, value in data.items():
             if key in _filter_out_store_object_key:
                 continue
 
             if value is None:
                 continue
-            if self._is_reference_field(key): # is one2many reference
+            if cls._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
                     if not element._is_saved():
@@ -87,11 +89,13 @@ class Model():
     def _is_saved(self) -> bool:
         return hasattr(self, '_id') and self._id
     
-    def _is_reference_field(self, field: str) -> bool:
-        return field in self.__annotations__ and len(get_args(self.__annotations__[field])) == 1 and issubclass(get_args(self.__annotations__[field])[0], Model)
+    @classmethod
+    def _is_reference_field(cls, field: str) -> bool:
+        return field in cls.__annotations__ and len(get_args(cls.__annotations__[field])) == 1 and issubclass(get_args(cls.__annotations__[field])[0], Model)
     
-    def _get_reference_model_of_field(self, field: str):
-        return get_args(self.__annotations__[field])[0]
+    @classmethod
+    def _get_reference_model_of_field(cls, field: str):
+        return get_args(cls.__annotations__[field])[0]
 
     @classmethod
     def _get_fields(cls):
@@ -101,10 +105,10 @@ class Model():
         current_utc_time = datetime.utcnow()
         self.updated_at = current_utc_time
         if self._is_saved():
-            self._database.update(self._get_collection_name(), self._id, self._get_data_store_object())
+            _database.update(self._get_collection_name(), self._id, self._get_data_store_object(self.__dict__))
         else:
             self.created_at = current_utc_time
-            saved_data_id = self._database.create(self._get_collection_name(), self._get_data_store_object())
+            saved_data_id = _database.create(self._get_collection_name(), self._get_data_store_object(self.__dict__))
             self._id = saved_data_id
         return self
 
@@ -123,19 +127,17 @@ class Model():
     
     @classmethod
     def get(cls: T, id: Union[str, ObjectId]) -> T:
-        class_instance = cls()
-        return cls(class_instance._get_data_load_object(class_instance._database.get(cls._get_collection_name(), id)))
+        return cls(cls._get_data_load_object(_database.get(cls._get_collection_name(), id)))
 
     @classmethod
     def query(cls: T, query: dict, sort=None) -> list[T]:
-        class_instance = cls()
-        return [cls(class_instance._get_data_load_object(record)) for record in class_instance._database.query(cls._get_collection_name(), query, sort)]
+        return [cls(cls._get_data_load_object(record)) for record in _database.query(cls._get_collection_name(), query, sort)]
 
     def unlink(self):
         '''
         Remove record from the database
         '''
-        self._database.delete(self._get_collection_name(), self._id)
+        _database.delete(self._get_collection_name(), self._id)
         self._id = None
 
     def dict(self) -> dict:
