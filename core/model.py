@@ -29,9 +29,9 @@ class Model():
     def __init__(self, data: dict=None):
         self._database = get_database()
         self._fields = self._get_fields()
-        self._set_value_from_data(data)
+        self._set_fields_from_data(data)
 
-    def _set_value_from_data(self, data: dict):
+    def _set_fields_from_data(self, data: dict):
         for key in self._fields:
             setattr(self, key, data.get(key) if data else None)
 

@@ -43,7 +43,7 @@ class ReportSearchAPI(Resource):
             'group': group,
         })
 
-        if len(result) == 0:
+        if not result:
             return {'message': 'not found'}, 404
 
         return result[0].dict()
