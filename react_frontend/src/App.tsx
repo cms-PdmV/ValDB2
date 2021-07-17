@@ -21,6 +21,7 @@ import { AllUserAdminPage } from "./pages/AllUserAdminPage";
 import { UserFormAdminPage } from "./pages/UserFormAdminPage";
 import { UserAdminPage } from "./pages/UserAdminPage";
 import { AuthPage } from "./pages/Auth";
+import { UserGroupAdminPage } from "./pages/UserGroupAdminPage";
 
 const theme = createMuiTheme({
   typography: {
@@ -89,6 +90,9 @@ function App() {
               </Route>
               <Route path="/admin/users">
                 { require([UserRole.ADMIN]) && <AllUserAdminPage /> }
+              </Route>
+              <Route path="/admin/usergroups">
+                { require([UserRole.ADMIN]) && <UserGroupAdminPage /> }
               </Route>
               <Route path="/admin">
                 { require([UserRole.ADMIN]) && <AdminPage /> }

@@ -37,6 +37,12 @@ export const userService = {
     update: (id: string, body: Partial<User>): Promise<void> => axios.put(`${serverUrl}/users/${id}/`, body).then(response => response.data).catch(error => { throw error }),
 }
 
+export const userGroupService = {
+    get: (group: string): Promise<User[]> => axios.get(`${serverUrl}/usergroups/get/${group}/`).then(response => response.data),
+    add: (email: string, group: string): Promise<void> => axios.post(`${serverUrl}/usergroups/add/`, { email, group }).then(response => response.data),
+    remove: (userid: string, group: string): Promise<void> => axios.post(`${serverUrl}/usergroups/remove/`, { userid, group }).then(response => response.data),
+}
+
 export const activityService = {
     get: (reportId: string): Promise<Activity[]> => axios.get(`${serverUrl}/activities/${reportId}/`).then(response => response.data).catch(error => { throw error }),
     create: (reportId: string, activity: Partial<Activity>): Promise<Activity[]> => axios.post(`${serverUrl}/activities/${reportId}/`, activity).then(response => response.data).catch(error => { throw error }),

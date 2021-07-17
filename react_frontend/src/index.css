@@ -49,11 +49,31 @@
 .ant-btn {
   background: #e5e5e5 !important;
   border-radius: 4px;
+  font-weight: bold;
+}
+
+.ant-btn-dangerous {
+  background: #f5222d !important;
+  color: white !important;
 }
 
 .ant-btn-primary {
   background: #234df7 !important;
   border-color: #234df7;
+  color: white !important;
+}
+
+.ant-btn:hover {
+  border: white solid 1px !important;
+  color: black !important;
+}
+
+.ant-btn-primary:hover {
+  color: white !important;
+}
+
+.ant-btn-dangerous:hover {
+  color: white !important;
 }
 
 .ant-modal-content {

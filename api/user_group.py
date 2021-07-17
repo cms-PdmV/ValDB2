@@ -35,7 +35,10 @@ class UserGroupAddAPI(Resource):
         '''
         email = api.payload['email']
         group = api.payload['group']
-        UserGroupController.add_user_to_group(email, group)
+        try:
+            UserGroupController.add_user_to_group(email, group)
+        except Exception as error:
+            return {'message': str(error)}, 500
 
 
 @api.route('/remove/')
@@ -92,6 +95,9 @@ class UserGroupController():
                     user.groups = []
                     user.save()
                 else:
-                    user.groups.remove(group)
-                    user.save()
-                lookup.remove_user_from_group(user_id, group)
+                    if group in user.groups:
+                        user.groups.remove(group)
+                        user.save()
+                print(user._id)
+                print(lookup.table[group])
+                lookup.remove_user_from_group(user._id, group)
