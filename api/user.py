@@ -2,12 +2,13 @@ from core.database import get_database
 from flask_restx.marshalling import marshal_with
 from data.group import get_all_groups
 from models.user import User, UserRole
+from lookup.user_group import UserGroupLookup
 
 from flask_restx import Resource
 from core import Namespace
 
 
-api = Namespace('uesrs', description='Users and their permission groups')
+api = Namespace('users', description='Users and their permission groups')
 
 user_model = api.model(User)
 
@@ -30,6 +31,8 @@ class UserListAPI(Resource):
         body = api.payload
         precess_payload(body)
         user = User(body).save()
+        lookup = UserGroupLookup()
+        lookup.update()
         return user.dict()
 
 @api.route('/<string:id>/')
@@ -46,6 +49,8 @@ class UserAPI(Resource):
         precess_payload(body)
         user = User.get(id)
         user.update(body)
+        lookup = UserGroupLookup()
+        lookup.update()
         return user.dict()
 
     def delete(self, id):

@@ -1,7 +1,10 @@
 from bson.objectid import ObjectId
 from data.group import get_all_groups
-from models.user import User
+from models.user import User, UserRole
 
+
+# TODO: add logging
+administrator_key = 'Administrator'
 
 class UserGroupLookup():
 
@@ -9,26 +12,25 @@ class UserGroupLookup():
     def __new__(cls):
         if not hasattr(cls, 'instance'):
             cls.instance = super().__new__(cls)
+            cls.table = {}
         return cls.instance
 
-    def __init__(self):
+    def initialize(self):
         self.table = {}
-        self._initialize_table()
-
-    def _initialize_table(self):
-        self.table = {}
-        for group in get_all_groups():
+        for group in [administrator_key] + get_all_groups():
             self.table[group] = []
 
     def update(self):
         '''
         Update user group lookup table
         '''
-        users = User.query({})
-        self._initialize_table()
-        for user in users:
-            for group in user.groups:
-                self.table[group].append(user._id)
+        administrators = User.query({'role': UserRole.ADMIN.value})
+        validators = User.query({'role': UserRole.VALIDATOR.value})
+        self.initialize()
+        self.table[administrator_key] = [administrator._id for administrator in administrators]
+        for validator in validators:
+            for group in validator.groups:
+                self.table[group].append(validator._id)
 
     def add_user_to_group(self, user_id: ObjectId, group: str):
         if user_id not in self.table[group]:
@@ -38,4 +40,4 @@ class UserGroupLookup():
         self.table[group].remove(user_id)
 
     def clear(self):
-        self._initialize_table()
+        self.initialize()

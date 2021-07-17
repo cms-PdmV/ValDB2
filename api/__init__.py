@@ -10,6 +10,7 @@ from .report import api as report_namespace
 from .group import api as group_namespace
 from .user import api as user_namespace
 from .activity import api as activity_namespace
+from .user_group import api as user_group_namespace
 
 api = Api(
     title='ValDB API',
@@ -22,3 +23,4 @@ api.add_namespace(report_namespace, path='/api/reports')
 api.add_namespace(group_namespace, path='/api/groups')
 api.add_namespace(user_namespace, path='/api/users')
 api.add_namespace(activity_namespace, path='/api/activities')
+api.add_namespace(user_group_namespace, path='/api/usergroups')

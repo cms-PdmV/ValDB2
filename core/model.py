@@ -198,6 +198,14 @@ class Model():
             for record in _database.query(cls.get_collection_name(), query, sort)
         ]
 
+    @classmethod
+    def query_one(cls: T, query: dict, sort=None) -> T:
+        query_result = _database.query(cls._get_collection_name(), query, sort)
+        if query_result:
+            return cls(cls._get_data_load_object(query_result[0]))
+        else:
+            return None
+
     def unlink(self):
         '''
         Remove record from the database.
