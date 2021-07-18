@@ -6,6 +6,7 @@ import { HorizontalLine } from "./HorizontalLine";
 import { reportStatusStyle } from "../utils/report";
 import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { SplitGroup } from "../utils/constant";
+import { useState } from "react";
 
 
 interface CategoryCompactViewProp {
@@ -29,14 +30,16 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
     { !selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
   </>)
 
-  return (
-    <Box width="100%">
-      {prop.categories.map((category, index) => <Accordion>
+  const CategoryReportList = ({ category }: { category: Category }) => {
+    const [expanded, setExpanded] = useState<boolean>(false);
+
+    return (
+      <Accordion expanded={expanded} onChange={(e, isExpanded) => { setExpanded(isExpanded) }}>
         <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown} />}>
           <strong>{category.name}</strong>
         </AccordionSummary>
         <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
-          {category.subcategories.map((subcategory, subindex) => <>
+          { expanded && category.subcategories.map((subcategory, subindex) => <>
             <HorizontalLine />
             <Box padding="1rem">
               <strong>{subcategory.name}</strong>
@@ -74,7 +77,15 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
             </Box>
           </>)}
         </AccordionDetails>
-      </Accordion>)}
+      </Accordion>
+    )
+  }
+
+  return (
+    <Box width="100%">
+      {prop.categories.map((category, index) => 
+        <CategoryReportList category={category} />
+      )}
     </Box>
   )
 }

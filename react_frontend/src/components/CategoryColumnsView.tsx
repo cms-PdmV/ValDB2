@@ -1,4 +1,4 @@
-import { Box, List, ListItem, Paper, ListItemText, ListItemSecondaryAction } from "@material-ui/core";
+import { Box, List, ListItem, Paper, ListItemText, ListItemSecondaryAction, ListSubheader } from "@material-ui/core";
 import { Category, ReportStatus } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faChevronRight, faSquare } from '@fortawesome/free-solid-svg-icons';
@@ -73,7 +73,9 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
           <List style={{padding: 0}}>
             {availableList.map((category, index) =>
               category.subcategories.map((subcategory, subindex) => <>
-                <Box padding="0.5rem 1rem" style={{background: '#e0e0e0'}} fontWeight="bold" borderRadius="8px" >{category.name} / {subcategory.name}</Box>
+                <ListSubheader style={{margin: '0 0 8px 0 0', padding: 0}}>
+                  <Box padding="0rem 1rem" style={{background: '#e0e0e0'}} height="38px" lineHeight="38px" fontWeight="bold" borderRadius="8px" >{category.name} / {subcategory.name}</Box>
+                </ListSubheader>
                 {subcategory.groups.map((group, groupindex) => (<>
                   { prop.reportView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} button style={{height: '48px'}}>
                     {group.path.split('.')[2]}
