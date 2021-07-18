@@ -1,5 +1,5 @@
 import { faCaretDown, faExclamationCircle, faPlus, faTimes, faTrash, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { Accordion, AccordionSummary, AccordionDetails, Chip, Dialog, DialogTitle, TextField, Box, Button } from "@material-ui/core";
+import { Accordion, AccordionSummary, AccordionDetails, Chip, Dialog, DialogTitle, TextField, Box, Button, Tooltip } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from "react";
 import { User } from "../types";
@@ -96,8 +96,10 @@ export function UserGroupList(prop: UserGroupListProp) {
           {loading && 'Loading...'}
           {users && <>
             <Chip onClick={openDialog} color="primary" label={<span><FontAwesomeIcon icon={faPlus}/><strong>&nbsp;&nbsp;Add</strong></span>} style={{...chipStyle, cursor: 'pointer'}} />
-            {users.map((user, index) => 
-              <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user._id, user.fullname || user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
+            {users.map((user, index) =>
+              <Tooltip title={user.email} placement="top" arrow>
+                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user._id, user.fullname || user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
+              </Tooltip>
             )}
             {users.length == 0 && <span style={{color: '#707070', fontStyle: 'italic'}}>Empty</span>}
           </>}
