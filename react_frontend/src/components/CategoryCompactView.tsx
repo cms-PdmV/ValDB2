@@ -5,6 +5,7 @@ import { faCaretDown, faCheck, faSquare } from '@fortawesome/free-solid-svg-icon
 import { HorizontalLine } from "./HorizontalLine";
 import { reportStatusStyle } from "../utils/report";
 import { buttonIconStyle, buttonStyle, color } from "../utils/css";
+import { SplitGroup } from "../utils/constant";
 
 
 interface CategoryCompactViewProp {
@@ -39,17 +40,37 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
             <HorizontalLine />
             <Box padding="1rem">
               <strong>{subcategory.name}</strong>
-              <Box borderRadius="8px" style={{background: 'white'}}>
-                {subcategory.groups.map((group, inedx) => 
-                  <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
-                    <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
-                    <Box padding="0 0 0.5rem" display="flex">
-                      {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
-                      {prop.selectableView && selectButton(group, group.selected || false)}
+              { !(category.name in SplitGroup) &&
+                <Box>
+                  {subcategory.groups.map((group, inedx) => 
+                    <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
+                      <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
+                      <Box padding="0 0 0.5rem" display="flex">
+                        {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
+                        {prop.selectableView && selectButton(group, group.selected || false)}
+                      </Box>
                     </Box>
-                  </Box>
-                )}
-              </Box>
+                  )}
+                </Box>
+              }
+              { (category.name in SplitGroup) &&
+                <Box>
+                  { SplitGroup[category.name].map((splitGroup: any) => 
+                    <Box paddingLeft="1rem" marginTop="1rem">
+                      <Box marginBottom="-0.5rem"><strong>{splitGroup.name}</strong></Box>
+                      {subcategory.groups.slice(...splitGroup.slice).map((group, inedx) => 
+                        <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
+                          <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
+                          <Box padding="0 0 0.5rem" display="flex">
+                            {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
+                            {prop.selectableView && selectButton(group, group.selected || false)}
+                          </Box>
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                </Box>
+              }
             </Box>
           </>)}
         </AccordionDetails>
