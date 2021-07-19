@@ -51,12 +51,12 @@ export function UserGroupList(prop: UserGroupListProp) {
     // TODO: show error message
   }
 
-  const handleRemove = (userId: string, name: string) => {
+  const handleRemove = (userId: string, name: string, email: string) => {
     console.log(userId)
     console.log(prop.group)
     confirm({
       title: 'Remove user from group?',
-      content: <span>Remove <strong>{name}</strong> from <strong>{prop.group.replaceAll('.', ' / ')}</strong></span>,
+      content: <span>Remove {name && <strong>{name}</strong>}({email}) <br />from <strong>{prop.group.replaceAll('.', ' / ')}</strong></span>,
       okText: 'Remove',
       okType: 'danger',
       cancelText: 'Cancel',
@@ -98,7 +98,7 @@ export function UserGroupList(prop: UserGroupListProp) {
             <Chip onClick={openDialog} color="primary" label={<span><FontAwesomeIcon icon={faPlus}/><strong>&nbsp;&nbsp;Add</strong></span>} style={{...chipStyle, cursor: 'pointer'}} />
             {users.map((user, index) =>
               <Tooltip title={user.email} placement="top" arrow>
-                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user._id, user.fullname || user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
+                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user._id, user.fullname, user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
               </Tooltip>
             )}
             {users.length == 0 && <span style={{color: '#707070', fontStyle: 'italic'}}>Empty</span>}
