@@ -3,7 +3,6 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import { TodoPage } from "./pages/Todo"
 import { ReportPage } from './pages/ReportPage';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { primaryColor } from './utils/css';
@@ -99,9 +98,6 @@ function App() {
               </Route>
               <Route path="/user">
                 <UserPage />
-              </Route>
-              <Route path="/todo">
-                <TodoPage />
               </Route>
               <Route path="/">
                 <AllCampaignPage />

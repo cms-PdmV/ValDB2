@@ -1,6 +1,5 @@
 .MuiButtonBase-root :not(.MuiButtonGroup-grouped) {
   box-shadow: none !important;
-  border-radius: 6px !important;
 }
 
 .MuiListItem-root {

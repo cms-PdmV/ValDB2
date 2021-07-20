@@ -11,11 +11,11 @@ export const SplitGroup: any = {
     ],
     HLT: [
         {
-            name: 'Group1',
+            name: 'POGs',
             slice: [0, 8],
         },
         {
-            name: 'Group2',
+            name: 'PAGs',
             slice: [8, 17],
         },
     ],
