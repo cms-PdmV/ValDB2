@@ -80,7 +80,7 @@ class UserGroupController():
                     user.groups.append(group)
             user.role = target_role
             user.save()
-            lookup.add_user_to_group(user._id, group)
+            lookup.add_user_to_group(user.id, group)
         else:
             raise Exception('group is not in table')
 
@@ -98,6 +98,6 @@ class UserGroupController():
                     if group in user.groups:
                         user.groups.remove(group)
                         user.save()
-                print(user._id)
+                print(user.id)
                 print(lookup.table[group])
-                lookup.remove_user_from_group(user._id, group)
+                lookup.remove_user_from_group(user.id, group)

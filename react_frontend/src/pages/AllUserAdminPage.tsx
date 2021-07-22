@@ -34,7 +34,7 @@ export function AllUserAdminPage() {
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user._id} onClick={() => { history.push(`/admin/users/${user._id}`)}} style={{cursor: 'pointer'}}>
+              <TableRow key={user.id} onClick={() => { history.push(`/admin/users/${user.id}`)}} style={{cursor: 'pointer'}}>
                 <TableCell component="th" scope="row">{user.fullname}</TableCell>
                 <TableCell align="left">{user.email}</TableCell>
                 <TableCell align="left">{userRoleLabel[user.role as UserRole]}</TableCell>

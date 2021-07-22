@@ -26,3 +26,4 @@ class Report(Model):
     campaign_name: str
     status: ReportStatus
     content: str
+    activities: list[Activity]

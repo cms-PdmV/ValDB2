@@ -77,8 +77,8 @@ export function UserFormAdminPage() {
       groups: selectedGroups
     }
     console.log(body)
-    user && userService.update(user._id, body).then(_ => {
-      history.push(`/admin/users/${user._id}`)
+    user && userService.update(user.id, body).then(_ => {
+      history.push(`/admin/users/${user.id}`)
     }).catch(error => alert(error))
   }
 

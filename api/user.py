@@ -23,7 +23,7 @@ class UserListAPI(Resource):
 
     @api.marshal_list_with(user_model)
     def get(self):
-        users = list(get_database().database[User._get_collection_name()].find({}))
+        users = list(get_database().database[User.get_collection_name()].find({}))
         return users
 
     @api.marshal_with(user_model)

@@ -27,10 +27,10 @@ class UserGroupLookup():
         administrators = User.query({'role': UserRole.ADMIN.value})
         validators = User.query({'role': UserRole.VALIDATOR.value})
         self.initialize()
-        self.table[administrator_key] = [administrator._id for administrator in administrators]
+        self.table[administrator_key] = [administrator.id for administrator in administrators]
         for validator in validators:
             for group in validator.groups:
-                self.table[group].append(validator._id)
+                self.table[group].append(validator.id)
 
     def add_user_to_group(self, user_id: ObjectId, group: str):
         if user_id not in self.table[group]:

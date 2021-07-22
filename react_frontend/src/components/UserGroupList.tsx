@@ -98,7 +98,7 @@ export function UserGroupList(prop: UserGroupListProp) {
             <Chip onClick={openDialog} color="primary" label={<span><FontAwesomeIcon icon={faPlus}/><strong>&nbsp;&nbsp;Add</strong></span>} style={{...chipStyle, cursor: 'pointer'}} />
             {users.map((user, index) =>
               <Tooltip title={user.email} placement="top" arrow>
-                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user._id, user.fullname, user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
+                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user.id, user.fullname, user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
               </Tooltip>
             )}
             {users.length == 0 && <span style={{color: '#707070', fontStyle: 'italic'}}>Empty</span>}

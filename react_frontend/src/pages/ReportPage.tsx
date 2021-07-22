@@ -46,7 +46,7 @@ export function ReportPage () {
         setEditingContent(response.data.content)
         setStatus(response.data.status)
         setAuthors(response.data.authors)
-        updateActivities(response.data._id)
+        updateActivities(response.data.id)
       } else {
         throw Error('Internal Error')
       }
@@ -57,8 +57,8 @@ export function ReportPage () {
     history.replace(`/campaigns/${campaign}/report/${group}`)
     if (report && user) {
       if (editingContent !== content) {
-        const newAuthors = [user].concat((report.authors || []).filter(e => e._id !== user?._id))
-        reportService.update(report._id, {
+        const newAuthors = [user].concat((report.authors || []).filter(e => e.id !== user?.id))
+        reportService.update(report.id, {
           content: editingContent,
           authors: newAuthors,
         }).then(response => {
@@ -66,7 +66,7 @@ export function ReportPage () {
             console.log('success')
             setContent(editingContent)
             setAuthors(newAuthors)
-            logReport.edit(report._id, user).then(_ => {
+            logReport.edit(report.id, user).then(_ => {
               updateActivities()
             })
           } else {
@@ -83,12 +83,12 @@ export function ReportPage () {
 
   const handleChangeStatus = (newStatus: number) => {
     if (report && user) {
-      reportService.update(report._id, {
+      reportService.update(report.id, {
         status: newStatus
       }).then(response => {
         if (response.status) {
           console.log('success')
-          logReport.changeStatus(report._id, user, status, newStatus).then(_ => {
+          logReport.changeStatus(report.id, user, status, newStatus).then(_ => {
             updateActivities()
           })
           setStatus(newStatus as ReportStatus)
@@ -102,7 +102,7 @@ export function ReportPage () {
   }
 
   const updateActivities = (reportId: string='') => {
-    const id = reportId || report?._id || ''
+    const id = reportId || report?.id || ''
     console.log(id)
     activityService.get(id).then(response => {
       console.log(response)
@@ -129,7 +129,7 @@ export function ReportPage () {
       { activities && <ActivityList activities={activities} /> }
       <HorizontalLine />
       <Spacer />
-      { user && report && <CommentBox reportId={report._id} user={user} updateActivities={updateActivities} /> }
+      { user && report && <CommentBox reportId={report.id} user={user} updateActivities={updateActivities} /> }
     </Container>
   )
 }

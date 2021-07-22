@@ -31,7 +31,7 @@ export function UserAdminPage() {
       <h1>{user?.fullname}</h1>
       <Label label="Role" value={userRoleLabel[user?.role as UserRole]} />
       <Label label="Email" value={user?.email} />
-      <Button variant="contained" color="primary" onClick={() => { history.push(`/admin/users/${user?._id}/edit`) }}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
+      <Button variant="contained" color="primary" onClick={() => { history.push(`/admin/users/${user?.id}/edit`) }}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
       <Spacer />
       <HorizontalLine />
       { user?.role !== UserRole.USER && <Box>

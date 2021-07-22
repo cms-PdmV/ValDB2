@@ -18,7 +18,7 @@ export enum UserRole {
 }
 
 export interface User {
-    _id: string
+    id: string
     role: UserRole
     email: string
     fullname: string
@@ -66,7 +66,6 @@ export interface Report {
 
 export interface Campaign {
     id?: string
-    id: string
     name: string
     description: string
     manager: User
