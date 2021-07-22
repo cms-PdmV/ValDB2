@@ -23,7 +23,7 @@ class Status(Enum):
 class Child(Model):
     name: str
 
-class AllTypeModel(Model):
+class AllTypeModel(Model): # pylint: disable=R0902
     name: str
     number: int
     value: float

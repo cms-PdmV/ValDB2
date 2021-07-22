@@ -1,6 +1,9 @@
+'''
+Base model class for ORM
+'''
 from datetime import datetime
 from enum import Enum
-from typing import TypeVar, Union, get_args
+from typing import Dict, TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
 from flask_restx import fields
@@ -12,7 +15,7 @@ FILTER_OUT_LOAD_OBJECT_KEY = ['_fields']
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ['id']
 _database = get_database()
 
-T = TypeVar('T')
+T = TypeVar('T') # pylint: disable=C0103
 
 class CustomField(fields.Raw):
     '''
@@ -32,15 +35,15 @@ class Model():
     Each object includes id, created_at, updated_up fields.
     '''
 
-    id: ObjectId
+    id: ObjectId # pylint: disable=C0103
     created_at: datetime
     updated_at: datetime
 
-    def __init__(self, data=None):
+    def __init__(self, data: Dict=None):
         self._fields = self._get_fields()
         self._set_fields_from_data(data)
 
-    def _set_fields_from_data(self, data: dict):
+    def _set_fields_from_data(self, data: Dict):
         '''
         Set attribute of object from data dictionary.
         '''
@@ -48,7 +51,7 @@ class Model():
             setattr(self, key, data.get(key) if data else None)
 
     @classmethod
-    def _get_data_load_object(cls, data: dict) -> dict:
+    def _get_data_load_object(cls, data: Dict) -> Dict:
         '''
         Get load data dictionary for converting to python object.
         '''
@@ -70,16 +73,16 @@ class Model():
                 for element in value:
                     elements.append(reference_model.get(element))
                 data_load_object[key] = elements
-            elif issubclass(cls.__annotations__[key], Model): # is many2one reference
-                data_load_object[key] = cls.__annotations__[key].get(value)
-            elif issubclass(cls.__annotations__[key], Enum): # is enum
-                data_load_object[key] = cls.__annotations__[key](value)
+            elif issubclass(cls.get_annotations()[key], Model): # is many2one reference
+                data_load_object[key] = cls.get_annotations()[key].get(value)
+            elif issubclass(cls.get_annotations()[key], Enum): # is enum
+                data_load_object[key] = cls.get_annotations()[key](value)
             else: # is general type
                 data_load_object[key] = value
         return data_load_object
 
     @classmethod
-    def _get_data_store_object(cls, data: dict) -> dict:
+    def _get_data_store_object(cls, data: Dict) -> Dict:
         '''
         Get store data dictionary for storing in database.
         '''
@@ -118,23 +121,23 @@ class Model():
         '''
         Retrun True if this record is a reference field.
         '''
-        return field in cls.__annotations__ and \
-            len(get_args(cls.__annotations__[field])) == 1 and \
-            issubclass(get_args(cls.__annotations__[field])[0], Model)
+        return field in cls.get_annotations() and \
+            len(get_args(cls.get_annotations()[field])) == 1 and \
+            issubclass(get_args(cls.get_annotations()[field])[0], Model)
 
     @classmethod
     def _get_reference_model_of_field(cls, field: str):
         '''
         Get reference field's class.
         '''
-        return get_args(cls.__annotations__[field])[0]
+        return get_args(cls.get_annotations()[field])[0]
 
     @classmethod
     def _get_fields(cls):
         '''
         All fields in object including prefilled fields.
         '''
-        return list(cls.__annotations__.keys()) + PREFILLED_FIELDS
+        return list(cls.get_annotations().keys()) + PREFILLED_FIELDS
 
     def save(self: T) -> T:
         '''
@@ -151,15 +154,15 @@ class Model():
             saved_data_id = _database.create(self.get_collection_name(),
                 self._get_data_store_object(self.__dict__)
             )
-            self.id = saved_data_id
+            self.id = saved_data_id # pylint: disable=C0103
         return self
 
-    def update(self: T, data: dict) -> T:
+    def update(self: T, data: Dict) -> T:
         '''
         Update the object with data dictionary and save to database.
         '''
         for key in data:
-            if key in self.__annotations__:
+            if key in self.get_annotations():
                 setattr(self, key, data[key])
         self.save()
         return self
@@ -174,14 +177,14 @@ class Model():
         return snake_case_name
 
     @classmethod
-    def get(cls: T, id: Union[str, ObjectId]) -> T:
+    def get(cls: T, record_id: Union[str, ObjectId]) -> T:
         '''
         Get object by their id.
         '''
-        return cls(cls._get_data_load_object(_database.get(cls.get_collection_name(), id)))
+        return cls(cls._get_data_load_object(_database.get(cls.get_collection_name(), record_id)))
 
     @classmethod
-    def query(cls: T, query: dict, sort=None) -> list[T]:
+    def query(cls: T, query: Dict, sort=None) -> list[T]:
         '''
         Query objects from database.
         '''
@@ -191,7 +194,7 @@ class Model():
 
     def unlink(self):
         '''
-        Remove record from the database
+        Remove record from the database.
         '''
         _database.delete(self.get_collection_name(), self.id)
         self.id = None
@@ -212,7 +215,7 @@ class Model():
         Update datetime from request in the model
         '''
         for field in self._fields:
-            if hasattr(self, field) and self.__annotations__.get(field) is datetime and \
+            if hasattr(self, field) and self.get_annotations().get(field) is datetime and \
                 isinstance(getattr(self, field), str):
                 datetime_object = datetime.strptime(getattr(self, field), datetime_format)
                 setattr(self, field, datetime_object)
@@ -266,16 +269,23 @@ class Model():
         return restx_field
 
     @classmethod
-    def get_flask_restx_fields(cls) -> dict:
+    def get_annotations(cls) -> Dict:
         '''
-        Return Flask RestX fields for model documentation
+        Return __annotations__ of object.
+        '''
+        return cls.__annotations__ # pylint: disable=E1101
+
+    @classmethod
+    def get_flask_restx_fields(cls) -> Dict:
+        '''
+        Return Flask RestX fields for model documentation.
         '''
         restx_fields = {}
         restx_fields['id'] = fields.String
         restx_fields['created_at'] = fields.String
         restx_fields['updated_at'] = fields.String
-        for key in cls.__annotations__:
-            type_of_field = cls.__annotations__[key]
+        for key in cls.get_annotations():
+            type_of_field = cls.get_annotations()[key]
             restx_fields[key] = cls._get_flask_restx_field(type_of_field)
         return restx_fields
 

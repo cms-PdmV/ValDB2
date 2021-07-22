@@ -1,3 +1,6 @@
+'''
+Database interface
+'''
 from typing import Union
 import os
 
@@ -77,6 +80,9 @@ database_connector = {
 }
 
 def get_database():
+    '''
+    Get database object. Return singleton database object.
+    '''
     load_dotenv()
     database_connector_type = os.getenv('DATABASE_CONNECTOR')
     return (database_connector[database_connector_type])()

@@ -1,3 +1,6 @@
+'''
+Campaign API
+'''
 import pymongo
 
 from flask_restx import Resource
@@ -16,9 +19,14 @@ campaign_model = api.model(Campaign)
 
 @api.route('/')
 class CampaignListAPI(Resource):
-
+    '''
+    Campaign list API
+    '''
     @api.marshal_list_with(campaign_model)
     def get(self):
+        '''
+        Get all campaign list
+        '''
         campaigns = list(
             get_database().database[Campaign.get_collection_name()]
             .find({}, {'reports': False})
@@ -28,6 +36,9 @@ class CampaignListAPI(Resource):
 
     @api.marshal_with(campaign_model)
     def post(self):
+        '''
+        Create campaign
+        '''
         data = api.payload
         campaign = Campaign(data)
         campaign.parse_datetime()
@@ -39,8 +50,13 @@ class CampaignListAPI(Resource):
 @api.route('/<string:campaignname>/')
 @api.param('campaignname', 'Campaign Short ID')
 class CampaignAPI(Resource):
-
+    '''
+    Campaign API
+    '''
     def get(self, campaignname):
+        '''
+        Get campaign by id
+        '''
         campaign = Campaign.get_by_name(campaignname)
         if not campaign:
             return {'message': 'not found'}, 404

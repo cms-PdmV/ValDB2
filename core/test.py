@@ -1,3 +1,6 @@
+'''
+Test case for unit test
+'''
 import os
 import unittest
 
@@ -15,6 +18,9 @@ class TestCase(unittest.TestCase):
 
     @staticmethod
     def _check_database_name():
+        '''
+        Check that test database should not be the same as running database
+        '''
         with open('.env') as file:
             for line in file:
                 line = line.split('=')
@@ -29,6 +35,9 @@ class TestCase(unittest.TestCase):
 
     @staticmethod
     def _clean_database():
+        '''
+        Remove all data in test database
+        '''
         database = get_database()
         database.client.drop_database(os.getenv(DATABASE_NAME_KEY))
 

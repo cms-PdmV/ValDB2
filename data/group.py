@@ -1,3 +1,6 @@
+'''
+Group permission data
+'''
 reconstruction_groups = ['Tracker', 'Ecal', 'HGcal', 'Hcal', 'CASTOR', 'DT', 'CSC', 'RPC', 'GEM',
     'MTD', 'PPS', 'L1', 'Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau',
     'PF', 'Info', 'RelMon'

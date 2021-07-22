@@ -1,3 +1,6 @@
+'''
+Main module for valdb
+'''
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv

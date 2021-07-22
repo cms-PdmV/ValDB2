@@ -1,3 +1,6 @@
+'''
+Report API
+'''
 from flask_restx import Resource
 
 from models.report import Report, ReportStatus
@@ -11,9 +14,12 @@ report_model = api.model(Report)
 
 @api.route('/')
 class ReportListAPI(Resource):
-
+    '''
+    Report list API
+    '''
     def post(self):
         '''
+        Create new report
         body: {
             campaign_name: string
             group: string
@@ -37,8 +43,14 @@ class ReportListAPI(Resource):
 @api.param('campaign', 'Campaign name')
 @api.param('group', 'Group path related to the report')
 class ReportSearchAPI(Resource):
+    '''
+    Report search API
+    '''
     @api.marshal_with(report_model)
     def get(self, campaign, group):
+        '''
+        Search report by campaign name and group name
+        '''
         result = Report.query({
             'campaign_name': campaign,
             'group': group,
@@ -52,9 +64,13 @@ class ReportSearchAPI(Resource):
 @api.route('/<string:reportid>/')
 @api.param('reportid', 'Report id')
 class ReportAPI(Resource):
+    '''
+    Report API
+    '''
 
     def put(self, reportid):
         '''
+        Get report by id
         body: {
             content: string
             user: string
