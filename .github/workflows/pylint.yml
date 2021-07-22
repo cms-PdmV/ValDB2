@@ -24,4 +24,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        python3 -m pylint `find . -type f | grep .py$ | xargs`
+        python3 -m pylint `find . -type f | grep .py$ | grep -v tests/ | xargs` --disable=R0201,R0903
