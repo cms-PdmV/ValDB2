@@ -36,7 +36,7 @@ export function CampaignFormPage () {
     campaignService.create(body).then(response => {
       if (response.status) {
         console.log(response.data)
-        if (response.data._id) {
+        if (response.data.id) {
           console.log('success !')
           history.push(`/campaigns/${response.data.name}`)
         }

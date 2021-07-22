@@ -6,9 +6,9 @@ from bson.objectid import ObjectId
 from flask_restx import fields
 from .database import get_database
 
-_prefilled_fields = ['_id', 'created_at', 'updated_at']
+_prefilled_fields = ['id', 'created_at', 'updated_at']
 _filter_out_load_object_key = ['_fields']
-_filter_out_store_object_key = _filter_out_load_object_key + ['_id']
+_filter_out_store_object_key = _filter_out_load_object_key + ['id']
 _database = get_database()
 
 T = TypeVar('T')
@@ -23,7 +23,7 @@ class CustomField(fields.Raw):
         super().__init__(*args, **kwargs)
 
 class Model():
-    _id: ObjectId
+    id: ObjectId
     created_at: datetime
     updated_at: datetime
 
@@ -41,10 +41,13 @@ class Model():
         if not data:
             return data_load_object
         for key, value in data.items():
+            if key == '_id':
+                data_load_object['id'] = value
+                continue
             if key in _filter_out_load_object_key or key not in cls._get_fields():
                 continue
 
-            if key in _prefilled_fields: # is _id
+            if key in _prefilled_fields:
                 data_load_object[key] = value
             elif cls._is_reference_field(key): # is one2many reference
                 elements = []
@@ -74,12 +77,12 @@ class Model():
                 for element in value:
                     if not element._is_saved():
                         element.save()
-                    element_ids.append(element._id)
+                    element_ids.append(element.id)
                 data_store_object[key] = element_ids
             elif isinstance(value, Model): # is many2one reference
                 if not value._is_saved():
                     value.save()
-                data_store_object[key] = value._id
+                data_store_object[key] = value.id
             elif isinstance(value, Enum): # is enum
                 data_store_object[key] = value.value
             else: # is general type
@@ -87,7 +90,7 @@ class Model():
         return data_store_object
 
     def _is_saved(self) -> bool:
-        return hasattr(self, '_id') and self._id
+        return hasattr(self, 'id') and self.id
     
     @classmethod
     def _is_reference_field(cls, field: str) -> bool:
@@ -105,11 +108,11 @@ class Model():
         current_utc_time = datetime.utcnow()
         self.updated_at = current_utc_time
         if self._is_saved():
-            _database.update(self._get_collection_name(), self._id, self._get_data_store_object(self.__dict__))
+            _database.update(self._get_collection_name(), self.id, self._get_data_store_object(self.__dict__))
         else:
             self.created_at = current_utc_time
             saved_data_id = _database.create(self._get_collection_name(), self._get_data_store_object(self.__dict__))
-            self._id = saved_data_id
+            self.id = saved_data_id
         return self
 
     def update(self: T, data: dict) -> T:
@@ -137,8 +140,8 @@ class Model():
         '''
         Remove record from the database
         '''
-        _database.delete(self._get_collection_name(), self._id)
-        self._id = None
+        _database.delete(self._get_collection_name(), self.id)
+        self.id = None
 
     def dict(self) -> dict:
         '''
@@ -208,7 +211,7 @@ class Model():
         Return Flask RestX fields for model documentation
         '''
         restx_fields = {}
-        restx_fields['_id'] = fields.String
+        restx_fields['id'] = fields.String
         restx_fields['created_at'] = fields.String
         restx_fields['updated_at'] = fields.String
         for key in cls.__annotations__:

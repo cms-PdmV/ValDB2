@@ -53,7 +53,7 @@ export function AllCampaignPage () {
             </TableHead>
             <TableBody>
               {campaigns.map((campaign) => (
-                <TableRow key={campaign._id} onClick={() => handleClickCampaign(campaign.name)} style={{cursor: 'pointer'}}>
+                <TableRow key={campaign.id} onClick={() => handleClickCampaign(campaign.name)} style={{cursor: 'pointer'}}>
                   <TableCell component="th" scope="row">{campaign.name}</TableCell>
                   <TableCell align="left">{getCategoryLabel(campaign.subcategories).map(label => <Chip label={label} style={{marginRight: '0.5rem'}} />)}</TableCell>
                   <TableCell align="right">{campaign.created_at.split('.')[0]}</TableCell>

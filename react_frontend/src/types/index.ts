@@ -50,7 +50,7 @@ export enum ReportStatus {
 }
 
 export interface Report {
-    _id: string
+    id: string
     authors: User[]
     group: string
     campaign_name: string
@@ -60,7 +60,7 @@ export interface Report {
 }
 
 export interface Campaign {
-    _id?: string
+    id?: string
     id: string
     name: string
     description: string

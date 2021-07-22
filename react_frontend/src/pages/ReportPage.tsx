@@ -45,7 +45,7 @@ export function ReportPage () {
   const handleSave = () => {
     history.replace(`/campaigns/${campaign}/report/${group}`)
     if (report) {
-      reportService.update(report._id, {
+      reportService.update(report.id, {
         content: editingContent,
       }).then(response => {
         if (response.status) {
@@ -62,7 +62,7 @@ export function ReportPage () {
 
   const handleChangeStatus = (newStatus: number) => {
     if (report) {
-      reportService.update(report._id, {
+      reportService.update(report.id, {
         status: newStatus
       }).then(response => {
         if (response.status) {
