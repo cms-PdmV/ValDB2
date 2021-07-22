@@ -1,13 +1,16 @@
-from core.database import get_database
-
 import pymongo
-from models.campaign import Campaign
+
 from flask_restx import Resource
+
+from core.database import get_database
 from core import Namespace
+from models.campaign import Campaign
 from data.group import group
 
 
-api = Namespace('campaigns', description='Manager can create, read, update and delete campaign in the system')
+api = Namespace('campaigns',
+    description='Manager can create, read, update and delete campaign in the system'
+)
 
 campaign_model = api.model(Campaign)
 
@@ -16,10 +19,8 @@ class CampaignListAPI(Resource):
 
     @api.marshal_list_with(campaign_model)
     def get(self):
-        # TODO: Pageination
-        # TODO: fix slow ORM when fetch large data
         campaigns = list(
-            get_database().database[Campaign._get_collection_name()]
+            get_database().database[Campaign.get_collection_name()]
             .find({}, {'reports': False})
             .sort([('created_at', pymongo.DESCENDING)])
         )
@@ -60,7 +61,9 @@ class CampaignAPI(Resource):
                     'subcategories': [],
                 }
             subcategory = category_subcategory.split('.')[1]
-            groups = [f'{category_subcategory}.{each_group}' for each_group in group[category][subcategory]]
+            groups = [f'{category_subcategory}.{each_group}'
+                for each_group in group[category][subcategory]
+            ]
             campaign_group[category]['subcategories'].append({
                 'subcategory': subcategory,
                 'groups': [{
@@ -68,11 +71,9 @@ class CampaignAPI(Resource):
                     'report': report_table.get(g).dict() if g in report_table else None,
                 } for g in groups],
             })
-        groups = [value for value in campaign_group.values()]
+        groups = list(campaign_group.values())
 
         return {
             'campaign': campaign.dict(),
             'groups': groups,
         }
-
-    # TODO: put request

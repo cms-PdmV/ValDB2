@@ -1,12 +1,14 @@
 from datetime import datetime
+from enum import Enum
+
 from bson.objectid import ObjectId
 from flask_restx import fields
+
 from core.model import CustomField, Model
 from core.database import MongoDatabase
 from core.test import TestCase
-from enum import Enum
 
-new_model_collection_name = 'new_model'
+NEW_MODEL_COLLECTION_NAME = 'new_model'
 
 class NewModel(Model):
     name: str
@@ -35,12 +37,12 @@ class AllTypeModel(Model):
 class TestModel(TestCase):
 
     def __init__(self, *args, **kwargs):
-        db = MongoDatabase()
-        db.database.drop_collection(new_model_collection_name)
+        database = MongoDatabase()
+        database.database.drop_collection(NEW_MODEL_COLLECTION_NAME)
         super().__init__(*args, **kwargs)
 
     def test_save_get(self):
-        db = MongoDatabase()
+        database = MongoDatabase()
         data1 = NewModel()
         data1.name = 'test_name'
         data1.amount = 5
@@ -54,16 +56,16 @@ class TestModel(TestCase):
         data2.save()
 
         self.assertTrue(isinstance(data1.id, ObjectId))
-        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1.id})
-        self.assertEqual(db_data1['name'], 'test_name')
-        self.assertEqual(db_data1['amount'], 5)
-        self.assertEqual(db_data1['active'], True)
+        database_data1 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data1.id})
+        self.assertEqual(database_data1['name'], 'test_name')
+        self.assertEqual(database_data1['amount'], 5)
+        self.assertEqual(database_data1['active'], True)
 
         self.assertTrue(isinstance(data2.id, ObjectId))
-        db_data2 = db.database[new_model_collection_name].find_one({'_id': data2.id})
-        self.assertEqual(db_data2['name'], 'test_name2')
-        self.assertEqual(db_data2['amount'], 10)
-        self.assertEqual(db_data2['active'], False)
+        database_data2 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data2.id})
+        self.assertEqual(database_data2['name'], 'test_name2')
+        self.assertEqual(database_data2['amount'], 10)
+        self.assertEqual(database_data2['active'], False)
 
         data3 = NewModel({
             'name': 'test_name3',
@@ -72,16 +74,16 @@ class TestModel(TestCase):
         }).save()
 
         self.assertTrue(isinstance(data3.id, ObjectId))
-        db_data3 = db.database[new_model_collection_name].find_one({'_id': data3.id})
-        self.assertEqual(db_data3['name'], 'test_name3')
-        self.assertEqual(db_data3['amount'], 20)
-        self.assertEqual(db_data3['active'], True)
+        database_data3 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data3.id})
+        self.assertEqual(database_data3['name'], 'test_name3')
+        self.assertEqual(database_data3['amount'], 20)
+        self.assertEqual(database_data3['active'], True)
 
         data1.amount = 50
         data1.save()
 
-        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1.id})
-        self.assertEqual(db_data1['amount'], 50)
+        database_data1 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data1.id})
+        self.assertEqual(database_data1['amount'], 50)
 
     def test_get(self):
         data1 = NewModel()
@@ -98,18 +100,18 @@ class TestModel(TestCase):
 
         self.assertTrue(isinstance(data1.id, ObjectId))
         self.assertTrue(isinstance(data2.id, ObjectId))
-        db_data1 = NewModel.get(data1.id)
-        db_data2 = NewModel.get(data2.id)
-        self.assertEqual(db_data1.name, 'test_name')
-        self.assertEqual(db_data2.name, 'test_name2')
-        self.assertEqual(db_data1.amount, 5)
-        self.assertEqual(db_data2.amount, 10)
-        self.assertEqual(db_data1.active, True)
-        self.assertEqual(db_data2.active, False)
+        database_data1 = NewModel.get(data1.id)
+        database_data2 = NewModel.get(data2.id)
+        self.assertEqual(database_data1.name, 'test_name')
+        self.assertEqual(database_data2.name, 'test_name2')
+        self.assertEqual(database_data1.amount, 5)
+        self.assertEqual(database_data2.amount, 10)
+        self.assertEqual(database_data1.active, True)
+        self.assertEqual(database_data2.active, False)
 
     def test_query(self):
-        db = MongoDatabase()
-        db.database.drop_collection(new_model_collection_name)
+        database = MongoDatabase()
+        database.database.drop_collection(NEW_MODEL_COLLECTION_NAME)
 
         self.assertEqual(len(NewModel.query({})), 0)
 
@@ -131,7 +133,7 @@ class TestModel(TestCase):
         self.assertEqual(queried_data1[0].id, data1.id)
 
     def test_unlink(self):
-        db = MongoDatabase()
+        database = MongoDatabase()
 
         data1 = NewModel()
         data1.name = 'test_name_to_be_deleted'
@@ -140,29 +142,29 @@ class TestModel(TestCase):
         data1.save()
 
         data1_id = data1.id
-        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1_id})
-        self.assertEqual(db_data1['_id'],  data1.id)
+        database_data1 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data1_id})
+        self.assertEqual(database_data1['_id'],  data1.id)
 
         data1.unlink()
-        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1_id})
-        self.assertEqual(db_data1,  None)
+        database_data1 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data1_id})
+        self.assertEqual(database_data1,  None)
         self.assertEqual(data1.id,  None)
         self.assertEqual(data1.name,  'test_name_to_be_deleted')
 
         data1.save()
         self.assertTrue(isinstance(data1.id, ObjectId))
         self.assertNotEqual(data1.id, data1_id)
-        db_data1 = db.database[new_model_collection_name].find_one({'_id': data1.id})
-        self.assertEqual(db_data1['_id'],  data1.id)
-        self.assertEqual(db_data1['name'],  'test_name_to_be_deleted')
+        database_data1 = database.database[NEW_MODEL_COLLECTION_NAME].find_one({'_id': data1.id})
+        self.assertEqual(database_data1['_id'],  data1.id)
+        self.assertEqual(database_data1['name'],  'test_name_to_be_deleted')
 
     def test_model_reference_save(self):
-        new_parent_collection_name = 'new_parent_model'
+        parent_collection_name = 'new_parent_model'
         class NewParentModel(Model):
             name: str
             childs: list[NewModel]
 
-        db = MongoDatabase()
+        database = MongoDatabase()
 
         child1 = NewModel({'name': 'c1'}).save()
         child2 = NewModel({'name': 'c2'}).save()
@@ -173,37 +175,24 @@ class TestModel(TestCase):
             'childs': [child1, child2, child3],
         }).save()
 
-        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent.id})
+        database_parent = database.database[parent_collection_name].find_one({'_id': parent.id})
         self.assertTrue(isinstance(parent.id, ObjectId))
-        self.assertTrue(len(db_parent['childs']), 3)
-        self.assertTrue(db_parent['childs'][0], child1.id)
-        self.assertTrue(db_parent['childs'][1], child2.id)
-        self.assertTrue(db_parent['childs'][2], child3.id)
+        self.assertTrue(len(database_parent['childs']), 3)
+        self.assertTrue(database_parent['childs'][0], child1.id)
+        self.assertTrue(database_parent['childs'][1], child2.id)
+        self.assertTrue(database_parent['childs'][2], child3.id)
 
         # test unsaved child, should save when parent is saved
         child4 = NewModel({'name': 'c4'})
         parent.childs.append(child4)
 
         parent.save()
-        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent.id})
-        self.assertTrue(len(db_parent['childs']), 4)
-        self.assertTrue(db_parent['childs'][3], child4.id)
-
-        # TODO: test mix type child, should raise exception
-        # class OtherChildModel(Model):
-        #     _name = 'other_child_model'
-        #     name: str
-
-        # other_child = OtherChildModel({
-        #     'name': 'other_child'
-        # }).save()
-        # parent.childs.append(other_child)
-
-        # with self.assertRaises(Exception):
-        #     parent.save()
+        database_parent = database.database[parent_collection_name].find_one({'_id': parent.id})
+        self.assertTrue(len(database_parent['childs']), 4)
+        self.assertTrue(database_parent['childs'][3], child4.id)
 
     def test_model_non_reference_save(self):
-        new_parent_collection_name = 'new_parent_model'
+        parent_collection_name = 'new_parent_model'
         class NewParentModel(Model):
             name: str
             childs: list[str]
@@ -215,9 +204,9 @@ class TestModel(TestCase):
 
         parent.save()
 
-        db = MongoDatabase()
-        db_parent = db.database[new_parent_collection_name].find_one({'_id': parent.id})
-        self.assertEqual(db_parent['childs'], ['a', 'b', 'c'])
+        database = MongoDatabase()
+        database_parent = database.database[parent_collection_name].find_one({'_id': parent.id})
+        self.assertEqual(database_parent['childs'], ['a', 'b', 'c'])
 
     def test_model_reference_get(self):
         class NewParentModel(Model):
@@ -244,39 +233,39 @@ class TestModel(TestCase):
         self.assertTrue(isinstance(fetched_parent.childs[2], NewModel))
 
     def test_get_collection_name(self):
-        self.assertEqual(NewModel._get_collection_name(), new_model_collection_name)
+        self.assertEqual(NewModel.get_collection_name(), NEW_MODEL_COLLECTION_NAME)
 
     def test_type_enum(self):
-        class Status(Enum):
+        class StatusEnum(Enum):
             TODO = 1
             IN_PROGRESS = 2
             DONE = 3
 
         class Todo(Model):
             name: str
-            status: Status
+            status: StatusEnum
 
-        db = MongoDatabase()
+        database = MongoDatabase()
 
         todo1 = Todo()
         todo1.name = 'todo_1'
-        todo1.status = Status.TODO
+        todo1.status = StatusEnum.TODO
         todo1.save()
 
         fetched_todo1 = Todo.get(todo1.id)
-        db_todo1 = db.database['todo'].find_one({'_id': todo1.id})
-        self.assertTrue(isinstance(fetched_todo1.status, Status))
-        self.assertEqual(fetched_todo1.status, Status.TODO)
-        self.assertEqual(db_todo1['status'], 1)
+        database_todo1 = database.database['todo'].find_one({'_id': todo1.id})
+        self.assertTrue(isinstance(fetched_todo1.status, StatusEnum))
+        self.assertEqual(fetched_todo1.status, StatusEnum.TODO)
+        self.assertEqual(database_todo1['status'], 1)
 
-        todo1.status = Status.DONE
+        todo1.status = StatusEnum.DONE
         todo1.save()
 
         fetched_todo1 = Todo.get(todo1.id)
-        db_todo1 = db.database['todo'].find_one({'_id': todo1.id})
-        self.assertTrue(isinstance(fetched_todo1.status, Status))
-        self.assertEqual(fetched_todo1.status, Status.DONE)
-        self.assertEqual(db_todo1['status'], 3)
+        database_todo1 = database.database['todo'].find_one({'_id': todo1.id})
+        self.assertTrue(isinstance(fetched_todo1.status, StatusEnum))
+        self.assertEqual(fetched_todo1.status, StatusEnum.DONE)
+        self.assertEqual(database_todo1['status'], 3)
 
     def test_type_many2one_reference(self):
         class Category(Model):

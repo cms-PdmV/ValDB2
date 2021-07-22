@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
-from database.index import database_index_setup
 from api import api
-from flask_restx import cors
+
+from database.index import database_index_setup
 
 load_dotenv()
 

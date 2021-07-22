@@ -1,26 +1,36 @@
-import unittest
-from dotenv import load_dotenv
-from .database import get_database
 import os
+import unittest
+
+from dotenv import load_dotenv
+
+from .database import get_database
 
 
-_database_name_key = 'DATABASE_NAME'
+DATABASE_NAME_KEY = 'DATABASE_NAME'
 
 class TestCase(unittest.TestCase):
+    '''
+    Test case for unittest. Clear database on setup.
+    '''
 
-    def _check_database_name(self):
-        with open('.env') as f:
-            for line in f:
+    @staticmethod
+    def _check_database_name():
+        with open('.env') as file:
+            for line in file:
                 line = line.split('=')
-                if line[0] == _database_name_key:
+                if line[0] == DATABASE_NAME_KEY:
                     database_name_dotenv = line[1].strip()
-                    database_name_env = os.getenv(_database_name_key)
+                    database_name_env = os.getenv(DATABASE_NAME_KEY)
                     if database_name_dotenv == database_name_env:
-                        raise Exception('Test database is the same as application database. Consider using different name for tests')
+                        raise Exception(
+                            'Test database is the same as application database.' \
+                            ' Consider using different name for tests'
+                        )
 
-    def _clean_database(self):
+    @staticmethod
+    def _clean_database():
         database = get_database()
-        database.client.drop_database(os.getenv(_database_name_key))
+        database.client.drop_database(os.getenv(DATABASE_NAME_KEY))
 
     def __init__(self, *args, **kwargs):
         load_dotenv()

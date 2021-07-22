@@ -15,4 +15,3 @@ class TodoListAPI(Resource):
                 'subcategories': [{'name': k, 'groups': v} for k, v in value.items()]
             })
         return groups
-

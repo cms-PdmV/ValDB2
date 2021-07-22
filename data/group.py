@@ -1,6 +1,13 @@
-reconstruction_groups = ['Tracker', 'Ecal', 'HGcal', 'Hcal', 'CASTOR', 'DT', 'CSC', 'RPC', 'GEM', 'MTD', 'PPS', 'L1', 'Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau', 'PF', 'Info', 'RelMon']
-hlt_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau', 'SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info', 'RelMon']
-pags_groups = ['SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info', 'RelMon']
+reconstruction_groups = ['Tracker', 'Ecal', 'HGcal', 'Hcal', 'CASTOR', 'DT', 'CSC', 'RPC', 'GEM',
+    'MTD', 'PPS', 'L1', 'Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau',
+    'PF', 'Info', 'RelMon'
+]
+hlt_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau', 'SMP',
+    'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info', 'RelMon'
+]
+pags_groups = ['SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info',
+    'RelMon'
+]
 hin_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'Info', 'RelMon']
 gen_groups = ['GEN', 'Info', 'RelMon']
 

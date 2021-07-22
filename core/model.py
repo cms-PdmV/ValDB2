@@ -4,39 +4,54 @@ from typing import TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
 from flask_restx import fields
+
 from .database import get_database
 
-_prefilled_fields = ['id', 'created_at', 'updated_at']
-_filter_out_load_object_key = ['_fields']
-_filter_out_store_object_key = _filter_out_load_object_key + ['id']
+PREFILLED_FIELDS = ['id', 'created_at', 'updated_at']
+FILTER_OUT_LOAD_OBJECT_KEY = ['_fields']
+FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ['id']
 _database = get_database()
 
 T = TypeVar('T')
 
 class CustomField(fields.Raw):
+    '''
+    Custom restx field for unsupported type
+    '''
     __schema_type__ = 'some-type'
     __schema_format__ = 'some-format'
     __schema_example__ = {}
-    def __init__(self, type: str, format: str, *args, **kwargs):
-        self.__schema_type__ = type
-        self.__schema_format__ = format
+    def __init__(self, type_text: str, format_text: str, *args, **kwargs):
+        self.__schema_type__ = type_text
+        self.__schema_format__ = format_text
         super().__init__(*args, **kwargs)
 
 class Model():
+    '''
+    Base ORM model.
+    Each object includes id, created_at, updated_up fields.
+    '''
+
     id: ObjectId
     created_at: datetime
     updated_at: datetime
 
-    def __init__(self, data: dict=None):
+    def __init__(self, data=None):
         self._fields = self._get_fields()
         self._set_fields_from_data(data)
 
     def _set_fields_from_data(self, data: dict):
+        '''
+        Set attribute of object from data dictionary.
+        '''
         for key in self._fields:
             setattr(self, key, data.get(key) if data else None)
 
     @classmethod
     def _get_data_load_object(cls, data: dict) -> dict:
+        '''
+        Get load data dictionary for converting to python object.
+        '''
         data_load_object = {}
         if not data:
             return data_load_object
@@ -44,10 +59,10 @@ class Model():
             if key == '_id':
                 data_load_object['id'] = value
                 continue
-            if key in _filter_out_load_object_key or key not in cls._get_fields():
+            if key in FILTER_OUT_LOAD_OBJECT_KEY or key not in cls._get_fields():
                 continue
 
-            if key in _prefilled_fields:
+            if key in PREFILLED_FIELDS:
                 data_load_object[key] = value
             elif cls._is_reference_field(key): # is one2many reference
                 elements = []
@@ -65,9 +80,12 @@ class Model():
 
     @classmethod
     def _get_data_store_object(cls, data: dict) -> dict:
+        '''
+        Get store data dictionary for storing in database.
+        '''
         data_store_object = {}
         for key, value in data.items():
-            if key in _filter_out_store_object_key:
+            if key in FILTER_OUT_STORE_OBJECT_KEY:
                 continue
 
             if value is None:
@@ -75,12 +93,12 @@ class Model():
             if cls._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
-                    if not element._is_saved():
+                    if not element.is_saved():
                         element.save()
                     element_ids.append(element.id)
                 data_store_object[key] = element_ids
             elif isinstance(value, Model): # is many2one reference
-                if not value._is_saved():
+                if not value.is_saved():
                     value.save()
                 data_store_object[key] = value.id
             elif isinstance(value, Enum): # is enum
@@ -89,33 +107,57 @@ class Model():
                 data_store_object[key] = value
         return data_store_object
 
-    def _is_saved(self) -> bool:
+    def is_saved(self) -> bool:
+        '''
+        Retrun True if this record is saved in database.
+        '''
         return hasattr(self, 'id') and self.id
-    
+
     @classmethod
     def _is_reference_field(cls, field: str) -> bool:
-        return field in cls.__annotations__ and len(get_args(cls.__annotations__[field])) == 1 and issubclass(get_args(cls.__annotations__[field])[0], Model)
-    
+        '''
+        Retrun True if this record is a reference field.
+        '''
+        return field in cls.__annotations__ and \
+            len(get_args(cls.__annotations__[field])) == 1 and \
+            issubclass(get_args(cls.__annotations__[field])[0], Model)
+
     @classmethod
     def _get_reference_model_of_field(cls, field: str):
+        '''
+        Get reference field's class.
+        '''
         return get_args(cls.__annotations__[field])[0]
 
     @classmethod
     def _get_fields(cls):
-        return list(cls.__annotations__.keys()) + _prefilled_fields
+        '''
+        All fields in object including prefilled fields.
+        '''
+        return list(cls.__annotations__.keys()) + PREFILLED_FIELDS
 
     def save(self: T) -> T:
+        '''
+        Save data to database. Create new record is the data is not existed.
+        '''
         current_utc_time = datetime.utcnow()
         self.updated_at = current_utc_time
-        if self._is_saved():
-            _database.update(self._get_collection_name(), self.id, self._get_data_store_object(self.__dict__))
+        if self.is_saved():
+            _database.update(self.get_collection_name(), self.id,
+                self._get_data_store_object(self.__dict__)
+            )
         else:
             self.created_at = current_utc_time
-            saved_data_id = _database.create(self._get_collection_name(), self._get_data_store_object(self.__dict__))
+            saved_data_id = _database.create(self.get_collection_name(),
+                self._get_data_store_object(self.__dict__)
+            )
             self.id = saved_data_id
         return self
 
     def update(self: T, data: dict) -> T:
+        '''
+        Update the object with data dictionary and save to database.
+        '''
         for key in data:
             if key in self.__annotations__:
                 setattr(self, key, data[key])
@@ -123,47 +165,62 @@ class Model():
         return self
 
     @classmethod
-    def _get_collection_name(cls: T):
+    def get_collection_name(cls: T):
+        '''
+        Collection name in database of current model.
+        '''
         object_name = cls.__name__
         snake_case_name = re.sub(r'(?<!^)(?=[A-Z])', '_', object_name).lower()
         return snake_case_name
-    
+
     @classmethod
     def get(cls: T, id: Union[str, ObjectId]) -> T:
-        return cls(cls._get_data_load_object(_database.get(cls._get_collection_name(), id)))
+        '''
+        Get object by their id.
+        '''
+        return cls(cls._get_data_load_object(_database.get(cls.get_collection_name(), id)))
 
     @classmethod
     def query(cls: T, query: dict, sort=None) -> list[T]:
-        return [cls(cls._get_data_load_object(record)) for record in _database.query(cls._get_collection_name(), query, sort)]
+        '''
+        Query objects from database.
+        '''
+        return [cls(cls._get_data_load_object(record))
+            for record in _database.query(cls.get_collection_name(), query, sort)
+        ]
 
     def unlink(self):
         '''
         Remove record from the database
         '''
-        _database.delete(self._get_collection_name(), self.id)
+        _database.delete(self.get_collection_name(), self.id)
         self.id = None
 
     def dict(self) -> dict:
         '''
-        Return data object as dictionary. Can be used for serialization. 
+        Return data object as dictionary. Can be used for serialization.
         '''
         data_as_dict = {}
-        
+
         for key in self._fields:
             value = getattr(self, key)
             data_as_dict[key] = self._serialize(value)
         return data_as_dict
 
-    def parse_datetime(self, format="%Y-%m-%d"):
+    def parse_datetime(self, datetime_format="%Y-%m-%d"):
         '''
         Update datetime from request in the model
         '''
         for field in self._fields:
-            if hasattr(self, field) and self.__annotations__.get(field) is datetime and isinstance(getattr(self, field), str):
-                datetime_object = datetime.strptime(getattr(self, field), format)
+            if hasattr(self, field) and self.__annotations__.get(field) is datetime and \
+                isinstance(getattr(self, field), str):
+                datetime_object = datetime.strptime(getattr(self, field), datetime_format)
                 setattr(self, field, datetime_object)
 
     def _serialize(self, value):
+        '''
+        Get rerializable object.
+        '''
         serialized_data = None
         if isinstance(value, ObjectId):
             serialized_data = str(value)
@@ -183,6 +240,9 @@ class Model():
 
     @classmethod
     def _get_flask_restx_field(cls, type_of_field):
+        '''
+        Get Flast Restx field
+        '''
         is_list = len(get_args(type_of_field)) == 1
 
         if type_of_field is str:
@@ -220,6 +280,9 @@ class Model():
         return restx_fields
 
     def __repr__(self) -> str:
-        field_data_keys = [key for key in self.__dict__ if key not in _filter_out_load_object_key]
+        field_data_keys = [
+            key for key in self.__dict__
+            if key not in FILTER_OUT_LOAD_OBJECT_KEY
+        ]
         sorted_field_data = {key: self.__dict__[key] for key in sorted(field_data_keys)}
-        return f"<{self._get_collection_name()} {sorted_field_data}>"
+        return f"<{self.get_collection_name()} {sorted_field_data}>"

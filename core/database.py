@@ -6,6 +6,9 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 class MongoDatabase():
+    '''
+    Interface to MongoDB database
+    '''
 
     # ensure single instance of database
     def __new__(cls):
@@ -24,11 +27,16 @@ class MongoDatabase():
         self.database = database
 
     def create(self, collection_name: str, data: object) -> ObjectId:
+        '''
+        Create new reocrd
+        '''
         return self.database[collection_name].insert_one(data).inserted_id
 
     def query(self, collection_name: str, query: dict, sort):
+        '''
+        Query record from database
+        '''
         data = []
-        # TODO: add filter query
         if sort:
             for record in self.database[collection_name].find(query).sort(sort):
                 data.append(record)
@@ -36,20 +44,33 @@ class MongoDatabase():
             for record in self.database[collection_name].find(query):
                 data.append(record)
         return data
-    
-    def get(self, collection_name: str, id: Union[str, ObjectId]):
-        if isinstance(id, str):
-            id = ObjectId(id)
-        return self.database[collection_name].find_one({'_id': id})
 
-    def update(self, collection_name: str, id: ObjectId, data: object):
-        self.database[collection_name].find_one_and_update({'_id': id}, {'$set': data})
+    def get(self, collection_name: str, record_id: Union[str, ObjectId]):
+        '''
+        Get one object from database
+        '''
+        if isinstance(record_id, str):
+            record_id = ObjectId(record_id)
+        return self.database[collection_name].find_one({'_id': record_id})
 
-    def delete(self, collection_name: str, id: ObjectId):
-        self.database[collection_name].find_one_and_delete({'_id': id})
+    def update(self, collection_name: str, record_id: ObjectId, data: object):
+        '''
+        Update record by id
+        '''
+        self.database[collection_name].find_one_and_update({'_id': record_id}, {'$set': data})
 
-    def count(self, collection_name: str, filter: dict = {}) -> int:
-        return self.database[collection_name].count_documents(filter)
+    def delete(self, collection_name: str, record_id: ObjectId):
+        '''
+        Delete record
+        '''
+        self.database[collection_name].find_one_and_delete({'_id': record_id})
+
+    def count(self, collection_name: str, query: dict = None) -> int:
+        '''
+        Count number or record matched the query.
+        '''
+        query = {} if query is None else query
+        return self.database[collection_name].count_documents(query)
 
 database_connector = {
     'mongo': MongoDatabase

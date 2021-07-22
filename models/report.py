@@ -16,4 +16,3 @@ class Report(Model):
     campaign_name: str
     status: ReportStatus
     content: str
-    # TODO: add activities

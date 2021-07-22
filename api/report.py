@@ -1,7 +1,7 @@
-from models.report import Report, ReportStatus
-
-from models.campaign import Campaign
 from flask_restx import Resource
+
+from models.report import Report, ReportStatus
+from models.campaign import Campaign
 from core import Namespace
 
 
@@ -11,14 +11,15 @@ report_model = api.model(Report)
 
 @api.route('/')
 class ReportListAPI(Resource):
-    '''
-    body: {
-        campaign_name: string
-        group: string
-        user: string
-    }
-    '''
+
     def post(self):
+        '''
+        body: {
+            campaign_name: string
+            group: string
+            user: string
+        }
+        '''
         campaign_name = api.payload['campaign_name']
         group = api.payload['group']
         campaign = Campaign.get_by_name(campaign_name)
@@ -48,16 +49,17 @@ class ReportSearchAPI(Resource):
 
         return result[0].dict()
 
-@api.route('/<string:id>/')
-@api.param('id', 'Report id')
+@api.route('/<string:reportid>/')
+@api.param('reportid', 'Report id')
 class ReportAPI(Resource):
-    '''
-    body: {
-        content: string
-        user: string
-    }
-    '''
-    def put(self, id):
-        report = Report.get(id)
+
+    def put(self, reportid):
+        '''
+        body: {
+            content: string
+            user: string
+        }
+        '''
+        report = Report.get(reportid)
         report.update(api.payload)
         return report.dict()

@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from models.report import Report
 from core import Model
-from datetime import datetime
 
 class Campaign(Model):
     name: str
