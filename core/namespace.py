@@ -3,14 +3,13 @@ Namespace for registering API
 '''
 from flask_restx import Namespace as NamespaceBase
 from flask_restx.model import Model
-from .model import Model as CoreModel
 
 class Namespace(NamespaceBase):
     '''
     Namespace base class for registering API
     '''
 
-    def model(self, model: CoreModel) -> Model:
+    def model(self, model) -> Model:
         '''
         Register restx fields document
         '''
