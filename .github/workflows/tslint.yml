@@ -14,6 +14,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Install dependencies
+      working-directory: ./react_frontend
       run: yarn
     - name: Run TSLint
+      working-directory: ./react_frontend
       run: yarn tslint
