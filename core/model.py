@@ -84,7 +84,7 @@ class Model():
         return data_load_object
 
     @classmethod
-    def _get_data_store_object(cls, data: Dict) -> Dict:
+    def _get_data_store_object(cls, data: Dict) -> Dict: # pylint: disable=R0912
         '''
         Get store data dictionary for storing in database.
         '''
@@ -199,12 +199,14 @@ class Model():
         ]
 
     @classmethod
-    def query_one(cls: T, query: dict, sort=None) -> T:
+    def query_one(cls: T, query: Dict, sort=None) -> T:
+        '''
+        Query one object from database.
+        '''
         query_result = _database.query(cls.get_collection_name(), query, sort)
         if query_result:
             return cls(cls._get_data_load_object(query_result[0]))
-        else:
-            return None
+        return None
 
     def unlink(self):
         '''

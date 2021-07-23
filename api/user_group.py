@@ -1,33 +1,39 @@
-from pymongo.common import VALIDATORS
-from lookup.user_group import UserGroupLookup, administrator_key
-from core.database import get_database
-from flask_restx.marshalling import marshal_with
+'''
+User group API
+'''
+from flask_restx import Resource
+
 from data.group import get_all_groups
 from models.user import User, UserRole
-
-from flask_restx import Resource
+from lookup.user_group import UserGroupLookup, ADMINISTRATOR_KEY
 from core import Namespace
 
 
-api = Namespace('user permission groups', description='Get group of users in each permission group')
+api = Namespace('user permission groups', description='Get group of users in each group')
 
 @api.route('/get/<string:group_path>/')
 @api.param('group_path', 'Group path string or "Administrator"')
 class UserGroupAPI(Resource):
-
+    '''
+    User group API
+    '''
     def get(self, group_path):
+        '''
+        Get users from group path
+        '''
         lookup = UserGroupLookup()
-        from pprint import pprint
-        pprint(lookup.table)
         user_ids = lookup.table[group_path]
         users = [User.get(user_id) for user_id in user_ids]
         return [user.dict() for user in users]
 
 @api.route('/add/')
 class UserGroupAddAPI(Resource):
-
+    '''
+    Add user group API
+    '''
     def post(self):
         '''
+        Add user to group
         body {
             email: string,
             group: string,
@@ -35,17 +41,16 @@ class UserGroupAddAPI(Resource):
         '''
         email = api.payload['email']
         group = api.payload['group']
-        try:
-            UserGroupController.add_user_to_group(email, group)
-        except Exception as error:
-            return {'message': str(error)}, 500
-
+        UserGroupController.add_user_to_group(email, group)
 
 @api.route('/remove/')
 class UserGroupRemoveAPI(Resource):
-
+    '''
+    Remove user group API
+    '''
     def post(self):
         '''
+        Remove user from group
         body {
             userid: string,
             group: string,
@@ -55,14 +60,19 @@ class UserGroupRemoveAPI(Resource):
         group = api.payload['group']
         UserGroupController.remove_user_from_group(userid, group)
 
-
 class UserGroupController():
+    '''
+    User group controller
+    '''
     @staticmethod
     def add_user_to_group(email, group):
+        '''
+        Add user to group
+        '''
         lookup = UserGroupLookup()
         if group in lookup.table:
             user = User.query_one({'email': email})
-            target_role = UserRole.ADMIN if group == administrator_key else UserRole.VALIDATOR
+            target_role = UserRole.ADMIN if group == ADMINISTRATOR_KEY else UserRole.VALIDATOR
             if not user:
                 user = User({
                     'email': email,
@@ -70,9 +80,12 @@ class UserGroupController():
                     'groups': [],
                 }).save()
             else:
-                if user.role == UserRole.ADMIN and group != administrator_key:
-                    raise Exception('cannot add admin to validator group. please remove this user from admin role')
-            
+                if user.role == UserRole.ADMIN and group != ADMINISTRATOR_KEY:
+                    raise Exception(
+                        'cannot add admin to validator group. please remove this user from admin' \
+                        ' role.'
+                    )
+
             if target_role == UserRole.ADMIN:
                 user.groups = get_all_groups()
             elif target_role == UserRole.VALIDATOR:
@@ -86,11 +99,14 @@ class UserGroupController():
 
     @staticmethod
     def remove_user_from_group(user_id, group):
+        '''
+        Remove user from group
+        '''
         lookup = UserGroupLookup()
         if group in lookup.table:
             user = User.get(user_id)
             if user:
-                if group == administrator_key:
+                if group == ADMINISTRATOR_KEY:
                     user.role = UserRole.USER
                     user.groups = []
                     user.save()
@@ -98,6 +114,4 @@ class UserGroupController():
                     if group in user.groups:
                         user.groups.remove(group)
                         user.save()
-                print(user.id)
-                print(lookup.table[group])
                 lookup.remove_user_from_group(user.id, group)

@@ -37,6 +37,9 @@ group = {
 }
 
 def get_all_groups():
+    '''
+    Get list of all groups in the system
+    '''
     groups = []
     for category_name, category in group.items():
         for subcategory_name, subcategory in category.items():

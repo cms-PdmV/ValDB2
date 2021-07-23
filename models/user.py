@@ -6,6 +6,9 @@ from enum import Enum
 from core import Model
 
 class UserRole(Enum):
+    '''
+    User role in the system
+    '''
     ADMIN = 1
     VALIDATOR = 2
     USER = 3

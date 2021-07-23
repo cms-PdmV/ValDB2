@@ -21,6 +21,9 @@ class GroupListAPI(Resource):
         for key, value in group.items():
             groups.append({
                 'name': key,
-                'subcategories': [{'name': k, 'groups': [{'path': f'{key}.{k}.{each_v}'} for each_v in v]} for k, v in value.items()]
+                'subcategories': [
+                    {'name': k, 'groups': [{'path': f'{key}.{k}.{each_v}'} for each_v in v]}
+                    for k, v in value.items()
+                ]
             })
         return groups
