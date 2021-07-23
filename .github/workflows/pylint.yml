@@ -8,16 +8,15 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     name: Get newest code and run pylint
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 3.9
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -25,4 +24,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        python3 -m pylint `find . -type f | grep .py$ | xargs`
+        python3 -m pylint `find . -type f | grep .py$ | grep -v tests/ | xargs` --disable=R0201,R0903
