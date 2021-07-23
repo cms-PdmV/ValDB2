@@ -1,5 +1,5 @@
 import { Box } from '@material-ui/core';
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown, { ReactElement } from 'react-markdown'
 import gfm from 'remark-gfm'
 import { HorizontalLine } from './HorizontalLine';
 
@@ -7,7 +7,7 @@ interface ReportContentViewerProp {
   content: string
 }
 
-export function ReportContentViewer (prop: ReportContentViewerProp) {
+export function ReportContentViewer (prop: ReportContentViewerProp): ReactElement {
   return <>
   <HorizontalLine />
     { prop.content !== '' && <Box margin="1rem 0"><ReactMarkdown remarkPlugins={[gfm]} children={prop.content} /></Box>}

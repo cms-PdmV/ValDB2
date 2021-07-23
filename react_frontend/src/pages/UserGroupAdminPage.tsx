@@ -1,19 +1,16 @@
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TextField, TableBody, Box, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
-import { useEffect, useState } from "react";
-import { useHistory } from "react-router";
+import { Box, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
+import { ReactElement, useEffect, useState } from "react";
 import { Container } from "../components/Container";
 import { Spacer } from "../components/Spacer";
 import { UserGroupList } from "../components/UserGroupList";
-import { categoryService, userService } from "../services";
-import { Category, User, UserRole } from "../types";
-import { userRoleLabel } from "../utils/label";
+import { categoryService } from "../services";
+import { Category } from "../types";
 
-export function UserGroupAdminPage() {
-  
+export function UserGroupAdminPage(): ReactElement {
+
   const [categories, setCategories] = useState<Category[]>()
-  const history = useHistory()
 
   useEffect(() => {
     categoryService.getAll().then((data) => {
@@ -28,20 +25,22 @@ export function UserGroupAdminPage() {
       <Spacer />
       { categories && <>
         <UserGroupList group="Administrator"/>
-        { categories.map((category, index) => 
-          <Accordion>
+        { categories.map((category, index) =>
+          <Accordion key={`accordion-${index}`}>
             <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown}/>}>
               <strong>{category.name}</strong>
             </AccordionSummary>
             <AccordionDetails style={{display: "block"}}>
-              { category.subcategories.map((subcategory, subindex) => 
-                <Accordion>
+              { category.subcategories.map((subcategory, subindex) =>
+                <Accordion key={`${category.name}-accordion-${subindex}`}>
                   <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown}/>}>
                   <strong>{subcategory.name}</strong>
                   </AccordionSummary>
                   <AccordionDetails style={{display: "block"}}>
-                    { subcategory.groups.map((group, groupindex) => 
-                      <UserGroupList group={group.path}/>
+                    { subcategory.groups.map((group, groupindex) =>
+                      <Box key={`${subcategory.name}-accordion-${groupindex}`}>
+                        <UserGroupList group={group.path} />
+                      </Box>
                     )}
                   </AccordionDetails>
                 </Accordion>

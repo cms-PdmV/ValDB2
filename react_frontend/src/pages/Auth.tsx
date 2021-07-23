@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import { userService } from "../services";
 import { User } from "../types";
 
@@ -5,7 +6,7 @@ interface AuthPageInterface {
   setUser: (user: User) => void
 }
 
-export function AuthPage(prop: AuthPageInterface) {
+export function AuthPage(prop: AuthPageInterface): ReactElement {
 
   const demoHandleSetUser = (userid: string) => {
     userService.get(userid).then(data => prop.setUser(data))

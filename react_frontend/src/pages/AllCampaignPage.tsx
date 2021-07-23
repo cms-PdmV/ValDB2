@@ -1,6 +1,7 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box } from "@material-ui/core";
+import { ReactElement } from "react";
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Container } from "../components/Container";
@@ -9,9 +10,9 @@ import { campaignService } from "../services";
 import { Campaign, UserRole } from "../types";
 
 
-const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) == i) : []
+const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) === i) : []
 
-export function AllCampaignPage () {
+export function AllCampaignPage (): ReactElement {
 
   const [campaigns, setCampaigns] = useState<Campaign[]>()
   const user = useContext(UserContext)
@@ -24,11 +25,10 @@ export function AllCampaignPage () {
   const handleCreateCampaign = () => {
     history.push('/campaigns/new')
   }
-  
+
   useEffect(() => {
     campaignService.getAll().then(response => {
       if (response.status) {
-        console.log(response.data)
         setCampaigns(response.data)
       } else {
         throw Error

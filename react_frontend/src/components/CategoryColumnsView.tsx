@@ -5,6 +5,7 @@ import { faCheck, faChevronRight, faSquare } from '@fortawesome/free-solid-svg-i
 import { useEffect, useState } from "react";
 import { ReportStatusLabel } from "./ReportStatusLabel";
 import { buttonIconStyle, buttonStyle, color } from "../utils/css";
+import { ReactElement } from "react";
 
 
 interface CategoryColumnsViewProp {
@@ -15,7 +16,7 @@ interface CategoryColumnsViewProp {
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
-export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
+export function CategoryColumnsView(prop: CategoryColumnsViewProp): ReactElement {
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [availableSubcategory, setAvailableSubcategory] = useState<string[]>(['All'])
@@ -37,8 +38,6 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
     targetCategories.forEach(e => {
       e.subcategories = e.subcategories.filter(s => selectedSubcategory === 'All' || s.name === selectedSubcategory)
     })
-    console.log(targetCategories)
-    console.log(prop.categories)
     setAvailableList(targetCategories)
   }, [selectedCategory, selectedSubcategory])
 
@@ -52,7 +51,7 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
               <ListItemSecondaryAction><FontAwesomeIcon icon={faChevronRight} /></ListItemSecondaryAction>
             </ListItem>
             {prop.categories.map((category, index) => (
-              <ListItem button selected={selectedCategory === category.name} onClick={() => setSelectedCategory(category.name)}>
+              <ListItem button selected={selectedCategory === category.name} onClick={() => setSelectedCategory(category.name)} key={`category-${index}`}>
                 <ListItemText primary={category.name}/>
                 <ListItemSecondaryAction><FontAwesomeIcon icon={faChevronRight} /></ListItemSecondaryAction>
             </ListItem>
@@ -62,7 +61,7 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
         <Box width="220px" padding="1rem 0.5rem 1rem 0.5rem">
           <List style={{padding: 0}}>
             {availableSubcategory.map((subcategory, index) => (
-              <ListItem button selected={selectedSubcategory === subcategory} onClick={() => setSelectedSubcategory(subcategory)}>
+              <ListItem button selected={selectedSubcategory === subcategory} onClick={() => setSelectedSubcategory(subcategory)} key={`subcategory-${index}`}>
                 <ListItemText primary={subcategory}/>
                 <ListItemSecondaryAction><FontAwesomeIcon icon={faChevronRight} /></ListItemSecondaryAction>
               </ListItem>
@@ -73,16 +72,16 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp) {
           <List style={{padding: 0}}>
             {availableList.map((category, index) =>
               category.subcategories.map((subcategory, subindex) => <>
-                <ListSubheader style={{margin: '0 0 8px 0 0', padding: 0}}>
+                <ListSubheader style={{margin: '0 0 8px 0 0', padding: 0}} key={`list-header-${index}`}>
                   <Box padding="0rem 1rem" style={{background: '#e0e0e0'}} height="38px" lineHeight="38px" fontWeight="bold" borderRadius="8px" >{category.name} / {subcategory.name}</Box>
                 </ListSubheader>
                 {subcategory.groups.map((group, groupindex) => (<>
-                  { prop.reportView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} button style={{height: '48px'}}>
+                  { prop.reportView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} button style={{height: '48px'}} key={`list-item-${subindex}-${groupindex}`}>
                     {group.path.split('.')[2]}
                     <Box position="absolute" left="200px"><ReportStatusLabel status={group.report ? group.report.status : ReportStatus.NOT_YET_DONE} /></Box>
                     <Box position="absolute" right="1rem"><FontAwesomeIcon icon={faChevronRight} /></Box>
                   </ListItem>}
-                  { prop.selectableView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} style={{height: '48px'}}>
+                  { prop.selectableView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} style={{height: '48px'}} key={`list-item-${subindex}-${groupindex}`}>
                     { group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: color.blue, color: 'white'}}><FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/></Box>}
                     { !group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
                     {group.path.split('.')[2]}

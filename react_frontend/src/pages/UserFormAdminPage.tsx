@@ -1,7 +1,7 @@
 import { faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, FormControl, InputLabel, Select } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
@@ -13,22 +13,24 @@ import { Category, User, UserRole } from "../types";
 import { splitPath } from "../utils/group";
 import { userRoleLabel } from "../utils/label";
 
+const selectedKey = 'selected'
+
 const setSelectedGroupFromGroups = (categories: Category[], groups: string[]) => {
   groups.forEach(path => {
     const categoriesInstance = categories?.map(e => Object.assign({}, e))
-    const { category, subcategory, group } = splitPath(path)
+    const pathString = splitPath(path)
+    const category = pathString.category
+    const subcategory = pathString.subcategory
     const targetGroup = categoriesInstance?.find(e => e.name === category)?.subcategories.find(e => e.name === subcategory)?.groups.find(e => e.path === path)
     if (targetGroup) {
-      targetGroup['selected'] = true
+      targetGroup[selectedKey] = true
     }
   })
 }
 
-const mockSelected = ["Reconstruction.Data.Tracker", "Reconstruction.Data.HGcal", "Reconstruction.Data.DT", "Reconstruction.Data.CSC", "GEN.Gen.GEN"]
+export function UserFormAdminPage(): ReactElement {
 
-export function UserFormAdminPage() {
-
-  const { id }: any = useParams()
+  const { id }: { id: string } = useParams()
   const [categories, setCategories] = useState<Category[]>()
   const [selectedRole, setSelectedRole] = useState<UserRole>(3)
   const [selectedGroups, setSelectedGroups] = useState<string[]>([])
@@ -36,7 +38,6 @@ export function UserFormAdminPage() {
   const history = useHistory()
 
   useEffect(() => {
-    
     categoryService.getAll().then(groupData => {
       setCategories(groupData)
       userService.get(id).then(data => {
@@ -52,12 +53,13 @@ export function UserFormAdminPage() {
 
   const handleSelectGroup = (path: string, selected: boolean) => {
     const categoriesInstance = categories?.map(e => Object.assign({}, e))
-    const { category, subcategory, group } = splitPath(path)
+    const pathString = splitPath(path)
+    const category = pathString.category
+    const subcategory = pathString.subcategory
     const targetGroup = categoriesInstance?.find(e => e.name === category)?.subcategories.find(e => e.name === subcategory)?.groups.find(e => e.path === path)
     if (targetGroup) {
-      targetGroup['selected'] = selected
+      targetGroup[selectedKey] = selected
     }
-    console.log(categoriesInstance)
     setCategories(categoriesInstance)
     let newSelectedGroup = [...selectedGroups]
     if (selected) {
@@ -66,8 +68,6 @@ export function UserFormAdminPage() {
       newSelectedGroup = newSelectedGroup.filter(e => e !== path)
     }
     setSelectedGroups(newSelectedGroup)
-    console.log(newSelectedGroup)
-    console.log(path)
   }
 
   const handleSave = () => {
@@ -76,10 +76,11 @@ export function UserFormAdminPage() {
       role: +selectedRole,
       groups: selectedGroups
     }
-    console.log(body)
-    user && userService.update(user.id, body).then(_ => {
-      history.push(`/admin/users/${user.id}`)
-    }).catch(error => alert(error))
+    if(user) {
+      userService.update(user.id, body).then(() => {
+        history.push(`/admin/users/${user.id}`)
+      }).catch(error => alert(error))
+    }
   }
 
   const handleDiscard = () => {
@@ -100,8 +101,8 @@ export function UserFormAdminPage() {
             id: 'outlined-age-native-simple',
           }}
         >
-          {Object.keys(userRoleLabel).map((role, index) => 
-            <option value={role}>{userRoleLabel[+role as UserRole]}</option>
+          {Object.keys(userRoleLabel).map((role, index) =>
+            <option value={role} key={`option-${index}`}>{userRoleLabel[+role as UserRole]}</option>
           )}
         </Select>
       </FormControl>
@@ -123,7 +124,6 @@ export function UserFormAdminPage() {
       { user && categories && +selectedRole === +UserRole.VALIDATOR && <CategoryView selectableView title="Report Group Permission" categories={categories} onSelectGroup={handleSelectGroup}/>}
       { user && categories && +selectedRole === +UserRole.ADMIN && <p>Adminitrator can access all report groups.</p>}
       { user && categories && +selectedRole === +UserRole.USER && <p>Base user only view report. Change to validator to select specific group for user.</p>}
-      {/* {id} */}
     </Container>
   )
 }

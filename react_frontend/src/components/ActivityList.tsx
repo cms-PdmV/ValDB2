@@ -1,15 +1,15 @@
 import { Box, Paper, Tooltip } from "@material-ui/core";
 import moment from "moment";
+import { ReactElement } from "react";
 import { useState } from "react";
 import { Activity, ActivityType } from "../types";
 import { Spacer } from "./Spacer";
-import { VerticleLine } from "./VerticleLine";
 
 interface ActivityListProp {
   activities: Activity[]
 }
 
-export function ActivityList(prop: ActivityListProp) {
+export function ActivityList(prop: ActivityListProp): ReactElement {
 
   const [filter, setFilter] = useState<'all' | 'activity' | 'comment'>('all')
 
@@ -63,7 +63,7 @@ export function ActivityList(prop: ActivityListProp) {
         case 'all': return true;
         case 'activity': return +e.type === +ActivityType.ACTIVITY;
         case 'comment': return +e.type === +ActivityType.COMMENT;
-      } 
+      }
     }).map(activity => <>
       { +activity.type === +ActivityType.ACTIVITY && activityLog(activity) }
       { +activity.type === +ActivityType.COMMENT && commentLog(activity) }

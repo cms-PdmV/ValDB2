@@ -7,6 +7,7 @@ import { reportStatusStyle } from "../utils/report";
 import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { SplitGroup } from "../utils/constant";
 import { useState } from "react";
+import { ReactElement } from "react-markdown";
 
 
 interface CategoryCompactViewProp {
@@ -17,7 +18,7 @@ interface CategoryCompactViewProp {
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
-export function CategoryCompactView(prop: CategoryCompactViewProp) {
+export function CategoryCompactView(prop: CategoryCompactViewProp): ReactElement {
 
   const reportButton = (group: Group, reportStatus: ReportStatus) => (
     <Tooltip title={reportStatusStyle[reportStatus].label}>
@@ -40,40 +41,42 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
         </AccordionSummary>
         <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
           { expanded && category.subcategories.map((subcategory, subindex) => <>
-            <HorizontalLine />
-            <Box padding="1rem">
-              <strong>{subcategory.name}</strong>
-              { !(category.name in SplitGroup) &&
-                <Box>
-                  {subcategory.groups.map((group, inedx) => 
-                    <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
-                      <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
-                      <Box padding="0 0 0.5rem" display="flex">
-                        {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
-                        {prop.selectableView && selectButton(group, group.selected || false)}
-                      </Box>
-                    </Box>
-                  )}
-                </Box>
-              }
-              { (category.name in SplitGroup) &&
-                <Box>
-                  { SplitGroup[category.name].map((splitGroup: any) => 
-                    <Box paddingLeft="1rem" marginTop="1rem">
-                      <Box marginBottom="-0.5rem"><strong>{splitGroup.name}</strong></Box>
-                      {subcategory.groups.slice(...splitGroup.slice).map((group, inedx) => 
-                        <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem">
-                          <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
-                          <Box padding="0 0 0.5rem" display="flex">
-                            {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
-                            {prop.selectableView && selectButton(group, group.selected || false)}
-                          </Box>
+            <Box key={`category-${subindex}`}>
+              <HorizontalLine />
+              <Box padding="1rem">
+                <strong>{subcategory.name}</strong>
+                { !(category.name in SplitGroup) &&
+                  <Box>
+                    {subcategory.groups.map((group, index) =>
+                      <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem" key={`group-item-${index}`}>
+                        <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
+                        <Box padding="0 0 0.5rem" display="flex">
+                          {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
+                          {prop.selectableView && selectButton(group, group.selected || false)}
                         </Box>
-                      )}
-                    </Box>
-                  )}
-                </Box>
-              }
+                      </Box>
+                    )}
+                  </Box>
+                }
+                { (category.name in SplitGroup) &&
+                  <Box>
+                    { SplitGroup[category.name].map((splitGroup: { name: string, slice: [number, number] }) =>
+                      <Box paddingLeft="1rem" marginTop="1rem">
+                        <Box marginBottom="-0.5rem"><strong>{splitGroup.name}</strong></Box>
+                        {subcategory.groups.slice(...splitGroup.slice).map((group, index) =>
+                          <Box width="58px" fontSize="0.8rem" display="inline-block" textAlign="center" marginTop="0.5rem" key={`group-item-${index}`}>
+                            <Box padding="0.5rem 0">{group.path.split('.')[2]}</Box>
+                            <Box padding="0 0 0.5rem" display="flex">
+                              {prop.reportView && reportButton(group, group.report ? group.report.status: ReportStatus.NOT_YET_DONE)}
+                              {prop.selectableView && selectButton(group, group.selected || false)}
+                            </Box>
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                  </Box>
+                }
+              </Box>
             </Box>
           </>)}
         </AccordionDetails>
@@ -83,8 +86,10 @@ export function CategoryCompactView(prop: CategoryCompactViewProp) {
 
   return (
     <Box width="100%">
-      {prop.categories.map((category, index) => 
-        <CategoryReportList category={category} />
+      {prop.categories.map((category, index) =>
+        <Box key={`category-report-list-${index}`}>
+          <CategoryReportList category={category} />
+        </Box>
       )}
     </Box>
   )

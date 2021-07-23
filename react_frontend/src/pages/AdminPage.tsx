@@ -1,10 +1,11 @@
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { List, ListItem, ListItemSecondaryAction, ListItemText, Paper } from "@material-ui/core";
+import { ReactElement } from "react";
 import { useHistory } from "react-router";
 import { Container } from "../components/Container";
 
-export function AdminPage() {
+export function AdminPage(): ReactElement {
   const history = useHistory()
   return (
     <Container>

@@ -5,21 +5,22 @@ import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
 import { Activity, Report, ReportEditorMode, ReportStatus, User } from '../types'
 import { useContext, useEffect, useState } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router';
-// import queryString from 'querystring'
+import { useHistory, useParams } from 'react-router';
 import { activityService, reportService } from '../services';
 import { UserContext } from '../context/user';
-import moment from 'moment';
 import { logReport } from '../utils/activity';
 import { ActivityList } from '../components/ActivityList';
 import { CommentBox } from '../components/CommentBox';
 import { Spacer } from '../components/Spacer';
 import { HorizontalLine } from '../components/HorizontalLine';
+import { ReactElement } from 'react-markdown';
 
-export function ReportPage () {
+export function ReportPage(): ReactElement {
 
-  const { campaign, group }: any = useParams()
-  // const { search } = useLocation()
+  const { campaign, group }: {
+    campaign: string,
+    group: string,
+  } = useParams()
 
   const [content, setContent] = useState<string>('');
   const [authors, setAuthors] = useState<User[]>([]);
@@ -33,12 +34,6 @@ export function ReportPage () {
   const history = useHistory()
 
   useEffect(() => {
-    console.log(campaign)
-    console.log(group)
-    // const query = queryString.parse(search)
-    // if ('edit' in query) {
-    //   setMode('edit')
-    // }
     reportService.seach(campaign, group).then(response => {
       if (response.status) {
         setReport(response.data)
@@ -63,18 +58,15 @@ export function ReportPage () {
           authors: newAuthors,
         }).then(response => {
           if (response.status) {
-            console.log('success')
             setContent(editingContent)
             setAuthors(newAuthors)
-            logReport.edit(report.id, user).then(_ => {
+            logReport.edit(report.id, user).then(() => {
               updateActivities()
             })
           } else {
             throw Error('Internal Error')
           }
         }).catch(error => alert(error))
-      } else {
-        console.log('no changes')
       }
     } else {
       alert('report not found!')
@@ -87,8 +79,7 @@ export function ReportPage () {
         status: newStatus
       }).then(response => {
         if (response.status) {
-          console.log('success')
-          logReport.changeStatus(report.id, user, status, newStatus).then(_ => {
+          logReport.changeStatus(report.id, user, status, newStatus).then(() => {
             updateActivities()
           })
           setStatus(newStatus as ReportStatus)
@@ -101,21 +92,15 @@ export function ReportPage () {
     }
   }
 
-  const updateActivities = (reportId: string='') => {
+  const updateActivities = (reportId='') => {
     const id = reportId || report?.id || ''
-    console.log(id)
     activityService.get(id).then(response => {
-      console.log(response)
       setActivity(response)
     })
   }
 
   const handleDiscard = () => {
     setEditingContent(content)
-  }
-
-  const handleAddComment = (comment: string) => {
-
   }
 
   return (

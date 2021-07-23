@@ -1,11 +1,12 @@
 import { Box, Chip } from "@material-ui/core";
+import { ReactElement } from "react";
 import { getCategoryGroupFromGroups } from "../utils/group";
 
 interface GroupListProp {
   groups: string[]
 }
 
-export function GroupList(prop: GroupListProp) {
+export function GroupList(prop: GroupListProp): ReactElement {
   return (<>
     { getCategoryGroupFromGroups(prop.groups).map(category =>
       category.subcategories.map(subcategory =>

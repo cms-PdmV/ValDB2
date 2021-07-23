@@ -1,7 +1,7 @@
 import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, Paper, TextField } from "@material-ui/core";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { User } from "../types";
 import { logReport } from "../utils/activity";
 import { Spacer } from "./Spacer";
@@ -12,14 +12,13 @@ interface CommentBoxProp {
   updateActivities: () => void
 }
 
-export function CommentBox(prop: CommentBoxProp) {
+export function CommentBox(prop: CommentBoxProp): ReactElement {
 
   const [value, setValue] = useState<string>()
 
   const handleAddComment = () => {
-    console.log(value)
     if (value && value !== '') {
-      logReport.comment(prop.reportId, prop.user, value).then(_ => {
+      logReport.comment(prop.reportId, prop.user, value).then(() => {
         prop.updateActivities()
         setValue('')
       })

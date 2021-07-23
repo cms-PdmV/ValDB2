@@ -222,8 +222,12 @@ class Model():
         data_as_dict = {}
 
         for key in self._fields:
-            value = getattr(self, key)
-            data_as_dict[key] = self._serialize(value)
+            if key == 'id' and ('id' in data_as_dict or '_id' in data_as_dict):
+                id_value = data_as_dict['id'] if 'id' in data_as_dict else data_as_dict['_id']
+                data_as_dict['id'] = str(id_value)
+            else:
+                value = getattr(self, key)
+                data_as_dict[key] = self._serialize(value)
         return data_as_dict
 
     def parse_datetime(self, datetime_format="%Y-%m-%d"):

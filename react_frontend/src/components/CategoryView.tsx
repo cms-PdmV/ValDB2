@@ -1,7 +1,7 @@
 import { faColumns, faTh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, ButtonGroup } from "@material-ui/core";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { Category } from "../types";
 import { CategoryColumnsView } from "./CategoryColumnsView";
 import { CategoryCompactView } from "./CategoryCompactView";
@@ -15,7 +15,7 @@ interface CategoryView {
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
-export function CategoryView(prop: CategoryView) {
+export function CategoryView(prop: CategoryView): ReactElement {
   const [mode, setMode] = useState<'compact' | 'columns'>('columns')
 
   const setNewMode = (newMode: 'compact' | 'columns') => {
@@ -35,6 +35,6 @@ export function CategoryView(prop: CategoryView) {
       <Box height="1rem" />
       { mode === 'columns' && <CategoryColumnsView {...prop} /> }
       { mode === 'compact' && <CategoryCompactView {...prop} /> }
-    </>      
+    </>
   )
 }

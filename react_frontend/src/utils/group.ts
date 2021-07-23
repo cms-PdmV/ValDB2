@@ -1,6 +1,10 @@
 import { Category } from '../types'
 
-export const splitPath = (groupString: string) => {
+export const splitPath = (groupString: string): {
+    category: string,
+    subcategory: string,
+    group: string
+} => {
     const splittedString = groupString.split('.');
     const category = splittedString[0];
     const subcategory = splittedString[1];
@@ -8,8 +12,8 @@ export const splitPath = (groupString: string) => {
     return { category, subcategory, group }
 }
 
-export const getCategoryGroupFromGroups = (groups: string[]) => {
-    let campaignGroups: Category[] = [];
+export const getCategoryGroupFromGroups = (groups: string[]): Category[] => {
+    const campaignGroups: Category[] = [];
 
     groups.forEach(groupString => {
         const splittedString = groupString.split('.');

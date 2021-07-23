@@ -45,5 +45,5 @@ export const userGroupService = {
 
 export const activityService = {
     get: (reportId: string): Promise<Activity[]> => axios.get(`${serverUrl}/activities/${reportId}/`).then(response => response.data).catch(error => { throw error }),
-    create: (reportId: string, activity: Partial<Activity>): Promise<Activity[]> => axios.post(`${serverUrl}/activities/${reportId}/`, activity).then(response => response.data).catch(error => { throw error }),
+    create: (reportId: string, activity: Partial<Activity>): Promise<void> => axios.post(`${serverUrl}/activities/${reportId}/`, activity).then(response => response.data).catch(error => { throw error }),
 }

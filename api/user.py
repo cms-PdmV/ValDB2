@@ -35,7 +35,10 @@ class UserListAPI(Resource):
         '''
         Get all users
         '''
-        users = list(get_database().database[User.get_collection_name()].find({}))
+        users = [{
+            'id': user['_id'],
+            **user,
+        } for user in list(get_database().database[User.get_collection_name()].find({}))]
         return users
 
     @api.marshal_with(user_model)

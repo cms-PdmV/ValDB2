@@ -4,12 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFeather } from '@fortawesome/free-solid-svg-icons';
 import { useHistory, useLocation } from 'react-router';
 import { User, UserRole } from '../types';
+import { ReactElement } from 'react';
 
 interface NavBarProp {
   user: User
 }
 
-export function NavBar(prop: NavBarProp) {
+export function NavBar(prop: NavBarProp): ReactElement {
 
   const history = useHistory()
   const location = useLocation()

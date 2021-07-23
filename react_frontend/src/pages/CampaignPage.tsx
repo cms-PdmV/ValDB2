@@ -1,10 +1,8 @@
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Chip, Box } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { CategoryColumnsView } from "../components/CategoryColumnsView";
-import { CategoryCompactView } from "../components/CategoryCompactView";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
@@ -13,8 +11,8 @@ import { campaignService, reportService } from "../services";
 import { Campaign, Category } from "../types";
 import { splitPath } from "../utils/group";
 
-export function CampaignPage() {
-  const { id }: any = useParams();
+export function CampaignPage(): ReactElement {
+  const { id }: { id: string } = useParams();
   const [campaign, setCampaign] = useState<Campaign>()
   const [groups, setGroups] = useState<Category[] | null>(null)
 
@@ -23,7 +21,6 @@ export function CampaignPage() {
   useEffect(() => {
     campaignService.get(id).then(response => {
       if (response.status) {
-        console.log(response.data)
         setCampaign(response.data.campaign)
         setGroups(response.data.groups)
       } else {
@@ -33,7 +30,9 @@ export function CampaignPage() {
   }, [])
 
   const handleClickReport = (groupPath: string) => {
-    const { category, subcategory, group } = splitPath(groupPath)
+    const pathString = splitPath(groupPath)
+    const category = pathString.category
+    const subcategory = pathString.subcategory
     const reportExisted = Boolean(groups?.find(e => e.name === category)?.subcategories.find(e => e.name === subcategory)?.groups.find(e => e.path === groupPath)?.report)
     if (reportExisted) {
       openReport(groupPath)
@@ -42,7 +41,7 @@ export function CampaignPage() {
     }
   }
 
-  const openReport = (groupPath: string, query: string='') => {
+  const openReport = (groupPath: string, query='') => {
     if (campaign) {
       history.push(`/campaigns/${campaign.name}/report/${groupPath}${query}`)
     }
@@ -55,7 +54,6 @@ export function CampaignPage() {
         group: groupPath,
       }).then(result => {
         if (result.status) {
-          console.log(result.data)
           openReport(groupPath, '?&edit')
         } else {
           throw Error('Internal Error')

@@ -15,26 +15,28 @@ import { LabelGroup } from "../components/LabelGroup";
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import moment from 'moment';
+import { ReactElement } from 'react';
 
 const { confirm } = Modal;
 
+type FormValue = {
+  name: string,
+  target_release: string,
+  reference_release: string,
+  description: string,
+  relmon: string,
+}
 
-export function CampaignFormPage () {
+export function CampaignFormPage (): ReactElement {
 
   const [categories, setCategories] = useState<Category[]>()
   const [selectedCategories, setSelectedCategories] = useState<string[]>()
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(Date.now()));
 
   const history = useHistory()
+  const { register, handleSubmit } = useForm<FormValue>();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data: any) => {
-    console.log('test')
+  const onSubmit = (data: FormValue) => {
     confirm({
       title: 'New Campaign Confirmation',
       content: <>
@@ -45,24 +47,18 @@ export function CampaignFormPage () {
           Deadline: moment(selectedDate).format('YYYY-MM-DD'),
           Description: data.description,
           Relmon: data.relmon,
-          Categories: selectedCategories?.join(', '),
+          Categories: selectedCategories?.join(', ') || '',
         }} />
       </>,
       onOk() {
-        console.log('OK');
-        console.log(data)
-        console.log(selectedCategories)
         const body: Partial<Campaign> = {
           ...data,
           deadline: moment(selectedDate).format('YYYY-MM-DD'),
           subcategories: selectedCategories,
         }
-        console.log(body)
         campaignService.create(body).then(response => {
           if (response.status) {
-            console.log(response.data)
             if (response.data.id) {
-              console.log('success !')
               history.push(`/campaigns/${response.data.name}`)
             }
           } else {
@@ -70,15 +66,11 @@ export function CampaignFormPage () {
           }
         })
       },
-      onCancel() {
-        console.log('Cancel');
-      },
     })
   }
 
   useEffect(() => {
     categoryService.getAll().then(data => {
-      console.log(data)
       setCategories(data)
     })
   }, [])
@@ -106,7 +98,6 @@ export function CampaignFormPage () {
         <TextField {...register('description')} variant="outlined" size="small" fullWidth multiline rows={3} label="Description"/>
         <Spacer />
         <TextField {...register('relmon')} variant="outlined" size="small" label="Relmon" style={{width: '280px'}} />
-        
         {/* Campaign's Categories */}
         <Spacer rem={2} />
         <Box fontWeight="bold">Select target categories</Box>

@@ -1,19 +1,18 @@
-import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TextField, TableBody, Box } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Box } from "@material-ui/core";
+import { ReactElement, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Container } from "../components/Container";
 import { userService } from "../services";
 import { User, UserRole } from "../types";
 import { userRoleLabel } from "../utils/label";
 
-export function AllUserAdminPage() {
+export function AllUserAdminPage(): ReactElement {
 
   const [users, setUsers] = useState<User[]>()
   const history = useHistory()
 
   useEffect(() => {
     userService.getAll().then(data => {
-      console.log(data)
       setUsers(data)
     }).catch(error => alert(error))
   }, [])
@@ -34,7 +33,7 @@ export function AllUserAdminPage() {
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id} onClick={() => { history.push(`/admin/users/${user.id}`)}} style={{cursor: 'pointer'}}>
+              <TableRow key={user.id} onClick={() => { history.push(`/admin/users/${user.id}`) }} style={{cursor: 'pointer'}}>
                 <TableCell component="th" scope="row">{user.fullname}</TableCell>
                 <TableCell align="left">{user.email}</TableCell>
                 <TableCell align="left">{userRoleLabel[user.role as UserRole]}</TableCell>

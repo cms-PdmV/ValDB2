@@ -1,4 +1,4 @@
-export const SplitGroup: any = {
+export const SplitGroup: Record<string, { name: string, slice: [number, number] }[]> = {
     Reconstruction: [
         {
             name: 'DPGs/TSG',
