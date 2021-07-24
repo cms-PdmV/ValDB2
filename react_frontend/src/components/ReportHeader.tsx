@@ -7,6 +7,7 @@ import { Spacer } from "./Spacer";
 import { reportStatusStyle } from "../utils/report";
 import { ReportStatusLabel } from "./ReportStatusLabel";
 import moment from "moment";
+import { Modal } from "antd";
 
 interface ReportHeaderProp {
   editable?: boolean
@@ -25,6 +26,7 @@ interface ReportHeaderProp {
 export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { confirm } = Modal;
 
   const handleOpenStatusMenu = (event: MouseEvent<HTMLButtonElement>) => {
     if (prop.editable) {
@@ -46,8 +48,16 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
   }
 
   const handleDiscard = () => {
-    prop.handleDiscard()
-    prop.onChangeMode('view')
+    confirm({
+      title: 'Discard changes?',
+      content: 'Your changes in report\'s content will be removed',
+      okText: 'Discard',
+      okType: 'danger',
+      onOk() {
+        prop.handleDiscard()
+        prop.onChangeMode('view')
+      },
+    })
   }
 
   const statusButton = (

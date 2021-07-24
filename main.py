@@ -20,7 +20,7 @@ lookup.update()
 
 app = Flask(__name__)
 api.init_app(app)
-CORS(app, supports_credentials=True, methods=["GET", "OPTIONS", "POST", "PUT", "DELETE"])
+CORS(app, supports_credentials=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

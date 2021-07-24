@@ -91,3 +91,11 @@ export interface Activity {
     content: string
     created_at?: string // 2020-21-2
 }
+
+export interface Attachment {
+    id: string
+    name: string
+    content: string
+    type: string
+    size: number
+}
