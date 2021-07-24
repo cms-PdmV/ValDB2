@@ -45,6 +45,11 @@
   color: rgb(35, 77, 247) !important;
 }
 
+.MuiOutlinedInput-inputMarginDense {
+  padding-top: 9px !important;
+  padding-bottom: 8px !important;
+}
+
 .ant-btn {
   background: #e5e5e5 !important;
   border-radius: 4px;

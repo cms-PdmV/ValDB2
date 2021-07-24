@@ -18,7 +18,7 @@ export interface CreateReportRequest {
 export const campaignService = {
     create: (body: Partial<Campaign>): Promise<AxiosResponse<Campaign>> => axios.post(`${serverUrl}/campaigns/`, body),
     update: (id: string, body: Partial<Campaign>): Promise<AxiosResponse<Campaign>> => axios.put(`${serverUrl}/campaigns/${id}/`, body),
-    getAll: (): Promise<AxiosResponse<Campaign[]>> => axios.get(`${serverUrl}/campaigns/`),
+    getAll: (skip: number, limit: number, search?: string): Promise<AxiosResponse<Campaign[]>> => axios.get(`${serverUrl}/campaigns/?skip=${skip}&limit=${limit}&search=${search || ''}`),
     get: (campaignName: string): Promise<AxiosResponse<CampaignResponse>> => axios.get(`${serverUrl}/campaigns/get/${campaignName}/`),
 }
 
@@ -33,7 +33,7 @@ export const categoryService = {
 }
 
 export const userService = {
-    getAll: (): Promise<User[]> => axios.get(`${serverUrl}/users/`).then(response => response.data).catch(error => { throw error }),
+    getAll: (skip: number, limit: number, search?: string): Promise<User[]> => axios.get(`${serverUrl}/users/?skip=${skip}&limit=${limit}&search=${search || ''}`).then(response => response.data).catch(error => { throw error }),
     get: (id: string): Promise<User> => axios.get(`${serverUrl}/users/${id}/`).then(response => response.data).catch(error => { throw error }),
     update: (id: string, body: Partial<User>): Promise<void> => axios.put(`${serverUrl}/users/${id}/`, body).then(response => response.data).catch(error => { throw error }),
 }

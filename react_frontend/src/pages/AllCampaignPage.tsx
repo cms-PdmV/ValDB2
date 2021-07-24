@@ -1,22 +1,30 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box } from "@material-ui/core";
+import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box, TextField } from "@material-ui/core";
 import { ReactElement } from "react";
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { useParams } from "react-router-dom";
 import { Container } from "../components/Container";
+import { Spacer } from "../components/Spacer";
 import { UserContext } from "../context/user";
 import { campaignService } from "../services";
 import { Campaign, UserRole } from "../types";
+import { PageLimit } from "../utils/constant";
 
 
 const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) === i) : []
 
 export function AllCampaignPage (): ReactElement {
 
-  const [campaigns, setCampaigns] = useState<Campaign[]>()
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const { search }: { search?: string } = useParams()
+  const [currentSearch, setCurrentSearch] = useState<string>(search || '')
+  const [searchValue, setSearchValue] = useState<string>(search || '')
   const user = useContext(UserContext)
   const history = useHistory()
+  const [skip, setSkip] = useState<number>(0)
+  const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
 
   const handleClickCampaign = (campaignName: string) => {
     history.push(`/campaigns/${campaignName}`)
@@ -27,19 +35,46 @@ export function AllCampaignPage (): ReactElement {
   }
 
   useEffect(() => {
-    campaignService.getAll().then(response => {
+    setCampaigns([])
+    setSkip(0)
+    setIsMaxPage(false)
+    handleLoadCampaign(0, currentSearch, [])
+  }, [currentSearch])
+
+  const handleLoadCampaign = (recordSkip: number, searchKeyword: string, targetCampaigns: Campaign[]) => {
+    campaignService.getAll(recordSkip, PageLimit, searchKeyword).then(response => {
       if (response.status) {
-        setCampaigns(response.data)
-      } else {
-        throw Error
+        const loadedCampaign = targetCampaigns.concat(response.data)
+        setCampaigns(loadedCampaign)
+        if (response.data.length < PageLimit) {
+          setSkip(recordSkip + PageLimit)
+          setIsMaxPage(true)
+        } else {
+          setSkip(recordSkip + PageLimit)
+        }
       }
     }).catch(error => alert(error))
-  }, [])
+  }
+
+  const handleSearch = () => {
+    if (searchValue === '') {
+      history.replace('/campaigns')
+      setCurrentSearch('')
+    } else {
+      history.replace(`/campaigns/search/${searchValue}`)
+      setCurrentSearch(searchValue)
+    }
+  }
 
   return (
     <Container>
       <h1>Campaigns</h1>
-      { user?.role === UserRole.ADMIN && <Button variant="contained" color="primary" onClick={handleCreateCampaign} ><FontAwesomeIcon icon={faPlus} />&nbsp;&nbsp;Create</Button>}
+      <Box display="flex">
+        { user?.role === UserRole.ADMIN && <Button variant="contained" color="primary" onClick={handleCreateCampaign} ><FontAwesomeIcon icon={faPlus} />&nbsp;&nbsp;Create</Button>}
+        <Spacer inline grow />
+        <TextField value={searchValue} onChange={e => setSearchValue(e.target.value)} onKeyPressCapture={e => { if (e.key === 'Enter') { handleSearch(); } }} defaultValue={search} placeholder="Search..." variant="outlined" size="small" style={{minWidth: '300px', height: '36px'}}></TextField>
+        <Button variant="contained" color="primary" onClick={handleSearch} ><FontAwesomeIcon icon={faSearch} /></Button>
+      </Box>
       <Box height="1rem" />
       { campaigns && <TableContainer component={Paper}>
         <Table>
@@ -58,6 +93,11 @@ export function AllCampaignPage (): ReactElement {
                 <TableCell align="right">{campaign.created_at.split('.')[0]}</TableCell>
               </TableRow>
             ))}
+            { !isMaxPage && <a onClick={() => { handleLoadCampaign(skip, currentSearch, campaigns) }} style={{cursor: 'pointer'}}>
+              <Box padding="1rem">
+                Load More
+              </Box>
+            </a>}
           </TableBody>
         </Table>
       </TableContainer>}

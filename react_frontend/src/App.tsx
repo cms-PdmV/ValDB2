@@ -22,6 +22,7 @@ import { UserAdminPage } from "./pages/UserAdminPage";
 import { AuthPage } from "./pages/Auth";
 import { UserGroupAdminPage } from "./pages/UserGroupAdminPage";
 import { ReactElement } from "react-markdown";
+import { userService } from "./services";
 
 const theme = createMuiTheme({
   typography: {
@@ -43,7 +44,7 @@ function App(): ReactElement {
   const [user, setUser] = useState<User>()
 
   useEffect(() => {
-    // TODO: check for logged in user token
+    userService.get('60e90fbd8aa6fe6b6731a4b5').then(data => setUser(data))
   }, [])
 
   const require = (roles: UserRole[]): boolean | undefined => user && roles.includes(user.role)
@@ -61,6 +62,9 @@ function App(): ReactElement {
               </Route>
               <Route path="/campaigns/form/:mode">
                 { require([UserRole.ADMIN]) && <CampaignFormPage /> }
+              </Route>
+              <Route path="/campaigns/search/:search">
+                <AllCampaignPage />
               </Route>
               <Route path="/campaigns/:campaign/report/:group">
                 <ReportPage />
