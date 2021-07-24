@@ -3,11 +3,13 @@ import { Category } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { ReactElement, useState } from "react";
+import { getSubcategoriesPathFromCategories } from "../utils/group";
 
 
 interface CamapignCategoryListProp {
   categories: Category[]
   selectable?: boolean
+  defaultValues?: Category[]
   onChange?: (selectedCategories: string[]) => void
 }
 
@@ -19,17 +21,28 @@ const checkboxStyle = {
   }
 }
 
-const generateSubItemArray = (categories: Category[]): boolean[][] => (
-  categories.map(category => category.subcategories.map(() => false))
-)
-const generateItemArray = (categories: Category[]): boolean[] => (
-  categories.map(() => false)
-)
+const generateSubItemArray = (categories: Category[], defaultValues?: Category[]): boolean[][] => {
+  if (!defaultValues) {
+    return categories.map(category => category.subcategories.map(() => false))
+  } else {
+    const selectedSubcategories = getSubcategoriesPathFromCategories(defaultValues)
+    return categories.map(category => category.subcategories.map((subcategory) => {
+      return selectedSubcategories.includes(`${category.name}.${subcategory.name}`)
+    }))
+  }
+}
+const generateItemArray = (categories: Category[], defaultValues: Category[] | undefined, subItems: boolean[][]): boolean[] => {
+  if (!defaultValues || !subItems) {
+    return categories.map(() => false)
+  } else {
+    return categories.map((_, index) => subItems[index].every(el => el === true))
+  }
+}
 
 export function CampaignCategoryList(prop: CamapignCategoryListProp): ReactElement {
 
-  const [subItems, setSubItems] = useState<boolean[][]>(generateSubItemArray(prop.categories))
-  const [items, setItems] = useState<boolean[]>(generateItemArray(prop.categories))
+  const [subItems, setSubItems] = useState<boolean[][]>(generateSubItemArray(prop.categories, prop.defaultValues))
+  const [items, setItems] = useState<boolean[]>(generateItemArray(prop.categories, prop.defaultValues, subItems))
 
   const handleCheck = (e: React.ChangeEvent<HTMLInputElement>, index: number, checked: boolean) => {
     e.stopPropagation()

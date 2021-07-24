@@ -56,14 +56,14 @@ function App(): ReactElement {
           <Router>
             <NavBar user={user}/>
             <Switch>
-              <Route path="/campaigns/new">
+              <Route path="/campaigns/form/:mode/:id">
+                { require([UserRole.ADMIN]) && <CampaignFormPage /> }
+              </Route>
+              <Route path="/campaigns/form/:mode">
                 { require([UserRole.ADMIN]) && <CampaignFormPage /> }
               </Route>
               <Route path="/campaigns/:campaign/report/:group">
                 <ReportPage />
-              </Route>
-              <Route path="/campaigns/:id/edit">
-                { require([UserRole.ADMIN]) && <CampaignFormPage /> }
               </Route>
               <Route path="/campaigns/:id">
                 <CampaignPage />

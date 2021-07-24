@@ -72,6 +72,7 @@ export interface Campaign {
     deadline: string // 2020-21-2
     target_release: string
     reference_release: string
+    relmon: string
     subcategories: string[]
     report: Report[]
     active: boolean

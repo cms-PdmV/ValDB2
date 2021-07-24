@@ -17,8 +17,9 @@ export interface CreateReportRequest {
 
 export const campaignService = {
     create: (body: Partial<Campaign>): Promise<AxiosResponse<Campaign>> => axios.post(`${serverUrl}/campaigns/`, body),
+    update: (id: string, body: Partial<Campaign>): Promise<AxiosResponse<Campaign>> => axios.put(`${serverUrl}/campaigns/${id}/`, body),
     getAll: (): Promise<AxiosResponse<Campaign[]>> => axios.get(`${serverUrl}/campaigns/`),
-    get: (campaignId: string): Promise<AxiosResponse<CampaignResponse>> => axios.get(`${serverUrl}/campaigns/${campaignId}/`),
+    get: (campaignName: string): Promise<AxiosResponse<CampaignResponse>> => axios.get(`${serverUrl}/campaigns/get/${campaignName}/`),
 }
 
 export const reportService = {

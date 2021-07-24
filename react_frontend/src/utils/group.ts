@@ -12,6 +12,14 @@ export const splitPath = (groupString: string): {
     return { category, subcategory, group }
 }
 
+export const getSubcategoriesPathFromCategories = (categories: Category[]): string[] => (
+    categories.map(category => category.subcategories.map(subcategory => `${category.name}.${subcategory.name}`)).flat()
+  )
+
+export const getGroupsFromCategories = (categories: Category[]): string[] => (
+    categories.map(category => category.subcategories.map(subcategory => subcategory.groups.map(group => group.path))).flat().flat()
+)
+
 export const getCategoryGroupFromGroups = (groups: string[]): Category[] => {
     const campaignGroups: Category[] = [];
 

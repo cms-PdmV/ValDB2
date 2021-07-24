@@ -23,7 +23,7 @@ export function AllCampaignPage (): ReactElement {
   }
 
   const handleCreateCampaign = () => {
-    history.push('/campaigns/new')
+    history.push('/campaigns/form/new')
   }
 
   useEffect(() => {

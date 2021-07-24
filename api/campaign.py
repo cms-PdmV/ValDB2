@@ -47,11 +47,11 @@ class CampaignListAPI(Resource):
         return campaign.dict()
 
 
-@api.route('/<string:campaignname>/')
+@api.route('/get/<string:campaignname>/')
 @api.param('campaignname', 'Campaign Short ID')
-class CampaignAPI(Resource):
+class CampaignGetAPI(Resource):
     '''
-    Campaign API
+    Campaign Get API
     '''
     def get(self, campaignname):
         '''
@@ -93,3 +93,16 @@ class CampaignAPI(Resource):
             'campaign': campaign.dict(),
             'groups': groups,
         }
+
+@api.route('/<string:campaignid>/')
+@api.param('campaignid', 'Campaign ID')
+class CampaignAPI(Resource):
+    '''
+    Campaign API
+    '''
+    def put(self, campaignid):
+        '''
+        Update campaign by id
+        '''
+        Campaign.get(campaignid).update(api.payload)
+        return 'ok'

@@ -1,14 +1,16 @@
-import { faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faInfo, faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Chip, Box } from "@material-ui/core";
+import { Chip, Box, Button } from "@material-ui/core";
+import { useContext } from "react";
 import { ReactElement, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
 import { Spacer } from "../components/Spacer";
+import { UserContext } from "../context/user";
 import { campaignService, reportService } from "../services";
-import { Campaign, Category } from "../types";
+import { Campaign, Category, UserRole } from "../types";
 import { splitPath } from "../utils/group";
 
 export function CampaignPage(): ReactElement {
@@ -17,6 +19,7 @@ export function CampaignPage(): ReactElement {
   const [groups, setGroups] = useState<Category[] | null>(null)
 
   const history = useHistory()
+  const user = useContext(UserContext)
 
   useEffect(() => {
     campaignService.get(id).then(response => {
@@ -41,9 +44,15 @@ export function CampaignPage(): ReactElement {
     }
   }
 
-  const openReport = (groupPath: string, query='') => {
+  const handleEditCampaign = () => {
     if (campaign) {
-      history.push(`/campaigns/${campaign.name}/report/${groupPath}${query}`)
+      history.push(`/campaigns/form/edit/${campaign.name}`)
+    }
+  }
+
+  const openReport = (groupPath: string) => {
+    if (campaign) {
+      history.push(`/campaigns/${campaign.name}/report/${groupPath}`)
     }
   }
 
@@ -54,7 +63,7 @@ export function CampaignPage(): ReactElement {
         group: groupPath,
       }).then(result => {
         if (result.status) {
-          openReport(groupPath, '?&edit')
+          openReport(groupPath)
         } else {
           throw Error('Internal Error')
         }
@@ -75,9 +84,13 @@ export function CampaignPage(): ReactElement {
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Created: {campaign?.created_at && campaign?.created_at.split(' ')[0]}</Box>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign?.deadline && campaign?.deadline.split(' ')[0]}</Box>
-      <Box height="2rem" />
+      <Spacer rem={0.5} />
+      <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: {campaign?.relmon}</Box>
+      <Spacer />
+      { user?.role === UserRole.ADMIN && <Button onClick={handleEditCampaign} variant="contained" color="primary"><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>}
+      <Spacer rem={2} />
       <HorizontalLine />
-      <Box height="2rem" />
+      <Spacer rem={2} />
       { groups && <CategoryView reportView categories={groups} onClickGroup={handleClickReport}/> }
     </Container>
   )
