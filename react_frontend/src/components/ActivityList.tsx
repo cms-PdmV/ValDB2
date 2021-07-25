@@ -1,8 +1,8 @@
-import { Box, Paper, Tooltip } from "@material-ui/core";
-import moment from "moment";
+import { Box, Paper } from "@material-ui/core";
 import { ReactElement } from "react";
 import { useState } from "react";
 import { Activity, ActivityType } from "../types";
+import { DatetimeSpan } from "./DatetimeSpan";
 import { Spacer } from "./Spacer";
 
 interface ActivityListProp {
@@ -12,15 +12,6 @@ interface ActivityListProp {
 export function ActivityList(prop: ActivityListProp): ReactElement {
 
   const [filter, setFilter] = useState<'all' | 'activity' | 'comment'>('all')
-
-  const datetimeFromNowToString = (datetime: string) => moment.utc(datetime).local().fromNow()
-  const datetimeToString = (datetime: string) => moment.utc(datetime).local().format('LLL')
-
-  const datetimeSpan = (datetime: string) => (
-    <Tooltip title={datetimeToString(datetime)}>
-      <span>{datetimeFromNowToString(datetime)}</span>
-    </Tooltip>
-  )
 
   const verticleDevider = <>
     <Spacer inline rem={0.3} />
@@ -34,7 +25,7 @@ export function ActivityList(prop: ActivityListProp): ReactElement {
       <Spacer inline rem={0.5} />
       {activity.content}
       {verticleDevider}
-      {datetimeSpan(activity.created_at || '')}
+      <DatetimeSpan datetime={activity.created_at || ''} />
     </Box>
   )
 
@@ -44,7 +35,7 @@ export function ActivityList(prop: ActivityListProp): ReactElement {
         <Box>
           <strong>{activity.user.fullname}</strong>
           {verticleDevider}
-          {datetimeSpan(activity.created_at || '')}
+          <DatetimeSpan datetime={activity.created_at || ''} />
         </Box>
         {activity.content}
       </Box>
