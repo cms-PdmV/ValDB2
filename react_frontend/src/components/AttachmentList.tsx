@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Tooltip } from "@material-ui/core";
 import { ReactElement } from "react-markdown";
 import { Attachment } from "../types";
-import { getAttactmentType } from "../utils/attachments";
+import { getAttactmentType, humanFileSize } from "../utils/attachments";
 import { color } from "../utils/css";
 import { Modal } from "antd";
 import { MouseEvent } from "react";
@@ -55,7 +55,7 @@ export function AttachmentList (prop: AttachmentListProp): ReactElement {
             <Box>
               <Box fontWeight="bold">{itemProp.attachment.name.replace(/(.{16})..+/, "$1…")}</Box>
               <Box lineHeight="1rem" fontSize="0.8rem" >{attachmentType.name}</Box>
-              <Box lineHeight="1rem" fontSize="0.8rem" marginBottom="0.2rem">{itemProp.attachment.size}</Box>
+              <Box lineHeight="1rem" fontSize="0.8rem" marginBottom="0.2rem">{humanFileSize(itemProp.attachment.size)}</Box>
             </Box>
             <Tooltip title="Remove" placement="top">
               <Box marginLeft="0.5rem" onClick={handleRemove} color={color.gray}>
