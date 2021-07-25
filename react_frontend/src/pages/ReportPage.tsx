@@ -3,10 +3,10 @@ import { ReportContentViewer } from '../components/ReportContentViewer';
 import { ReportHeader } from '../components/ReportHeader';
 import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
-import { Activity, Report, ReportEditorMode, ReportStatus, User } from '../types'
+import { Activity, Attachment, Report, ReportEditorMode, ReportStatus, User } from '../types'
 import { useContext, useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
-import { activityService, reportService } from '../services';
+import { activityService, attachmentService, reportService } from '../services';
 import { UserContext } from '../context/user';
 import { logReport } from '../utils/activity';
 import { ActivityList } from '../components/ActivityList';
@@ -14,6 +14,11 @@ import { CommentBox } from '../components/CommentBox';
 import { Spacer } from '../components/Spacer';
 import { HorizontalLine } from '../components/HorizontalLine';
 import { ReactElement } from 'react-markdown';
+import EasyMDE from 'easymde';
+import { useCallback } from 'react';
+import { getAttactmentType, SupportEditorAttachmentTypes } from '../utils/attachments';
+import { message } from 'antd';
+import { AttachmentList } from '../components/AttachmentList';
 
 export function ReportPage(): ReactElement {
 
@@ -22,13 +27,14 @@ export function ReportPage(): ReactElement {
     group: string,
   } = useParams()
 
-  const [content, setContent] = useState<string>('');
-  const [authors, setAuthors] = useState<User[]>([]);
-  const [status, setStatus] = useState<ReportStatus>(ReportStatus.IN_PROGRESS);
-  const [report, setReport] = useState<Report>();
-  const [editingContent, setEditingContent] = useState<string>('');
-  const [mode, setMode] = useState<ReportEditorMode>('view');
-  const [activities, setActivity] = useState<Activity[]>([]);
+  const [content, setContent] = useState<string>('')
+  const [authors, setAuthors] = useState<User[]>([])
+  const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [status, setStatus] = useState<ReportStatus>(ReportStatus.IN_PROGRESS)
+  const [report, setReport] = useState<Report>()
+  const [editingContent, setEditingContent] = useState<string>('')
+  const [mode, setMode] = useState<ReportEditorMode>('view')
+  const [activities, setActivity] = useState<Activity[]>([])
   const user = useContext(UserContext)
 
   const history = useHistory()
@@ -41,6 +47,7 @@ export function ReportPage(): ReactElement {
         setEditingContent(response.data.content)
         setStatus(response.data.status)
         setAuthors(response.data.authors)
+        setAttachments(response.data.attachments || [])
         updateActivities(response.data.id)
       } else {
         throw Error('Internal Error')
@@ -63,6 +70,7 @@ export function ReportPage(): ReactElement {
             logReport.edit(report.id, user).then(() => {
               updateActivities()
             })
+            message.success('Saved')
           } else {
             throw Error('Internal Error')
           }
@@ -72,6 +80,45 @@ export function ReportPage(): ReactElement {
       alert('report not found!')
     }
   }
+
+  const handleAddAttachmentToReport = useCallback((uploadedAttachments: Attachment[]) => {
+    const newAttachments = uploadedAttachments.concat(attachments)
+    if (report && user) {
+      reportService.update(report.id, {
+        attachments: newAttachments,
+      }).then(response => {
+        if (response.status) {
+          if (response.data.attachments) {
+            setAttachments(response.data.attachments)
+            logReport.addAttachment(report.id, user, uploadedAttachments.length).then(() => {
+              updateActivities()
+            })
+          } else {
+            throw Error('Cannot save attachments to report')
+          }
+        } else {
+          throw Error('Internal Error')
+        }
+      }).catch(error => alert(error))
+    }
+  }, [report, user, attachments])
+
+  const handleUpdateAttachmentForReport = useCallback((removedAttachments: Attachment[]) => {
+    if (report && user) {
+      reportService.update(report.id, {
+        attachments: removedAttachments,
+      }).then(response => {
+        if (response.status) {
+          setAttachments(response.data.attachments || [])
+          logReport.removeAttachment(report.id, user).then(() => {
+            updateActivities()
+          })
+        } else {
+          throw Error('Internal Error')
+        }
+      }).catch(error => alert(error))
+    }
+  }, [report, user, attachments])
 
   const handleChangeStatus = (newStatus: number) => {
     if (report && user) {
@@ -103,13 +150,46 @@ export function ReportPage(): ReactElement {
     setEditingContent(content)
   }
 
+  const handleAddTextToEditor = (mdeInstance: EasyMDE, text: string) => {
+    const pos = mdeInstance.codemirror.getCursor();
+    mdeInstance.codemirror.setSelection(pos, pos);
+    mdeInstance.codemirror.replaceSelection(text);
+  }
+
+  const onFilesDrop = useCallback(async (mdeInstance: EasyMDE, acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      message.info('Uploading attachments')
+      const uploadedAttachments: Attachment[] = []
+      await Promise.all(acceptedFiles.map(async file => {
+        const data = new FormData()
+        data.append('file', file)
+        data.append('name', file.name)
+        data.append('type', file.type)
+        data.append('size', file.size.toFixed())
+        await attachmentService.create(data).then(attactment => {
+          message.success(`Uploaded ${attactment.name}`)
+          uploadedAttachments.push(attactment)
+          if (mdeInstance) {
+            const type = getAttactmentType(attactment.type)
+            if (SupportEditorAttachmentTypes.includes(type.name)) {
+              handleAddTextToEditor(mdeInstance, `![${attactment.name}](${attactment.url})`)
+            }
+          }
+        })
+      }))
+      handleAddAttachmentToReport(uploadedAttachments)
+    }
+  }, [attachments, report, user, attachments])
+
   return (
     <Container>
       { report && <Box>
         <ReportHeader campaign={campaign} date={report.created_at} authors={authors} editable={user?.groups.includes(group)} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
-        { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} />}
+        { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} onFilesDrop={onFilesDrop} />}
         { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
       </Box>}
+      <h3>Attachments</h3>
+      <AttachmentList attachments={attachments} onUpdate={handleUpdateAttachmentForReport} />
       <h3>Activities</h3>
       { activities && <ActivityList activities={activities} /> }
       <HorizontalLine />

@@ -1,3 +1,5 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
 export type ReportEditorMode = 'edit' | 'view' | 'readonly'
 
 export interface Response<T> {
@@ -60,6 +62,7 @@ export interface Report {
     status: ReportStatus
     content: string
     activity: Activity[]
+    attachments?: Attachment[]
     created_at: string // 2020-21-2
     updated_at: string // 2020-21-2
 }
@@ -98,4 +101,11 @@ export interface Attachment {
     content: string
     type: string
     size: number
+    url: string
+}
+
+export interface AttachmentType {
+    name: string
+    icon: IconDefinition
+    types: string[]
 }

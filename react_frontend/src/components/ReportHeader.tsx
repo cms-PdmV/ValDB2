@@ -8,6 +8,7 @@ import { reportStatusStyle } from "../utils/report";
 import { ReportStatusLabel } from "./ReportStatusLabel";
 import moment from "moment";
 import { Modal } from "antd";
+import { VerticleLine } from "./VerticleLine";
 
 interface ReportHeaderProp {
   editable?: boolean
@@ -101,10 +102,15 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
         </Box>
       }
       { prop.mode === 'edit' &&
-        <Box display="flex">
-          <Button variant="contained" color="primary" onClick={handleSave} style={{marginRight: '1rem'}}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
+        <Box display="flex" alignItems="center">
+          <Button variant="contained" color="primary" onClick={handleSave}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
+          <Spacer inline />
           {statusButton}
-          <Button variant="contained" onClick={handleDiscard} style={{marginLeft: 'auto'}}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>
+          <Spacer inline grow />
+          <Spacer inline rem={0.5}/>
+          <VerticleLine />
+          <Spacer inline rem={0.5}/>
+          <Button variant="contained" onClick={handleDiscard}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>
         </Box>
       }
     </Box>
