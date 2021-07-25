@@ -1,7 +1,8 @@
 import { Box, PopoverProps } from "@material-ui/core";
 import { Popover } from "@material-ui/core";
 import { useState } from "react";
-import { User, UserRole } from "../types";
+import { ReactElement } from "react-markdown";
+import { User } from "../types";
 import { userRoleLabel } from "../utils/label";
 
 interface UserSpanProp {
@@ -20,7 +21,7 @@ const popoverProps = {
   },
 } as Partial<PopoverProps>
 
-export function UserSpan(prop: UserSpanProp) {
+export function UserSpan(prop: UserSpanProp): ReactElement {
   const [anchorEl, setAnchorEl] = useState<HTMLAnchorElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {

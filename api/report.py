@@ -8,9 +8,9 @@ from flask_restx import Resource
 
 from utils.query import add_skip_and_limit, serialize_raw_query
 from core.database import get_database
+from core import Namespace
 from models.report import Report, ReportStatus
 from models.campaign import Campaign
-from core import Namespace
 
 
 api = Namespace('reports', description='Report in the system')
@@ -46,7 +46,7 @@ class ReportListAPI(Resource):
 
 @api.route('/user/<string:userid>/')
 @api.param('userid', 'Report id')
-class ReportAPI(Resource):
+class ReportUserAPI(Resource):
     '''
     Report of users API
     '''
@@ -58,15 +58,11 @@ class ReportAPI(Resource):
         query_params = request.args
         query_result = get_database().database[Report.get_collection_name()] \
             .find(
-                {'authors': ObjectId(userid)}, 
+                {'authors': ObjectId(userid)},
                 {'content': False, 'authors': False, 'activities': False, 'attachments': False}) \
             .sort([('created_at', pymongo.DESCENDING)])
         add_skip_and_limit(query_result, query_params)
-        from pprint import pprint
-        res = serialize_raw_query(query_result)
-        pprint(res)
-        pprint(res)
-        return res
+        return serialize_raw_query(query_result)
 
 @api.route('/search/<string:campaign>/<string:group>/')
 @api.param('campaign', 'Campaign name')
@@ -95,7 +91,6 @@ class ReportAPI(Resource):
     '''
     Report API
     '''
-
     def put(self, reportid):
         '''
         Get report by id

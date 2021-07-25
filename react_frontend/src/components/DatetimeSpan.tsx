@@ -10,7 +10,6 @@ export const DatetimeSpan = (prop: { datetime: string }): ReactElement => {
   const [text, setText] = useState<string>(datetimeFromNowToString(prop.datetime))
 
   setInterval(() => {
-    console.log('change')
     setText(datetimeFromNowToString(prop.datetime))
   }, 60000)
 
