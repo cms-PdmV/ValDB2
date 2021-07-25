@@ -21,4 +21,4 @@ export const SplitGroup: Record<string, { name: string, slice: [number, number] 
     ],
 }
 
-export const PageLimit = 3
+export const PageLimit = 20

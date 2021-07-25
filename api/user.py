@@ -4,7 +4,7 @@ User API
 from flask.globals import request
 from flask_restx import Resource
 
-from utils.query import add_skip_and_limit, build_query
+from utils.query import add_skip_and_limit, build_query, serialize_raw_query
 from core import Namespace
 from core.database import get_database
 from data.group import get_all_groups
@@ -41,11 +41,7 @@ class UserListAPI(Resource):
         database_query = build_query(['fullname', 'email'], query_params)
         query_result = get_database().database[User.get_collection_name()].find(database_query)
         add_skip_and_limit(query_result, query_params)
-        users = [{
-            'id': user['_id'],
-            **user,
-        } for user in list(query_result)]
-        return users
+        return serialize_raw_query(query_result)
 
     @api.marshal_with(user_model)
     def post(self):

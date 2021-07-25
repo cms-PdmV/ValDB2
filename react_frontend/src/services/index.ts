@@ -26,6 +26,7 @@ export const reportService = {
     create: (body: CreateReportRequest): Promise<AxiosResponse<Report>> => axios.post(`${serverUrl}/reports/`, body),
     update: (id: string, body: Partial<Report>): Promise<AxiosResponse<Report>> => axios.put(`${serverUrl}/reports/${id}/`, body),
     seach: (campaign: string, group: string): Promise<AxiosResponse<Report>> => axios.get(`${serverUrl}/reports/search/${campaign}/${group}/`),
+    getByUser: (skip: number, limit: number, userId: string): Promise<Report[]> => axios.get(`${serverUrl}/reports/user/${userId}/?skip=${skip}&limit=${limit}`).then(response => response.data).catch(error => { throw error }),
 }
 
 export const categoryService = {
