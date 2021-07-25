@@ -9,6 +9,7 @@ import { ReportStatusLabel } from "./ReportStatusLabel";
 import moment from "moment";
 import { Modal } from "antd";
 import { VerticleLine } from "./VerticleLine";
+import { UserSpan } from "./UserSpan";
 
 interface ReportHeaderProp {
   editable?: boolean
@@ -91,7 +92,7 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
       <Chip label={prop.group.split('.').join(' / ')}/>
       <Spacer />
       <Box marginBottom="1rem" alignItems="center" color="#707070">
-        <strong>Authors: </strong>{prop.authors ? prop.authors.map((e, index) => <a>{e.fullname}{index === prop.authors.length - 1 ? '' : ', '}</a>) : 'None'}
+        <strong>Authors: </strong>{prop.authors ? prop.authors.map((e, index) => <><UserSpan user={e} />{index === prop.authors.length - 1 ? '' : ', '}</>) : 'None'}
         <Spacer rem={0.5} />
         <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;<strong>Created:</strong>&nbsp;{moment(prop.date, 'YYYY-MM-DD').fromNow()}</p>
       </Box>

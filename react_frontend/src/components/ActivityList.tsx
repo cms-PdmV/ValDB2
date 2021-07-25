@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Activity, ActivityType } from "../types";
 import { DatetimeSpan } from "./DatetimeSpan";
 import { Spacer } from "./Spacer";
+import { UserSpan } from "./UserSpan";
 
 interface ActivityListProp {
   activities: Activity[]
@@ -21,7 +22,7 @@ export function ActivityList(prop: ActivityListProp): ReactElement {
 
   const activityLog = (activity: Activity) => (
     <Box marginBottom="0.5rem" color="#606060">
-      <a>{activity.user.fullname}</a>
+      <UserSpan user={activity.user} />
       <Spacer inline rem={0.5} />
       {activity.content}
       {verticleDevider}
@@ -33,7 +34,7 @@ export function ActivityList(prop: ActivityListProp): ReactElement {
     <Paper style={{marginBottom: '1.5rem', marginTop: '1rem'}}>
       <Box padding="1rem">
         <Box>
-          <strong>{activity.user.fullname}</strong>
+          <UserSpan bold user={activity.user} />
           {verticleDevider}
           <DatetimeSpan datetime={activity.created_at || ''} />
         </Box>
