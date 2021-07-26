@@ -1,0 +1,21 @@
+name: ESLint
+
+on:
+  workflow_dispatch:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: ESLint Check
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Install dependencies
+      working-directory: ./react_frontend
+      run: yarn
+    - name: Run ESLint
+      working-directory: ./react_frontend
+      run: yarn eslint

@@ -34,7 +34,7 @@ class TestCase(unittest.TestCase):
                         )
 
     @staticmethod
-    def _clean_database():
+    def clean_database():
         '''
         Remove all data in test database
         '''
@@ -44,5 +44,5 @@ class TestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         load_dotenv()
         self._check_database_name()
-        self._clean_database()
+        self.clean_database()
         super().__init__(*args, **kwargs)

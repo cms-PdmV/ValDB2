@@ -3,16 +3,14 @@ Group permission data
 '''
 reconstruction_groups = ['Tracker', 'Ecal', 'HGcal', 'Hcal', 'CASTOR', 'DT', 'CSC', 'RPC', 'GEM',
     'MTD', 'PPS', 'L1', 'Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau',
-    'PF', 'Info', 'RelMon'
+    'PF'
 ]
 hlt_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau', 'SMP',
-    'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info', 'RelMon'
+    'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN'
 ]
-pags_groups = ['SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN', 'Info',
-    'RelMon'
-]
-hin_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'Info', 'RelMon']
-gen_groups = ['GEN', 'Info', 'RelMon']
+pags_groups = ['SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN']
+hin_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet']
+gen_groups = ['GEN']
 
 group = {
     'Reconstruction': {
@@ -37,3 +35,14 @@ group = {
         'Gen': gen_groups,
     }
 }
+
+def get_all_groups():
+    '''
+    Get list of all groups in the system
+    '''
+    groups = []
+    for category_name, category in group.items():
+        for subcategory_name, subcategory in category.items():
+            for group_name in subcategory:
+                groups.append(f"{category_name}.{subcategory_name}.{group_name}")
+    return groups

@@ -1,0 +1,39 @@
+'''
+Activity API
+'''
+from flask_restx import Resource
+
+from models.report import Report
+from models.activity import Activity
+from core import Namespace
+
+
+api = Namespace('reports', description='Report in the system')
+
+activity_model = api.model(Activity)
+
+@api.route('/<string:reportid>/')
+@api.param('reportid', 'Report id')
+class ActivityAPI(Resource):
+    '''
+    Activity API
+    '''
+    def get(self, reportid):
+        '''
+        Get activity by id
+        '''
+        report = Report.get(reportid).dict()
+        return report['activities'] or []
+
+    def post(self, reportid):
+        '''
+        Create activity
+        body: Activity
+        '''
+        report = Report.get(reportid)
+        activity = Activity(api.payload).save()
+        if not report.activities:
+            report.activities = []
+        report.activities.append(activity)
+        report.save()
+        return 'ok'

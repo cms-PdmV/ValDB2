@@ -1,10 +1,12 @@
 '''
 Campaign API
 '''
+from flask.globals import request
 import pymongo
 
 from flask_restx import Resource
 
+from utils.query import add_skip_and_limit, build_query
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
@@ -27,11 +29,13 @@ class CampaignListAPI(Resource):
         '''
         Get all campaign list
         '''
-        campaigns = list(
-            get_database().database[Campaign.get_collection_name()]
-            .find({}, {'reports': False})
+        query_params = request.args
+        database_query = build_query(['name'], query_params)
+        query_result = get_database().database[Campaign.get_collection_name()] \
+            .find(database_query, {'reports': False}) \
             .sort([('created_at', pymongo.DESCENDING)])
-        )
+        add_skip_and_limit(query_result, query_params)
+        campaigns = list(query_result)
         return campaigns
 
     @api.marshal_with(campaign_model)
@@ -47,11 +51,11 @@ class CampaignListAPI(Resource):
         return campaign.dict()
 
 
-@api.route('/<string:campaignname>/')
+@api.route('/get/<string:campaignname>/')
 @api.param('campaignname', 'Campaign Short ID')
-class CampaignAPI(Resource):
+class CampaignGetAPI(Resource):
     '''
-    Campaign API
+    Campaign Get API
     '''
     def get(self, campaignname):
         '''
@@ -73,7 +77,7 @@ class CampaignAPI(Resource):
             category = category_subcategory.split('.')[0]
             if category not in campaign_group:
                 campaign_group[category] = {
-                    'category': category,
+                    'name': category,
                     'subcategories': [],
                 }
             subcategory = category_subcategory.split('.')[1]
@@ -81,9 +85,9 @@ class CampaignAPI(Resource):
                 for each_group in group[category][subcategory]
             ]
             campaign_group[category]['subcategories'].append({
-                'subcategory': subcategory,
+                'name': subcategory,
                 'groups': [{
-                    'name': g,
+                    'path': g,
                     'report': report_table.get(g).dict() if g in report_table else None,
                 } for g in groups],
             })
@@ -93,3 +97,16 @@ class CampaignAPI(Resource):
             'campaign': campaign.dict(),
             'groups': groups,
         }
+
+@api.route('/<string:campaignid>/')
+@api.param('campaignid', 'Campaign ID')
+class CampaignAPI(Resource):
+    '''
+    Campaign API
+    '''
+    def put(self, campaignid):
+        '''
+        Update campaign by id
+        '''
+        Campaign.get(campaignid).update(api.payload)
+        return 'ok'

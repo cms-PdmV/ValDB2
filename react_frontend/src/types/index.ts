@@ -1,17 +1,11 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
 export type ReportEditorMode = 'edit' | 'view' | 'readonly'
 
-export interface Response <T> {
+export interface Response<T> {
     status: 'ok' | 'error'
     message?: string
     data?: T
-} 
-
-export interface Category {
-    name: string
-    subcategories: {
-        name: string
-        groups: string[]
-    }[]
 }
 
 export interface Report {
@@ -19,24 +13,35 @@ export interface Report {
     name: string
 }
 
+export enum UserRole {
+    ADMIN = 1,
+    VALIDATOR = 2,
+    USER = 3,
+}
+
 export interface User {
-    name: string
+    id: string
+    role: UserRole
+    email: string
+    fullname: string
+    groups: string[]
 }
 
 export interface Activity {
     content: string
 }
 
-export interface CampaignReportGroup {
-    name: string
+export interface Group {
+    path: string
     report?: Report
+    selected?: boolean
 }
 
-export interface CampaignGroup {
-    category: string
+export interface Category {
+    name: string
     subcategories: {
-        subcategory: string
-        groups: CampaignReportGroup[]
+        name: string
+        groups: Group[]
     }[]
 }
 
@@ -57,19 +62,50 @@ export interface Report {
     status: ReportStatus
     content: string
     activity: Activity[]
+    attachments?: Attachment[]
+    created_at: string // 2020-21-2
+    updated_at: string // 2020-21-2
 }
 
 export interface Campaign {
-    id: string
+    id?: string
     name: string
     description: string
     manager: User
     deadline: string // 2020-21-2
     target_release: string
     reference_release: string
+    relmon: string
     subcategories: string[]
     report: Report[]
     active: boolean
     created_at: string // 2020-21-2
     updated_at: string // 2020-21-2
+}
+
+export enum ActivityType {
+    ACTIVITY = 1,
+    COMMENT = 2,
+}
+
+export interface Activity {
+    type: ActivityType
+    user: User
+    content: string
+    created_at?: string // 2020-21-2
+}
+
+export interface Attachment {
+    id: string
+    name: string
+    content: string
+    type: string
+    size: number
+    url: string
+}
+
+export interface AttachmentType {
+    name: string
+    icon: IconDefinition
+    types: string[]
 }

@@ -74,6 +74,8 @@ class Model():
                     elements.append(reference_model.get(element))
                 data_load_object[key] = elements
             elif issubclass(cls.get_annotations()[key], Model): # is many2one reference
+                if isinstance(value, dict):
+                    value = value['id'] if 'id' in value else value['_id']
                 data_load_object[key] = cls.get_annotations()[key].get(value)
             elif issubclass(cls.get_annotations()[key], Enum): # is enum
                 data_load_object[key] = cls.get_annotations()[key](value)
@@ -82,7 +84,7 @@ class Model():
         return data_load_object
 
     @classmethod
-    def _get_data_store_object(cls, data: Dict) -> Dict:
+    def _get_data_store_object(cls, data: Dict) -> Dict: # pylint: disable=R0912
         '''
         Get store data dictionary for storing in database.
         '''
@@ -96,9 +98,13 @@ class Model():
             if cls._is_reference_field(key): # is one2many reference
                 element_ids = []
                 for element in value:
-                    if not element.is_saved():
-                        element.save()
-                    element_ids.append(element.id)
+                    if isinstance(element, dict):
+                        if 'id' in element:
+                            element_ids.append(element['id'])
+                    else:
+                        if not element.is_saved():
+                            element.save()
+                        element_ids.append(element.id)
                 data_store_object[key] = element_ids
             elif isinstance(value, Model): # is many2one reference
                 if not value.is_saved():
@@ -192,6 +198,16 @@ class Model():
             for record in _database.query(cls.get_collection_name(), query, sort)
         ]
 
+    @classmethod
+    def query_one(cls: T, query: Dict, sort=None) -> T:
+        '''
+        Query one object from database.
+        '''
+        query_result = _database.query(cls.get_collection_name(), query, sort)
+        if query_result:
+            return cls(cls._get_data_load_object(query_result[0]))
+        return None
+
     def unlink(self):
         '''
         Remove record from the database.
@@ -206,8 +222,12 @@ class Model():
         data_as_dict = {}
 
         for key in self._fields:
-            value = getattr(self, key)
-            data_as_dict[key] = self._serialize(value)
+            if key == 'id' and ('id' in data_as_dict or '_id' in data_as_dict):
+                id_value = data_as_dict['id'] if 'id' in data_as_dict else data_as_dict['_id']
+                data_as_dict['id'] = str(id_value)
+            else:
+                value = getattr(self, key)
+                data_as_dict[key] = self._serialize(value)
         return data_as_dict
 
     def parse_datetime(self, datetime_format="%Y-%m-%d"):

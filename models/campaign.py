@@ -15,6 +15,7 @@ class Campaign(Model):
     deadline: datetime
     target_release: str
     reference_release: str
+    relmon: str
     subcategories: list[str]
     reports: list[Report]
     active: bool

@@ -1,16 +1,23 @@
-import { Avatar, Box, Button, Chip, Menu, MenuItem, Tooltip } from "@material-ui/core";
+import { Box, Button, Chip, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faCalendar, faSave, faTimes, faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import { ReportEditorMode, ReportStatus } from "../types";
-import { useState } from "react";
-import { VerticleLine } from "./VerticleLine";
+import { ReportEditorMode, ReportStatus, User } from "../types";
+import { ReactElement, useState, MouseEvent } from "react";
 import { Spacer } from "./Spacer";
 import { reportStatusStyle } from "../utils/report";
+import { ReportStatusLabel } from "./ReportStatusLabel";
+import moment from "moment";
+import { Modal } from "antd";
+import { VerticleLine } from "./VerticleLine";
+import { UserSpan } from "./UserSpan";
 
 interface ReportHeaderProp {
+  editable?: boolean
+  authors: User[]
   mode: ReportEditorMode
   campaign: string
   group: string
+  date: string
   status: ReportStatus
   onChangeMode: (mode: ReportEditorMode) => void
   handleSave: () => void
@@ -18,12 +25,15 @@ interface ReportHeaderProp {
   handleChangeStatus: (newStatus: number) => void
 }
 
-export function ReportHeader(prop: ReportHeaderProp) {
+export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { confirm } = Modal;
 
-  const handleOpenStatusMenu = (event: any) => {
-    setAnchorEl(event.currentTarget);
+  const handleOpenStatusMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    if (prop.editable) {
+      setAnchorEl(event.currentTarget)
+    }
   };
 
   const handleClose = () => {
@@ -40,22 +50,23 @@ export function ReportHeader(prop: ReportHeaderProp) {
   }
 
   const handleDiscard = () => {
-    prop.handleDiscard()
-    prop.onChangeMode('view')
+    confirm({
+      title: 'Discard changes?',
+      content: 'Your changes in report\'s content will be removed',
+      okText: 'Discard',
+      okType: 'danger',
+      onOk() {
+        prop.handleDiscard()
+        prop.onChangeMode('view')
+      },
+    })
   }
-
-  const statusLabel = (status: ReportStatus) => (
-    <span>
-      <Box display="inline-flex" width="26px" height="26px" borderRadius="4px" color="white" style={{background: reportStatusStyle[+status as ReportStatus].background_color}}><FontAwesomeIcon style={{margin: 'auto', fontSize: '14px'}} icon={reportStatusStyle[+status as ReportStatus].icon} /></Box>
-      &nbsp;&nbsp;{reportStatusStyle[+status as ReportStatus].label}
-    </span>
-  )
 
   const statusButton = (
     <>
       <Tooltip title="Report Status" placement="top">
-        <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu} style={{marginLeft: '1rem'}}>
-          {statusLabel(prop.status)}&nbsp;&nbsp;<FontAwesomeIcon icon={faCaretDown} />
+        <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu}>
+          <ReportStatusLabel status={+prop.status as ReportStatus} />&nbsp;&nbsp;{prop.editable && <FontAwesomeIcon icon={faCaretDown} />}
         </Button>
       </Tooltip>
       <Menu
@@ -65,9 +76,9 @@ export function ReportHeader(prop: ReportHeaderProp) {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        {Object.keys(reportStatusStyle).map((status, index) => 
-          <MenuItem onClick={() => {prop.handleChangeStatus(+status); handleClose();}}>
-            {statusLabel(+status as ReportStatus)}
+        {Object.keys(reportStatusStyle).map((status, index) =>
+          <MenuItem onClick={() => {prop.handleChangeStatus(+status); handleClose();}} key={`status-menu-${index}`}>
+            <ReportStatusLabel status={+status as ReportStatus} />
           </MenuItem>
         )}
       </Menu>
@@ -76,29 +87,31 @@ export function ReportHeader(prop: ReportHeaderProp) {
 
   return (
     <Box marginTop="1rem" marginBottom="2rem">
-    
       <Box fontSize="2rem" fontWeight="bold">{prop.campaign}</Box>
       <Spacer />
       <Chip label={prop.group.split('.').join(' / ')}/>
       <Spacer />
-      
-      <Box marginBottom="1rem" display="flex" alignItems="center" color="#707070">
-        <Avatar style={{width: '32px', height: '32px'}}>C</Avatar>
-        &nbsp;&nbsp;by&nbsp;<strong><span style={{color: '#505050'}}>Chanchana Wicha</span></strong>
-        <VerticleLine />
-        <FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;10 Nov, 2021
+      <Box marginBottom="1rem" alignItems="center" color="#707070">
+        <strong>Authors: </strong>{prop.authors ? prop.authors.map((e, index) => <><UserSpan user={e} />{index === prop.authors.length - 1 ? '' : ', '}</>) : 'None'}
+        <Spacer rem={0.5} />
+        <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;<strong>Created:</strong>&nbsp;{moment(prop.date, 'YYYY-MM-DD').fromNow()}</p>
       </Box>
-      { prop.mode === 'view' && 
+      { prop.mode === 'view' &&
         <Box>
-          <Button variant="contained" color="primary" onClick={handleEdit}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
+          { prop.editable && <Button variant="contained" color="primary" onClick={handleEdit} style={{marginRight: '1rem'}}><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>}
           {statusButton}
         </Box>
       }
-      { prop.mode === 'edit' && 
-        <Box display="flex">
+      { prop.mode === 'edit' &&
+        <Box display="flex" alignItems="center">
           <Button variant="contained" color="primary" onClick={handleSave}><FontAwesomeIcon icon={faSave} />&nbsp;&nbsp;Save</Button>
+          <Spacer inline />
           {statusButton}
-          <Button variant="contained" onClick={handleDiscard} style={{marginLeft: 'auto'}}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>
+          <Spacer inline grow />
+          <Spacer inline rem={0.5}/>
+          <VerticleLine />
+          <Spacer inline rem={0.5}/>
+          <Button variant="contained" onClick={handleDiscard}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp;Discard</Button>
         </Box>
       }
     </Box>
