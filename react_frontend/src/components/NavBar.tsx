@@ -36,7 +36,7 @@ export function NavBar(prop: NavBarProp): ReactElement {
           <Button onClick={() => history.push('/admin')} style={currentPath === 'admin' ? selectedPathStyle : {}}>Administator</Button>
           <Box width="1rem" />
         </>}
-        <Button onClick={() => history.push('/user')} style={currentPath === 'user' ? selectedPathStyle : {}}>{prop.user.fullname}&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>C</Avatar></Button>
+        <Button onClick={() => history.push('/user')} style={currentPath === 'user' ? selectedPathStyle : {}}>{prop.user.fullname}&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>{prop.user.fullname[0] || ' '}</Avatar></Button>
       </Box>
     </Box>
   )
