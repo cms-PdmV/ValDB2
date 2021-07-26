@@ -24,7 +24,7 @@ export function NavBar(prop: NavBarProp): ReactElement {
 
   return (
     <Box height="64px" boxShadow={boxShadow} display="flex" alignItems="center" padding="0 1rem" style={{background: '#ffffff'}}>
-      <Box color={primaryColor} fontWeight={800} fontSize="1.5rem"><FontAwesomeIcon icon={faFeather} />&nbsp;&nbsp;ValDB2</Box>
+      <Box color={primaryColor} fontWeight={800} fontSize="1.5rem"><FontAwesomeIcon icon={faFeather} />&nbsp;&nbsp;ValDB</Box>
       <Box marginLeft="auto" display="flex">
         <Button onClick={() => history.push('/campaigns')} style={currentPath === 'campaigns' ? selectedPathStyle : {}}>Campaigns</Button>
         <Box width="1rem" />

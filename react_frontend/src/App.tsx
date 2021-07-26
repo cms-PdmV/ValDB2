@@ -10,7 +10,7 @@ import { AdminPage } from './pages/AdminPage';
 import { AllCampaignPage } from './pages/AllCampaignPage';
 import { CampaignFormPage } from './pages/CampaignFormPage';
 import { CampaignPage } from './pages/CampaignPage';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { User, UserRole } from "./types";
 import { NavBar } from "./components/NavBar";
 import { UserContext } from "./context/user";
@@ -22,7 +22,6 @@ import { UserAdminPage } from "./pages/UserAdminPage";
 import { AuthPage } from "./pages/Auth";
 import { UserGroupAdminPage } from "./pages/UserGroupAdminPage";
 import { ReactElement } from "react-markdown";
-import { userService } from "./services";
 
 const theme = createMuiTheme({
   typography: {
@@ -43,9 +42,6 @@ function App(): ReactElement {
 
   const [user, setUser] = useState<User>()
 
-  useEffect(() => {
-    userService.get('60e90fbd8aa6fe6b6731a4b5').then(data => setUser(data))
-  }, [])
 
   const require = (roles: UserRole[]): boolean | undefined => user && roles.includes(user.role)
 
