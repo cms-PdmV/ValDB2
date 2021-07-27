@@ -1,8 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 import { Activity, Campaign, Category, Report, User, Attachment } from '../types'
 
-// TODO: change this to env var
-const serverUrl = "http://localhost:5000/api"
+const serverUrl = `${process.env.REACT_APP_SERVER_URL || ''}/api`
 
 export interface CampaignResponse {
     campaign: Campaign

@@ -43,6 +43,7 @@ def catch_all(_path):
         return response
 
 @app.route('/valdb/file/<string:fileid>')
+@app.route('/file/<string:fileid>')
 def serve_file_attachment(fileid):
     '''
     Serve attachment from /file endpoint
