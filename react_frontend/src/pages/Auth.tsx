@@ -19,8 +19,10 @@ export function AuthPage(prop: AuthPageInterface): ReactElement {
 
   const handleSetUser = (userid: string) => {
     userService.get(userid).then(data => {
-      setUser(data.id)
-      prop.setUser(data)
+      if (data.id) {
+        setUser(data.id)
+        prop.setUser(data)
+      }
     })
   }
 
@@ -29,10 +31,10 @@ export function AuthPage(prop: AuthPageInterface): ReactElement {
       <p>authenticating...</p>
       {/* temp */}
       <div>
-        <button onClick={() => handleSetUser('60e90fbd8aa6fe6b6731a4b5')}>admin</button><br />
-        <button onClick={() => handleSetUser('60e910478aa6fe6b6731a4b7')}>validator</button><br />
-        <button onClick={() => handleSetUser('60e910daa0c89859e0ff0b41')}>user</button><br />
-        <button onClick={() => handleSetUser('60e9230a48d39ee6d7a7a217')}>test user</button><br />
+        <button onClick={() => handleSetUser('60ffe0a2273e27d0a613a3d8')}>admin</button><br />
+        <button onClick={() => handleSetUser('60ffe192273e27d0a613a3dc')}>validator</button><br />
+        <button onClick={() => handleSetUser('60ffe228273e27d0a613a3e0')}>user</button><br />
+        <button onClick={() => handleSetUser('60ffe346273e27d0a613a3e3')}>test user</button><br />
       </div>
     </div>
   )

@@ -50,7 +50,7 @@ function App(): ReactElement {
       { !user && <AuthPage setUser={setUser} />}
       { user &&
         <UserContext.Provider value={user}>
-          <Router>
+          <Router basename={process.env.PUBLIC_URL}>
             <NavBar user={user}/>
             <Switch>
               <Route path="/campaigns/form/:mode/:id">
