@@ -24,7 +24,15 @@ class MongoDatabase():
         database_host = os.getenv('DATABASE_HOST')
         database_port = int(os.getenv('DATABASE_PORT'))
         database_name = os.getenv('DATABASE_NAME')
-        client = MongoClient(database_host, database_port)
+        database_username = os.getenv('DATABASE_USERNAME')
+        database_password = os.getenv('DATABASE_PASSWORD')
+        client = MongoClient(
+            database_host,
+            database_port,
+            username=database_username,
+            password=database_password,
+            authSource='admin',
+            authMechanism='SCRAM-SHA-256')
         database = client[database_name]
         self.client = client
         self.database = database

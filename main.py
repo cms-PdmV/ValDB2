@@ -1,6 +1,8 @@
 '''
 Main module for valdb
 '''
+import os
+
 from flask import Flask, render_template
 from jinja2.exceptions import TemplateNotFound
 from flask_cors import CORS
@@ -40,7 +42,7 @@ def catch_all(_path):
         response += 'Webpage is starting, please wait a few minutes...'
         return response
 
-@app.route('/file/<string:fileid>')
+@app.route('/valdb/file/<string:fileid>')
 def serve_file_attachment(fileid):
     '''
     Serve attachment from /file endpoint
@@ -48,4 +50,6 @@ def serve_file_attachment(fileid):
     return serve_file(fileid)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    host = os.getenv('HOST')
+    port = os.getenv('PORT')
+    app.run(host=host, port=port ,debug=True)
