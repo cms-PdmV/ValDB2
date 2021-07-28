@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios'
 import { Activity, Campaign, Category, Report, User, Attachment } from '../types'
 
-const serverUrl = `${process.env.REACT_APP_SERVER_URL || ''}/api`
+const serverUrl = `${process.env.REACT_APP_SERVER_URL || ''}/valdb/api`
 
 export interface CampaignResponse {
     campaign: Campaign
