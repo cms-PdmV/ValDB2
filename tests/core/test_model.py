@@ -375,6 +375,10 @@ class TestModel(TestCase):
         except BadRequest:
             self.fail()
 
+        fetched_cat_dict = Animal.get(cat.id).dict()
+        self.assertTrue(hasattr(cat, '_validation'))
+        self.assertTrue('_validation' not in fetched_cat_dict)
+
     def test_dict_serialize(self):
         child1 = Child({'name': 'child1'}).save()
         child2 = Child({'name': 'child2'}).save()
