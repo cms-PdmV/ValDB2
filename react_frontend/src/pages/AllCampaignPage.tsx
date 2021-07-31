@@ -42,18 +42,16 @@ export function AllCampaignPage (): ReactElement {
   }, [currentSearch])
 
   const handleLoadCampaign = (recordSkip: number, searchKeyword: string, targetCampaigns: Campaign[]) => {
-    campaignService.getAll(recordSkip, PageLimit, searchKeyword).then(response => {
-      if (response.status) {
-        const loadedCampaign = targetCampaigns.concat(response.data)
-        setCampaigns(loadedCampaign)
-        if (response.data.length < PageLimit) {
-          setSkip(recordSkip + PageLimit)
-          setIsMaxPage(true)
-        } else {
-          setSkip(recordSkip + PageLimit)
-        }
+    campaignService.getAll(recordSkip, PageLimit, searchKeyword).then(fetchedCampaings => {
+      const loadedCampaign = targetCampaigns.concat(fetchedCampaings)
+      setCampaigns(loadedCampaign)
+      if (fetchedCampaings.length < PageLimit) {
+        setSkip(recordSkip + PageLimit)
+        setIsMaxPage(true)
+      } else {
+        setSkip(recordSkip + PageLimit)
       }
-    }).catch(error => alert(error))
+    })
   }
 
   const handleSearch = () => {

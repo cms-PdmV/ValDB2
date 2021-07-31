@@ -3,7 +3,10 @@ User model
 '''
 from enum import Enum
 
+from core.validation import regex, required
 from core import Model
+
+CERN_EMAIL_FORMAT = r'\b[A-Za-z0-9._%+-]+@cern\.ch\b'
 
 class UserRole(Enum):
     '''
@@ -21,3 +24,7 @@ class User(Model):
     email: str
     fullname: str
     groups: list[str]
+
+    _validation = {
+        'email': [required(), regex(CERN_EMAIL_FORMAT, example='example@cern.ch')],
+    }

@@ -40,7 +40,7 @@ def unique(error='{} is not unique'):
     Unique in database
     '''
     def validate(field, value, model):
-        if not model.query_one({field: value}):
-            return VALID
-        return False, error.format(readable(field))
+        if (not model.is_saved()) and model.query_one({field: value}):
+            return False, error.format(readable(field))
+        return VALID
     return validate

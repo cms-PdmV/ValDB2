@@ -121,7 +121,7 @@ class Model():
         '''
         Retrun True if this record is saved in database.
         '''
-        return hasattr(self, 'id') and self.id
+        return bool(hasattr(self, 'id') and self.id)
 
     @classmethod
     def _is_reference_field(cls, field: str) -> bool:

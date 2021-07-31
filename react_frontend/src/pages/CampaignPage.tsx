@@ -22,14 +22,10 @@ export function CampaignPage(): ReactElement {
   const user = useContext(UserContext)
 
   useEffect(() => {
-    campaignService.get(id).then(response => {
-      if (response.status) {
-        setCampaign(response.data.campaign)
-        setGroups(response.data.groups)
-      } else {
-        throw Error('Internal Error')
-      }
-    }).catch(error => alert(error.message))
+    campaignService.get(id).then(fetchedCampaign => {
+      setCampaign(fetchedCampaign.campaign)
+      setGroups(fetchedCampaign.groups)
+    })
   }, [])
 
   const handleClickReport = (groupPath: string) => {

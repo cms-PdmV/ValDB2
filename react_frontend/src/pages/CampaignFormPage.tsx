@@ -60,23 +60,17 @@ export function CampaignFormPage (): ReactElement {
   )
 
   const handleCreateCampaign = (body: Partial<Campaign>) => {
-    campaignService.create(body).then(response => {
-      if (response.status) {
-        if (response.data.id) {
-          history.push(`/campaigns/${response.data.name}`)
-        }
-      } else {
-        alert('ops')
+    campaignService.create(body).then(newCampaign => {
+      if (newCampaign) {
+        history.push(`/campaigns/${newCampaign.name}`)
       }
     })
   }
 
   const handleUpdateCampaign = (campaignId: string, body: Partial<Campaign>) => {
-    campaignService.update(campaignId, body).then(response => {
-      if (response.status) {
+    campaignService.update(campaignId, body).then(newCampaign => {
+      if (newCampaign) {
         history.push(`/campaigns/${body.name || campaign?.name || ''}`)
-      } else {
-        alert('ops')
       }
     })
   }
@@ -104,11 +98,11 @@ export function CampaignFormPage (): ReactElement {
     categoryService.getAll().then(data => {
       setCategories(data)
       if (mode === 'edit' && id) {
-        campaignService.get(id).then(campaignData => {
-          const fetchedCampaign = campaignData.data.campaign
+        campaignService.get(id).then(fetchCampaign => {
+          const fetchedCampaign = fetchCampaign.campaign
           setCampaign(fetchedCampaign)
           setSelectedDate(moment(fetchedCampaign.deadline, 'YYYY-MM-DD').toDate())
-          setCampaignCategories(campaignData.data.groups)
+          setCampaignCategories(fetchCampaign.groups)
         })
       }
     })
