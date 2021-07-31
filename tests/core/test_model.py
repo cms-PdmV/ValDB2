@@ -1,3 +1,5 @@
+from werkzeug.exceptions import BadRequest
+from core.validation import required
 from datetime import datetime
 from enum import Enum
 
@@ -354,6 +356,24 @@ class TestModel(TestCase):
         self.assertTrue(isinstance(data2.updated_at, datetime))
         self.assertTrue(data2.updated_at > data_created_at)
         self.assertTrue(data2.created_at == data.created_at)
+
+    def test_validation_error(self):
+        class Animal(Model):
+            name: str
+
+            _validation = {
+                'name': [required()]
+            }
+
+        cat = Animal()
+        with self.assertRaises(BadRequest):
+            cat.save()
+        
+        cat.name = 'kitty'
+        try:
+            cat.save()
+        except BadRequest:
+            self.fail()
 
     def test_dict_serialize(self):
         child1 = Child({'name': 'child1'}).save()

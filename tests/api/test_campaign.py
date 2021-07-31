@@ -1,6 +1,6 @@
 from models.campaign import Campaign
 from core import TestCase
-from api.campaign import CampaignAPI
+from api.campaign import CampaignGetAPI
 
 class CampaignTest(TestCase):
 
@@ -9,7 +9,7 @@ class CampaignTest(TestCase):
             'subcategories': ['Reconstruction.Data', 'Reconstruction.FullSim', 'GEN.Gen'],
             'reports': []
         }).save()
-        api = CampaignAPI()
+        api = CampaignGetAPI()
         result = api.get(campaign.name)
 
         self.assertEqual(len(result['groups']), 2)

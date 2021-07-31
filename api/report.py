@@ -5,6 +5,7 @@ import pymongo
 from bson.objectid import ObjectId
 from flask.globals import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from utils.query import add_skip_and_limit, serialize_raw_query
 from core.database import get_database
@@ -81,7 +82,7 @@ class ReportSearchAPI(Resource):
         })
 
         if not result:
-            return {'message': 'not found'}, 404
+            raise NotFound('Report is not found')
 
         return result[0].dict()
 

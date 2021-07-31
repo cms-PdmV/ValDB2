@@ -7,11 +7,12 @@ from typing import Dict, TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
 from flask_restx import fields
+from werkzeug.exceptions import BadRequest
 
 from .database import get_database
 
 PREFILLED_FIELDS = ['id', 'created_at', 'updated_at']
-FILTER_OUT_LOAD_OBJECT_KEY = ['_fields']
+FILTER_OUT_LOAD_OBJECT_KEY = ['_fields', '']
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ['id']
 _database = get_database()
 
@@ -145,10 +146,29 @@ class Model():
         '''
         return list(cls.get_annotations().keys()) + PREFILLED_FIELDS
 
-    def save(self: T) -> T:
+    def validate(self: T):
+        '''
+        Validate model from '_validation' attribute.
+        Raise bad request on validation error.
+        '''
+        if hasattr(self, '_validation') and isinstance(getattr(self, '_validation'), dict):
+            error_messages = []
+            for field, rules in getattr(self, '_validation').items():
+                if not hasattr(self, field):
+                    continue
+                for rule in rules:
+                    valid, message = rule(field=field, value=getattr(self, field), model=self)
+                    if not valid:
+                        error_messages.append(message)
+            if error_messages:
+                raise BadRequest(', '.join(error_messages))
+
+    def save(self: T, validate=True) -> T:
         '''
         Save data to database. Create new record is the data is not existed.
         '''
+        if validate:
+            self.validate()
         current_utc_time = datetime.utcnow()
         self.updated_at = current_utc_time
         if self.is_saved():
@@ -163,14 +183,14 @@ class Model():
             self.id = saved_data_id # pylint: disable=C0103
         return self
 
-    def update(self: T, data: Dict) -> T:
+    def update(self: T, data: Dict, validate=True) -> T:
         '''
         Update the object with data dictionary and save to database.
         '''
         for key in data:
             if key in self.get_annotations():
                 setattr(self, key, data[key])
-        self.save()
+        self.save(validate=validate)
         return self
 
     @classmethod

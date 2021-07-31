@@ -3,7 +3,6 @@ Campaign API
 '''
 from flask.globals import request
 import pymongo
-
 from flask_restx import Resource
 
 from utils.query import add_skip_and_limit, build_query
