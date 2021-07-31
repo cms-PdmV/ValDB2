@@ -12,7 +12,7 @@ from werkzeug.exceptions import BadRequest
 from .database import get_database
 
 PREFILLED_FIELDS = ['id', 'created_at', 'updated_at']
-FILTER_OUT_LOAD_OBJECT_KEY = ['_fields', '']
+FILTER_OUT_LOAD_OBJECT_KEY = ['_fields', '_validation']
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ['id']
 _database = get_database()
 
