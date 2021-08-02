@@ -1,5 +1,5 @@
 from models.campaign import Campaign
-from core import TestCase, validation
+from core import TestCase
 from api.campaign import CampaignGetAPI
 
 class CampaignTest(TestCase):

@@ -115,7 +115,7 @@ class ValidationTest(TestCase):
         self._test_validation_rule(required(), valids, invalids)
 
     def test_regex(self):
-        expression = r'[0-9]{1,4}_[0-9]{1,3}_[0-9]{1,3}.{0,20}'
-        valids = ['2021_05_12.testtest', '1_2_3.abc']
+        expression = r'[0-9]{1,3}_[0-9]{1,3}_[0-9]{1,3}.{0,20}'
+        valids = ['20_05_12.testtest', '1_2_3.abc']
         invalids = [None, '', 'test', '.test', '55.tt']
         self._test_validation_rule(regex(expression), valids, invalids)
