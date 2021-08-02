@@ -40,19 +40,15 @@ export function ReportPage(): ReactElement {
   const history = useHistory()
 
   useEffect(() => {
-    reportService.seach(campaign, group).then(response => {
-      if (response.status) {
-        setReport(response.data)
-        setContent(response.data.content)
-        setEditingContent(response.data.content)
-        setStatus(response.data.status)
-        setAuthors(response.data.authors)
-        setAttachments(response.data.attachments || [])
-        updateActivities(response.data.id)
-      } else {
-        throw Error('Internal Error')
-      }
-    }).catch(error => alert(error))
+    reportService.seach(campaign, group).then(fetchedReport => {
+      setReport(fetchedReport)
+      setContent(fetchedReport.content)
+      setEditingContent(fetchedReport.content)
+      setStatus(fetchedReport.status)
+      setAuthors(fetchedReport.authors)
+      setAttachments(fetchedReport.attachments || [])
+      updateActivities(fetchedReport.id)
+    })
   }, [])
 
   const handleSave = () => {
@@ -86,20 +82,16 @@ export function ReportPage(): ReactElement {
     if (report && user) {
       reportService.update(report.id, {
         attachments: newAttachments,
-      }).then(response => {
-        if (response.status) {
-          if (response.data.attachments) {
-            setAttachments(response.data.attachments)
-            logReport.addAttachment(report.id, user, uploadedAttachments.length).then(() => {
-              updateActivities()
-            })
-          } else {
-            throw Error('Cannot save attachments to report')
-          }
+      }).then(updatedReport => {
+        if (updatedReport.attachments) {
+          setAttachments(updatedReport.attachments)
+          logReport.addAttachment(report.id, user, uploadedAttachments.length).then(() => {
+            updateActivities()
+          })
         } else {
-          throw Error('Internal Error')
+          alert('Error: Cannot save attachments to report')
         }
-      }).catch(error => alert(error))
+      })
     }
   }, [report, user, attachments])
 
@@ -107,16 +99,12 @@ export function ReportPage(): ReactElement {
     if (report && user) {
       reportService.update(report.id, {
         attachments: removedAttachments,
-      }).then(response => {
-        if (response.status) {
-          setAttachments(response.data.attachments || [])
-          logReport.removeAttachment(report.id, user).then(() => {
-            updateActivities()
-          })
-        } else {
-          throw Error('Internal Error')
-        }
-      }).catch(error => alert(error))
+      }).then(updatedReport => {
+        setAttachments(updatedReport.attachments || [])
+        logReport.removeAttachment(report.id, user).then(() => {
+          updateActivities()
+        })
+      })
     }
   }, [report, user, attachments])
 

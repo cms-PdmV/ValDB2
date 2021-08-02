@@ -15,21 +15,25 @@ class UserGroupLookUpTest(TestCase):
         self.lookup = UserGroupLookup()
         self.admin = User({
             'fullname': 'admin1',
+            'email': 'admin@cern.ch',
             'role': UserRole.ADMIN,
             'groups': [group1, group2, group3]
         }).save()
         self.user1 = User({
             'fullname': 'user1',
+            'email': 'user1@cern.ch',
             'role': UserRole.VALIDATOR,
             'groups': [group1, group2, group3]
         }).save()
         self.user2 = User({
             'fullname': 'user2',
+            'email': 'user2@cern.ch',
             'role': UserRole.VALIDATOR,
             'groups': [group1]
         }).save()
         User({
             'fullname': 'user3',
+            'email': 'user3@cern.ch',
             'role': UserRole.USER,
             'groups': []
         }).save()

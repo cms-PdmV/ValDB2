@@ -2,6 +2,7 @@
 User group API
 '''
 from flask_restx import Resource
+from werkzeug.exceptions import BadRequest
 
 from data.group import get_all_groups
 from models.user import User, UserRole
@@ -81,7 +82,7 @@ class UserGroupController():
                 }).save()
             else:
                 if user.role == UserRole.ADMIN and group != ADMINISTRATOR_KEY:
-                    raise Exception(
+                    raise BadRequest(
                         'cannot add admin to validator group. please remove this user from admin' \
                         ' role.'
                     )
@@ -95,7 +96,7 @@ class UserGroupController():
             user.save()
             lookup.add_user_to_group(user.id, group)
         else:
-            raise Exception('group is not in table')
+            raise BadRequest('group is not in table')
 
     @staticmethod
     def remove_user_from_group(user_id, group):
