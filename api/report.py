@@ -5,13 +5,14 @@ import pymongo
 from bson.objectid import ObjectId
 from flask.globals import request
 from flask_restx import Resource
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import Forbidden, NotFound
 
 from utils.query import add_skip_and_limit, serialize_raw_query
 from core.database import get_database
 from core import Namespace
 from models.report import Report, ReportStatus
 from models.campaign import Campaign
+from models.user import User
 
 
 api = Namespace('reports', description='Report in the system')
@@ -45,6 +46,7 @@ class ReportListAPI(Resource):
         campaign.save()
         return new_report.dict()
 
+@DeprecationWarning
 @api.route('/user/<string:userid>/')
 @api.param('userid', 'Report id')
 class ReportUserAPI(Resource):
@@ -94,12 +96,21 @@ class ReportAPI(Resource):
     '''
     def put(self, reportid):
         '''
-        Get report by id
-        body: {
-            content: string
-            user: string
-        }
+        Update report content
+        body: Report
         '''
         report = Report.get(reportid)
+        user = User.get_from_request(request)
+        if report.group not in user.groups:
+            raise Forbidden()
+        if 'authors' in api.payload:
+            api.payload.pop('authors')
         report.update(api.payload)
+        if 'content' in api.payload:
+            previous_authors = []
+            if report.authors:
+                previous_authors = [author for author in report.authors if author.id != user.id]
+            new_authors = [user] + previous_authors
+            report.authors = new_authors
+            report.save()
         return report.dict()

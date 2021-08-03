@@ -2,6 +2,7 @@
 Main module for valdb
 '''
 import os
+import logging
 
 from flask import Flask, render_template
 from jinja2.exceptions import TemplateNotFound
@@ -12,8 +13,10 @@ from api import api
 from api.static import serve_file
 from database.index import database_index_setup
 from lookup.user_group import UserGroupLookup
+from middlewares.authorization import AuthorizationMiddleware
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 # setup database indexes
 database_index_setup()
@@ -25,6 +28,7 @@ lookup.update()
 app = Flask(__name__,
     static_folder='./build/static',
     template_folder='./build')
+app.wsgi_app = AuthorizationMiddleware(app.wsgi_app)
 
 api.init_app(app)
 CORS(app, supports_credentials=True)

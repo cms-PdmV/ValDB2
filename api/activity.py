@@ -1,10 +1,12 @@
 '''
 Activity API
 '''
+from flask.globals import request
 from flask_restx import Resource
 
 from models.report import Report
 from models.activity import Activity
+from models.user import User
 from core import Namespace
 
 
@@ -31,6 +33,8 @@ class ActivityAPI(Resource):
         body: Activity
         '''
         report = Report.get(reportid)
+        user = User.get_from_request(request)
+        api.payload['user'] = user.id
         activity = Activity(api.payload).save()
         if not report.activities:
             report.activities = []

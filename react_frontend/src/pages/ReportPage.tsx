@@ -63,7 +63,7 @@ export function ReportPage(): ReactElement {
           if (response.status) {
             setContent(editingContent)
             setAuthors(newAuthors)
-            logReport.edit(report.id, user).then(() => {
+            logReport.edit(report.id).then(() => {
               updateActivities()
             })
             message.success('Saved')
@@ -85,7 +85,7 @@ export function ReportPage(): ReactElement {
       }).then(updatedReport => {
         if (updatedReport.attachments) {
           setAttachments(updatedReport.attachments)
-          logReport.addAttachment(report.id, user, uploadedAttachments.length).then(() => {
+          logReport.addAttachment(report.id, uploadedAttachments.length).then(() => {
             updateActivities()
           })
         } else {
@@ -101,7 +101,7 @@ export function ReportPage(): ReactElement {
         attachments: removedAttachments,
       }).then(updatedReport => {
         setAttachments(updatedReport.attachments || [])
-        logReport.removeAttachment(report.id, user).then(() => {
+        logReport.removeAttachment(report.id).then(() => {
           updateActivities()
         })
       })
@@ -114,7 +114,7 @@ export function ReportPage(): ReactElement {
         status: newStatus
       }).then(response => {
         if (response.status) {
-          logReport.changeStatus(report.id, user, status, newStatus).then(() => {
+          logReport.changeStatus(report.id, status, newStatus).then(() => {
             updateActivities()
           })
           setStatus(newStatus as ReportStatus)
