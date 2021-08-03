@@ -8,7 +8,6 @@ import { HorizontalLine } from "../components/HorizontalLine";
 import { Label } from "../components/Label";
 import { Spacer } from "../components/Spacer";
 import { UserContext } from "../context/user";
-import { removeUser } from "../storages/user";
 import { UserRole } from "../types";
 import { userRoleLabel } from "../utils/label";
 
@@ -17,7 +16,7 @@ export function UserPage(): ReactElement {
   const history = useHistory()
 
   const handleLogout = () => {
-    removeUser()
+    // TODO: logout
     history.push('/')
     window.location.reload()
   }
