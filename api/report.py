@@ -5,7 +5,7 @@ import pymongo
 from bson.objectid import ObjectId
 from flask.globals import request
 from flask_restx import Resource
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import Forbidden
 
 from utils.query import add_skip_and_limit, serialize_raw_query
 from core.database import get_database
@@ -46,6 +46,17 @@ class ReportListAPI(Resource):
         campaign.save()
         return new_report.dict()
 
+@api.route('/assigned/')
+class AssignedReportAPI(Resource):
+    '''
+    Assigned Report of User
+    '''
+    def get(self):
+        '''
+        Get assign report
+        '''
+        pass
+
 @DeprecationWarning
 @api.route('/user/<string:userid>/')
 @api.param('userid', 'Report id')
@@ -84,7 +95,7 @@ class ReportSearchAPI(Resource):
         })
 
         if not result:
-            raise NotFound('Report is not found')
+            return None
 
         return result[0].dict()
 

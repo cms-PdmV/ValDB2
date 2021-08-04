@@ -19,6 +19,7 @@ interface ReportHeaderProp {
   group: string
   date: string
   status: ReportStatus
+  isCampaignOpen: boolean
   onChangeMode: (mode: ReportEditorMode) => void
   handleSave: () => void
   handleDiscard: () => void
@@ -87,7 +88,7 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
   return (
     <Box marginTop="1rem" marginBottom="2rem">
-      <Box fontSize="2rem" fontWeight="bold">{prop.campaign}</Box>
+      <Box fontSize="2rem" fontWeight="bold">{prop.campaign}&nbsp;&nbsp;<Chip color={prop.isCampaignOpen ? 'default' : 'secondary'} label={prop.isCampaignOpen ? 'Open' : 'Closed'} style={{fontWeight: 'normal'}} /></Box>
       <Spacer />
       <Chip label={prop.group.split('.').join(' / ')}/>
       <Spacer />

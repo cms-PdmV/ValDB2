@@ -5,8 +5,8 @@ import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
 import { Activity, Attachment, Report, ReportEditorMode, ReportStatus, User } from '../types'
 import { useContext, useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router';
-import { activityService, attachmentService, reportService } from '../services';
+import { useParams } from 'react-router';
+import { activityService, attachmentService, campaignService, reportService } from '../services';
 import { UserContext } from '../context/user';
 import { logReport } from '../utils/activity';
 import { ActivityList } from '../components/ActivityList';
@@ -35,24 +35,38 @@ export function ReportPage(): ReactElement {
   const [editingContent, setEditingContent] = useState<string>('')
   const [mode, setMode] = useState<ReportEditorMode>('view')
   const [activities, setActivity] = useState<Activity[]>([])
+  const [isCampaignOpen, setIsCampaignOpen] = useState<boolean>(false)
   const user = useContext(UserContext)
 
-  const history = useHistory()
-
   useEffect(() => {
+    campaignService.get(campaign).then(fetchedCampaign => {
+      setIsCampaignOpen(fetchedCampaign.campaign.is_open)
+    })
     reportService.seach(campaign, group).then(fetchedReport => {
-      setReport(fetchedReport)
-      setContent(fetchedReport.content)
-      setEditingContent(fetchedReport.content)
-      setStatus(fetchedReport.status)
-      setAuthors(fetchedReport.authors)
-      setAttachments(fetchedReport.attachments || [])
-      updateActivities(fetchedReport.id)
+      if (!fetchedReport) {
+        reportService.create({
+          campaign_name: campaign,
+          group,
+        }).then(newReport => {
+          setReportState(newReport)
+        })
+      } else {
+        setReportState(fetchedReport)
+      }
     })
   }, [])
 
+  const setReportState = (reportData: Report) => {
+    setReport(reportData)
+    setContent(reportData.content)
+    setEditingContent(reportData.content)
+    setStatus(reportData.status)
+    setAuthors(reportData.authors)
+    setAttachments(reportData.attachments || [])
+    updateActivities(reportData.id)
+  }
+
   const handleSave = () => {
-    history.replace(`/campaigns/${campaign}/report/${group}`)
     if (report && user) {
       if (editingContent !== content) {
         const newAuthors = [user].concat((report.authors || []).filter(e => e.id !== user?.id))
@@ -172,7 +186,7 @@ export function ReportPage(): ReactElement {
   return (
     <Container>
       { report && <Box>
-        <ReportHeader campaign={campaign} date={report.created_at} authors={authors} editable={user?.groups.includes(group)} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
+        <ReportHeader campaign={campaign} isCampaignOpen={isCampaignOpen} date={report.created_at} authors={authors} editable={isCampaignOpen && user?.groups.includes(group)} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
         { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} onFilesDrop={onFilesDrop} />}
         { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
       </Box>}
