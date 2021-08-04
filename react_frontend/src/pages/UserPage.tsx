@@ -13,21 +13,12 @@ import { userRoleLabel } from "../utils/label";
 
 export function UserPage(): ReactElement {
   const user = useContext(UserContext)
-  const history = useHistory()
-
-  const handleLogout = () => {
-    // TODO: logout
-    history.push('/')
-    window.location.reload()
-  }
 
   return (<>
     { user && <Container>
       <h1>{user.fullname}</h1>
       <Label label="Role" value={userRoleLabel[user.role as UserRole]} />
       <Label label="Email" value={user.email} />
-      <Spacer />
-      <Button variant="contained" onClick={handleLogout}>Logout</Button>
       <Spacer />
       <HorizontalLine />
       { user.role !== UserRole.USER && <Box>
