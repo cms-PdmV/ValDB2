@@ -210,20 +210,20 @@ class Model():
         return cls(cls._get_data_load_object(_database.get(cls.get_collection_name(), record_id)))
 
     @classmethod
-    def query(cls: T, query: Dict, sort=None) -> list[T]:
+    def query(cls: T, query: Dict, sort=None, option=None) -> list[T]:
         '''
         Query objects from database.
         '''
         return [cls(cls._get_data_load_object(record))
-            for record in _database.query(cls.get_collection_name(), query, sort)
+            for record in _database.query(cls.get_collection_name(), query, sort, option)
         ]
 
     @classmethod
-    def query_one(cls: T, query: Dict, sort=None) -> T:
+    def query_one(cls: T, query: Dict, sort=None, option=None) -> T:
         '''
         Query one object from database.
         '''
-        query_result = _database.query(cls.get_collection_name(), query, sort)
+        query_result = _database.query(cls.get_collection_name(), query, sort, option)
         if query_result:
             return cls(cls._get_data_load_object(query_result[0]))
         return None

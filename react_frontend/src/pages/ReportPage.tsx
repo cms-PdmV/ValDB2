@@ -3,7 +3,7 @@ import { ReportContentViewer } from '../components/ReportContentViewer';
 import { ReportHeader } from '../components/ReportHeader';
 import { Container } from '../components/Container';
 import { Box } from "@material-ui/core"
-import { Activity, Attachment, Report, ReportEditorMode, ReportStatus, User } from '../types'
+import { Activity, Attachment, Report, ReportEditorMode, ReportStatus } from '../types'
 import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { activityService, attachmentService, campaignService, reportService } from '../services';
@@ -28,9 +28,8 @@ export function ReportPage(): ReactElement {
   } = useParams()
 
   const [content, setContent] = useState<string>('')
-  const [authors, setAuthors] = useState<User[]>([])
   const [attachments, setAttachments] = useState<Attachment[]>([])
-  const [status, setStatus] = useState<ReportStatus>(ReportStatus.IN_PROGRESS)
+  const [status, setStatus] = useState<ReportStatus>(ReportStatus.NOT_YET_DONE)
   const [report, setReport] = useState<Report>()
   const [editingContent, setEditingContent] = useState<string>('')
   const [mode, setMode] = useState<ReportEditorMode>('view')
@@ -61,7 +60,6 @@ export function ReportPage(): ReactElement {
     setContent(reportData.content)
     setEditingContent(reportData.content)
     setStatus(reportData.status)
-    setAuthors(reportData.authors)
     setAttachments(reportData.attachments || [])
     updateActivities(reportData.id)
   }
@@ -73,18 +71,14 @@ export function ReportPage(): ReactElement {
         reportService.update(report.id, {
           content: editingContent,
           authors: newAuthors,
-        }).then(response => {
-          if (response.status) {
-            setContent(editingContent)
-            setAuthors(newAuthors)
-            logReport.edit(report.id).then(() => {
-              updateActivities()
-            })
-            message.success('Saved')
-          } else {
-            throw Error('Internal Error')
-          }
-        }).catch(error => alert(error))
+        }).then(updatedReport => {
+          setReport(updatedReport)
+          setContent(updatedReport.content)
+          logReport.edit(report.id).then(() => {
+            updateActivities()
+          })
+          message.success('Saved')
+        })
       }
     } else {
       alert('report not found!')
@@ -124,18 +118,17 @@ export function ReportPage(): ReactElement {
 
   const handleChangeStatus = (newStatus: number) => {
     if (report && user) {
-      reportService.update(report.id, {
-        status: newStatus
-      }).then(response => {
-        if (response.status) {
-          logReport.changeStatus(report.id, status, newStatus).then(() => {
-            updateActivities()
-          })
-          setStatus(newStatus as ReportStatus)
-        } else {
-          throw Error('Internal Error')
-        }
-      }).catch(error => alert(error))
+      if (+newStatus !== +status) {
+        reportService.update(report.id, {
+          status: newStatus
+        }).then(updatedReport => {
+            logReport.changeStatus(report.id, status, newStatus).then(() => {
+              updateActivities()
+            })
+            setReport(updatedReport)
+            setStatus(updatedReport.status)
+        })
+      }
     } else {
       alert('report not found!')
     }
@@ -186,7 +179,7 @@ export function ReportPage(): ReactElement {
   return (
     <Container>
       { report && <Box>
-        <ReportHeader campaign={campaign} isCampaignOpen={isCampaignOpen} date={report.created_at} authors={authors} editable={isCampaignOpen && user?.groups.includes(group)} group={group} status={status} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
+        <ReportHeader report={report} isCampaignOpen={isCampaignOpen} editable={isCampaignOpen && user?.groups.includes(group)} mode={mode} onChangeMode={setMode} handleSave={handleSave} handleDiscard={handleDiscard} handleChangeStatus={handleChangeStatus} />
         { mode === 'edit' && <ReportContentEditor content={editingContent} onChangeContent={setEditingContent} onFilesDrop={onFilesDrop} />}
         { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
       </Box>}

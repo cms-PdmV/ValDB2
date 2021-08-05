@@ -10,9 +10,8 @@ import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
 import { Spacer } from "../components/Spacer";
 import { UserContext } from "../context/user";
-import { campaignService, reportService } from "../services";
+import { campaignService } from "../services";
 import { Campaign, Category, UserRole } from "../types";
-import { splitPath } from "../utils/group";
 import { Modal, message } from "antd"
 
 const { confirm } = Modal

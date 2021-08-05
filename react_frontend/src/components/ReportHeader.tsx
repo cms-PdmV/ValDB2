@@ -1,24 +1,20 @@
 import { Box, Button, Chip, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faCalendar, faSave, faTimes, faCaretDown } from '@fortawesome/free-solid-svg-icons';
-import { ReportEditorMode, ReportStatus, User } from "../types";
+import { ReportEditorMode, ReportStatus, Report } from "../types";
 import { ReactElement, useState, MouseEvent } from "react";
 import { Spacer } from "./Spacer";
 import { reportStatusStyle } from "../utils/report";
 import { ReportStatusLabel } from "./ReportStatusLabel";
-import moment from "moment";
 import { Modal } from "antd";
 import { VerticleLine } from "./VerticleLine";
 import { UserSpan } from "./UserSpan";
+import { DatetimeSpan } from "./DatetimeSpan";
 
 interface ReportHeaderProp {
   editable?: boolean
-  authors: User[]
   mode: ReportEditorMode
-  campaign: string
-  group: string
-  date: string
-  status: ReportStatus
+  report: Report
   isCampaignOpen: boolean
   onChangeMode: (mode: ReportEditorMode) => void
   handleSave: () => void
@@ -67,7 +63,7 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
     <>
       <Tooltip title="Report Status" placement="top">
         <Button variant="contained" aria-controls="simple-menu" aria-haspopup="true" onClick={handleOpenStatusMenu}>
-          <ReportStatusLabel status={+prop.status as ReportStatus} />&nbsp;&nbsp;{prop.editable && <FontAwesomeIcon icon={faCaretDown} />}
+          <ReportStatusLabel status={prop.report.status} />&nbsp;&nbsp;{prop.editable && <FontAwesomeIcon icon={faCaretDown} />}
         </Button>
       </Tooltip>
       <Menu
@@ -88,14 +84,14 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
   return (
     <Box marginTop="1rem" marginBottom="2rem">
-      <Box fontSize="2rem" fontWeight="bold">{prop.campaign}&nbsp;&nbsp;<Chip color={prop.isCampaignOpen ? 'default' : 'secondary'} label={prop.isCampaignOpen ? 'Open' : 'Closed'} style={{fontWeight: 'normal'}} /></Box>
+      <Box fontSize="2rem" fontWeight="bold">{prop.report.campaign_name}&nbsp;&nbsp;<Chip color={prop.isCampaignOpen ? 'default' : 'secondary'} label={prop.isCampaignOpen ? 'Open' : 'Closed'} style={{fontWeight: 'normal'}} /></Box>
       <Spacer />
-      <Chip label={prop.group.split('.').join(' / ')}/>
+      <Chip label={prop.report.group.split('.').join(' / ')}/>
       <Spacer />
       <Box marginBottom="1rem" alignItems="center" color="#707070">
-        <strong>Authors: </strong>{prop.authors ? prop.authors.map((e, index) => <><UserSpan user={e} />{index === prop.authors.length - 1 ? '' : ', '}</>) : 'None'}
+        <strong>Authors: </strong>{prop.report.authors ? prop.report.authors.map((e, index) => <><UserSpan user={e} />{index === prop.report.authors.length - 1 ? '' : ', '}</>) : 'None'}
         <Spacer rem={0.5} />
-        <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;<strong>Created:</strong>&nbsp;{moment(prop.date, 'YYYY-MM-DD').fromNow()}</p>
+        <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;<strong>Created:</strong>&nbsp;<DatetimeSpan datetime={prop.report.created_at} updateDatetime={prop.report.updated_at} /></p>
       </Box>
       { prop.mode === 'view' &&
         <Box>
