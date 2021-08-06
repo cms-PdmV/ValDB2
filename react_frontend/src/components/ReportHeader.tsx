@@ -10,6 +10,7 @@ import { Modal } from "antd";
 import { VerticleLine } from "./VerticleLine";
 import { UserSpan } from "./UserSpan";
 import { DatetimeSpan } from "./DatetimeSpan";
+import { CampaignStatus } from "./CampaignStatus";
 
 interface ReportHeaderProp {
   editable?: boolean
@@ -84,7 +85,7 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
   return (
     <Box marginTop="1rem" marginBottom="2rem">
-      <Box fontSize="2rem" fontWeight="bold">{prop.report.campaign_name}&nbsp;&nbsp;<Chip color={prop.isCampaignOpen ? 'default' : 'secondary'} label={prop.isCampaignOpen ? 'Open' : 'Closed'} style={{fontWeight: 'normal'}} /></Box>
+      <Box fontSize="2rem" fontWeight="bold">{prop.report.campaign_name}&nbsp;&nbsp;<CampaignStatus isOpen={prop.isCampaignOpen} /></Box>
       <Spacer />
       <Chip label={prop.report.group.split('.').join(' / ')}/>
       <Spacer />

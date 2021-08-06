@@ -2,11 +2,11 @@
 Campaign API
 '''
 from flask.globals import request
-import pymongo
 from flask_restx import Resource
 
-from utils.query import add_skip_and_limit, build_query
+from utils.query import add_skip_and_limit, build_query, build_sort
 from utils.user import require_permission
+from utils.request import parse_list_of_tuple
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
@@ -31,12 +31,14 @@ class CampaignListAPI(Resource):
         Get all campaign list
         '''
         query_params = request.args
+        sorting = parse_list_of_tuple(query_params.get('sort'))
         database_query = build_query(['name'], query_params)
-        query_result = get_database().database[Campaign.get_collection_name()] \
-            .find(database_query, {'reports': False}) \
-            .sort([('created_at', pymongo.DESCENDING)])
-        add_skip_and_limit(query_result, query_params)
-        campaigns = list(query_result)
+        query = get_database().database[Campaign.get_collection_name()] \
+            .find(database_query, {'reports': False})
+        if sorting:
+            query.sort(build_sort(sorting))
+        add_skip_and_limit(query, query_params)
+        campaigns = list(query)
         return campaigns
 
     @api.marshal_with(campaign_model)

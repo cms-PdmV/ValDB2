@@ -5,10 +5,26 @@ import { ReactElement, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Container } from "../components/Container";
 import { Spacer } from "../components/Spacer";
+import { TableSortingButton } from "../components/TableSortingButton";
 import { userService } from "../services";
-import { User, UserRole } from "../types";
+import { Sorting, SortingType, User, UserRole } from "../types";
 import { PageLimit } from "../utils/constant";
 import { userRoleLabel } from "../utils/label";
+
+const defaultSorting: Sorting[] = [
+  {
+    value: 'role',
+    type: 'asc',
+  },
+  {
+    value: 'email',
+    type: 'asc',
+  },
+  {
+    value: 'fullname',
+    type: null,
+  },
+]
 
 export function AllUserAdminPage(): ReactElement {
 
@@ -18,16 +34,17 @@ export function AllUserAdminPage(): ReactElement {
   const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
   const [currentSearch, setCurrentSearch] = useState<string>('')
   const [searchValue, setSearchValue] = useState<string>('')
+  const [sorting, setSorting] = useState<Sorting[]>(defaultSorting)
 
   useEffect(() => {
     setUsers([])
     setSkip(0)
     setIsMaxPage(false)
-    handleLoadUser(0, currentSearch, [])
-  }, [currentSearch])
+    handleLoadUser(0, currentSearch, sorting, [])
+  }, [sorting, currentSearch])
 
-  const handleLoadUser =  (recordSkip: number, searchKeyword: string, targetUsers: User[]) => {
-    userService.getAll(recordSkip, PageLimit, searchKeyword).then(response => {
+  const handleLoadUser =  (recordSkip: number, searchKeyword: string, sortingOption: Sorting[], targetUsers: User[]) => {
+    userService.getAll(recordSkip, PageLimit, sortingOption, searchKeyword).then(response => {
       const loadedUsers = targetUsers.concat(response)
       setUsers(loadedUsers)
       if (response.length < PageLimit) {
@@ -47,6 +64,15 @@ export function AllUserAdminPage(): ReactElement {
     }
   }
 
+  const handleChangeSort = (value: string, type: SortingType) => {
+    const newSorting = [...sorting]
+    const target = newSorting.find(e => e.value === value)
+    if (target) {
+      target.type = type
+    }
+    setSorting(newSorting)
+  }
+
   return (
     <Container>
       <Box display="flex" alignItems="center">
@@ -62,9 +88,9 @@ export function AllUserAdminPage(): ReactElement {
         <Table>
           <TableHead style={{fontWeight: 'bold'}}>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="left">Email</TableCell>
-              <TableCell align="left">Role</TableCell>
+              <TableCell><TableSortingButton label="Name" value="fullname" sorting={sorting.find(e => e.value === 'fullname')?.type} onChange={handleChangeSort}/></TableCell>
+              <TableCell align="left"><TableSortingButton label="Email" value="email" sorting={sorting.find(e => e.value === 'email')?.type} onChange={handleChangeSort}/></TableCell>
+              <TableCell align="left"><TableSortingButton label="Role" value="role" sorting={sorting.find(e => e.value === 'role')?.type} onChange={handleChangeSort}/></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -75,7 +101,7 @@ export function AllUserAdminPage(): ReactElement {
                 <TableCell align="left">{userRoleLabel[user.role as UserRole]}</TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={() => { handleLoadUser(skip, currentSearch, users) }} style={{cursor: 'pointer'}}>
+            { !isMaxPage && <a onClick={() => { handleLoadUser(skip, currentSearch, sorting, users) }} style={{cursor: 'pointer'}}>
               <Box padding="1rem">
                 Load More
               </Box>

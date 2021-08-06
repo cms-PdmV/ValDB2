@@ -6,8 +6,9 @@ import logging
 from flask.globals import request
 from flask_restx import Resource
 
-from utils.query import add_skip_and_limit, build_query, serialize_raw_query
+from utils.query import add_skip_and_limit, build_query, build_sort, serialize_raw_query
 from utils.user import require_permission
+from utils.request import parse_list_of_tuple
 from core import Namespace
 from core.database import get_database
 from data.group import get_all_groups
@@ -44,10 +45,13 @@ class UserListAPI(Resource):
         '''
         require_permission(request, [UserRole.ADMIN])
         query_params = request.args
+        sorting = parse_list_of_tuple(query_params.get('sort'))
         database_query = build_query(['fullname', 'email'], query_params)
-        query_result = get_database().database[User.get_collection_name()].find(database_query)
-        add_skip_and_limit(query_result, query_params)
-        return serialize_raw_query(query_result)
+        query = get_database().database[User.get_collection_name()].find(database_query)
+        if sorting:
+            query.sort(build_sort(sorting))
+        add_skip_and_limit(query, query_params)
+        return serialize_raw_query(query)
 
     @api.marshal_with(user_model)
     def post(self):

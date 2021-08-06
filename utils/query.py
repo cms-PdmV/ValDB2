@@ -2,6 +2,8 @@
 Database query helper
 '''
 
+import pymongo
+
 def build_query(fields, query_params):
     '''
     Build mongodb query from search keyword that matched specific fields
@@ -15,6 +17,18 @@ def build_query(fields, query_params):
         for field in fields]
     }
     return database_query
+
+def build_sort(sorting_fields):
+    '''
+    Build sorting option for pymongo
+    sorting_fields: (field: string, type: 'asc' | 'desc')[]
+    '''
+    pymongo_sorting_type = {
+        'asc': pymongo.ASCENDING,
+        'desc': pymongo.DESCENDING,
+    }
+    return [(field, pymongo_sorting_type[sort_type]) for field, sort_type in sorting_fields \
+        if sort_type]
 
 def add_skip_and_limit(query_result, query_params):
     '''
