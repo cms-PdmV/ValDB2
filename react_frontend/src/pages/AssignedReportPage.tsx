@@ -20,7 +20,7 @@ export function AssignedReportPage(): ReactElement {
 
   return (
     <Container>
-      <h1>My Reports</h1>
+      <h1>Assigned Reports</h1>
       <TableContainer component={Paper}>
         <Table>
           <TableHead style={{fontWeight: 'bold'}}>
