@@ -8,6 +8,7 @@ import { Spacer } from "./Spacer";
 import { Modal } from "antd"
 import { ReactElement } from "react";
 import { ChangeEvent } from "react";
+import { useHistory } from "react-router-dom";
 
 const { confirm } = Modal;
 
@@ -25,6 +26,8 @@ export function UserGroupList(prop: UserGroupListProp): ReactElement {
   const [loading, setLoading] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
   const [textValue, setTextValue] = useState<string>();
+
+  const history = useHistory()
 
   const onChange = (e: ChangeEvent<Record<string, string>>, isExpanded: boolean) => {
     if (isExpanded && !users) {
@@ -48,9 +51,8 @@ export function UserGroupList(prop: UserGroupListProp): ReactElement {
         updateUsers().then(() => {
           handleClose()
         })
-      }).catch(error => alert(error))
+      })
     }
-    // TODO: show error message
   }
 
   const handleRemove = (userId: string, name: string, email: string) => {
@@ -80,7 +82,7 @@ export function UserGroupList(prop: UserGroupListProp): ReactElement {
   const handleTextValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
     setTextValue(e.target.value)
-}
+  }
 
   return (<>
     <Accordion expanded={expanded} onChange={onChange}>
@@ -95,7 +97,7 @@ export function UserGroupList(prop: UserGroupListProp): ReactElement {
             <Chip onClick={openDialog} color="primary" label={<span><FontAwesomeIcon icon={faPlus}/><strong>&nbsp;&nbsp;Add</strong></span>} style={{...chipStyle, cursor: 'pointer'}} />
             {users.map((user, index) =>
               <Tooltip title={user.email} placement="top" arrow key={`user-chip-${index}`}>
-                <Chip label={user.fullname || user.email} style={chipStyle} onDelete={() => {handleRemove(user.id, user.fullname, user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
+                <Chip label={user.fullname || user.email} style={chipStyle} onClick={() => { history.push(`/admin/users/${user.id}`) }} onDelete={() => {handleRemove(user.id, user.fullname, user.email)}} deleteIcon={<FontAwesomeIcon icon={faTimes} />}/>
               </Tooltip>
             )}
             {users.length === 0 && <span style={{color: '#707070', fontStyle: 'italic'}}>Empty</span>}
