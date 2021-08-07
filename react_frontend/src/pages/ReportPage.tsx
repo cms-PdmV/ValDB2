@@ -16,9 +16,10 @@ import { HorizontalLine } from '../components/HorizontalLine';
 import { ReactElement } from 'react-markdown';
 import EasyMDE from 'easymde';
 import { useCallback } from 'react';
-import { getAttactmentType, SupportEditorAttachmentTypes } from '../utils/attachments';
-import { message } from 'antd';
+import { getAttactmentType, humanFileSize, SupportEditorAttachmentTypes } from '../utils/attachments';
+import { message, Modal } from 'antd';
 import { AttachmentList } from '../components/AttachmentList';
+import { MaxFileSizeKB, MaxFileSizeMB } from '../utils/constant';
 
 export function ReportPage(): ReactElement {
 
@@ -156,21 +157,29 @@ export function ReportPage(): ReactElement {
       message.info('Uploading attachments')
       const uploadedAttachments: Attachment[] = []
       await Promise.all(acceptedFiles.map(async file => {
-        const data = new FormData()
-        data.append('file', file)
-        data.append('name', file.name)
-        data.append('type', file.type)
-        data.append('size', file.size.toFixed())
-        await attachmentService.create(data).then(attactment => {
-          message.success(`Uploaded ${attactment.name}`)
-          uploadedAttachments.push(attactment)
-          if (mdeInstance) {
-            const type = getAttactmentType(attactment.type)
-            if (SupportEditorAttachmentTypes.includes(type.name)) {
-              handleAddTextToEditor(mdeInstance, `![${attactment.name}](${attactment.url})`)
+        if (file.size > MaxFileSizeKB) {
+          Modal.error({
+            title: 'Error',
+            content: <span>Cannot upload <strong>{file.name}({humanFileSize(file.size)})</strong> because the file's size exceeds <strong>{MaxFileSizeMB} MB</strong>.</span>
+          })
+          return
+        } else {
+          const data = new FormData()
+          data.append('file', file)
+          data.append('name', file.name)
+          data.append('type', file.type)
+          data.append('size', file.size.toFixed())
+          await attachmentService.create(data).then(attactment => {
+            message.success(`Uploaded ${attactment.name}`)
+            uploadedAttachments.push(attactment)
+            if (mdeInstance) {
+              const type = getAttactmentType(attactment.type)
+              if (SupportEditorAttachmentTypes.includes(type.name)) {
+                handleAddTextToEditor(mdeInstance, `![${attactment.name}](${attactment.url})`)
+              }
             }
-          }
-        })
+          })
+        }
       }))
       handleAddAttachmentToReport(uploadedAttachments)
     }

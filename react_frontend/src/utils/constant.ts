@@ -22,3 +22,6 @@ export const SplitGroup: Record<string, { name: string, slice: [number, number] 
 }
 
 export const PageLimit = 20
+
+export const MaxFileSizeMB = 5
+export const MaxFileSizeKB = MaxFileSizeMB * 1024 * 1024
