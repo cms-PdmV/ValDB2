@@ -122,7 +122,7 @@ export function CampaignFormPage (): ReactElement {
       { ((!isEdit) || (isEdit && campaign)) && <form onSubmit={handleSubmit(onSubmit)}>
         {/* General Information */}
         <Spacer />
-        <TextField {...register('name')} defaultValue={campaign?.name} variant="outlined" size="small" label="Campaign Name" style={{minWidth: '500px'}}/>
+        <TextField {...register('name')} defaultValue={campaign?.name} variant="outlined" size="small" label="Campaign Name" placeholder="XX_XX_XX_xxxxx" style={{minWidth: '500px'}}/>
         <Spacer />
         <TextField {...register('target_release')} defaultValue={campaign?.target_release} variant="outlined" size="small" label="Target Release"/>
         <Spacer inline />
