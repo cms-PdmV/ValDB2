@@ -7,6 +7,7 @@ import { getAttactmentType, humanFileSize } from "../utils/attachments";
 import { color } from "../utils/css";
 import { Modal } from "antd";
 import { MouseEvent } from "react";
+import { attachmentService } from "../services";
 
 const { confirm } = Modal
 
@@ -35,7 +36,9 @@ export function AttachmentList (prop: AttachmentListProp): ReactElement {
         okText: 'Remove',
         okType: 'danger',
         onOk: () => {
-          prop.onUpdate(prop.attachments.filter(e => e.id !== itemProp.attachment.id))
+          attachmentService.remove(itemProp.attachment.id).then(() => {
+            prop.onUpdate(prop.attachments.filter(e => e.id !== itemProp.attachment.id))
+          })
         }
       })
     }

@@ -112,6 +112,7 @@ export function ReportPage(): ReactElement {
         setAttachments(updatedReport.attachments || [])
         logReport.removeAttachment(report.id).then(() => {
           updateActivities()
+          message.success('Succesfully removed attachment.')
         })
       })
     }

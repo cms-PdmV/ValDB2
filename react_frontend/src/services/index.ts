@@ -70,4 +70,5 @@ export const activityService = {
 
 export const attachmentService = {
     create: (body: FormData): Promise<Attachment> => axios.post(`${serverUrl}/attachment/`, body).then(response).catch(error),
+    remove: (attachmnetId: string): Promise<string> => axios.delete(`${serverUrl}/attachment/${attachmnetId}/`).then(response).catch(error),
 }

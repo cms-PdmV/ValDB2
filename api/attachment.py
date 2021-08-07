@@ -30,7 +30,7 @@ class AttachmentCreateAPI(Resource):
             'content': file_content,
         }).save().dict()
 
-@api.route('/<string:attachmentid>')
+@api.route('/<string:attachmentid>/')
 @api.param('attachmentid', 'Attachment ID')
 class AttachmentAPI(Resource):
     '''
@@ -41,3 +41,10 @@ class AttachmentAPI(Resource):
         Get attachment metadata
         '''
         return Attachment.get(attachmentid).dict()
+
+    def delete(self, attachmentid):
+        '''
+        Remove attachment
+        '''
+        Attachment.get(attachmentid).unlink()
+        return 'ok'
