@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Activity, Campaign, Category, Report, User, Attachment, Sorting } from '../types'
 import { parseSortingParam } from '../utils/request'
+import { Modal } from 'antd'
 
 const serverUrl = `${process.env.REACT_APP_SERVER_URL || '/valdb'}/api`
 
@@ -24,7 +25,10 @@ const response = <Type>(responseData: AxiosResponse<Type>): Type => {
 }
 
 const error = (errorData: AxiosError) => {
-    alert(`Error: ${errorData.response?.data.message || 'Unknown error'}`)
+    Modal.error({
+        title: 'Error!',
+        content: `${errorData.response?.data.message || 'Unknown error'}`,
+    })
 }
 
 export const campaignService = {
