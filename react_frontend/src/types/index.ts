@@ -68,7 +68,7 @@ export interface Report {
 }
 
 export interface Campaign {
-    id?: string
+    id: string
     name: string
     description: string
     manager: User
@@ -78,7 +78,7 @@ export interface Campaign {
     relmon: string
     subcategories: string[]
     report: Report[]
-    active: boolean
+    is_open: boolean
     created_at: string // 2020-21-2
     updated_at: string // 2020-21-2
 }

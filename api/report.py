@@ -5,15 +5,18 @@ import pymongo
 from bson.objectid import ObjectId
 from flask.globals import request
 from flask_restx import Resource
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import Forbidden
 
 from utils.query import add_skip_and_limit, serialize_raw_query
+from utils.group import get_subcategory_from_group
 from core.database import get_database
 from core import Namespace
 from models.report import Report, ReportStatus
 from models.campaign import Campaign
 from models.user import User
 
+
+DEFAULT_REPORT_STATUS = ReportStatus.NOT_YET_DONE
 
 api = Namespace('reports', description='Report in the system')
 
@@ -37,7 +40,7 @@ class ReportListAPI(Resource):
         group = api.payload['group']
         campaign = Campaign.get_by_name(campaign_name)
         new_report = Report()
-        new_report.status = ReportStatus.NOT_YET_DONE
+        new_report.status = DEFAULT_REPORT_STATUS
         new_report.campaign_name = campaign_name
         new_report.content = ''
         new_report.group = group
@@ -45,6 +48,36 @@ class ReportListAPI(Resource):
         campaign.reports.append(new_report)
         campaign.save()
         return new_report.dict()
+
+@api.route('/assigned/')
+class AssignedReportAPI(Resource):
+    '''
+    Assigned Report of User
+    '''
+    def get(self):
+        '''
+        Get assign report
+        '''
+        user = User.get_from_request(request)
+        user_subcategories = [get_subcategory_from_group(group) for group in user.groups]
+        assigned_reports = []
+        assigned_open_campaigns = Campaign.query({
+            'is_open': True,
+            'subcategories': {'$in': user_subcategories}
+        }, sort=[('created_at', pymongo.DESCENDING)], option={'reports': False})
+        for campaign in assigned_open_campaigns:
+            for group in user.groups:
+                user_subcategory = get_subcategory_from_group(group)
+                if user_subcategory in campaign.subcategories:
+                    report = Report.search(campaign.name, group)
+                    if not report:
+                        report = Report({
+                            'group': group,
+                            'campaign_name': campaign.name,
+                            'status': DEFAULT_REPORT_STATUS,
+                        })
+                    assigned_reports.append(report.dict())
+        return assigned_reports
 
 @DeprecationWarning
 @api.route('/user/<string:userid>/')
@@ -78,15 +111,10 @@ class ReportSearchAPI(Resource):
         '''
         Search report by campaign name and group name
         '''
-        result = Report.query({
-            'campaign_name': campaign,
-            'group': group,
-        })
-
-        if not result:
-            raise NotFound('Report is not found')
-
-        return result[0].dict()
+        report = Report.search(campaign, group)
+        if not report:
+            return None
+        return report.dict()
 
 @api.route('/<string:reportid>/')
 @api.param('reportid', 'Report id')

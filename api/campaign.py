@@ -117,4 +117,4 @@ class CampaignAPI(Resource):
             for report in campaign.reports:
                 report.campaign_name = campaign.name
                 report.save()
-        return 'ok'
+        return campaign.dict()

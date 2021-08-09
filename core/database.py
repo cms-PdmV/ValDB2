@@ -43,16 +43,16 @@ class MongoDatabase():
         '''
         return self.database[collection_name].insert_one(data).inserted_id
 
-    def query(self, collection_name: str, query: dict, sort):
+    def query(self, collection_name: str, query: dict, sort, option):
         '''
         Query record from database
         '''
         data = []
         if sort:
-            for record in self.database[collection_name].find(query).sort(sort):
+            for record in self.database[collection_name].find(query, option).sort(sort):
                 data.append(record)
         else:
-            for record in self.database[collection_name].find(query):
+            for record in self.database[collection_name].find(query, option):
                 data.append(record)
         return data
 
