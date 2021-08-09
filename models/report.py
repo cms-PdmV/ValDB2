@@ -37,3 +37,13 @@ class Report(Model):
         'campaign_name': [required()],
         'status': [required()],
     }
+
+    @classmethod
+    def search(cls, campaign_name, group):
+        '''
+        Search report by campaign name and group path
+        '''
+        return cls.query_one({
+            'campaign_name': campaign_name,
+            'group': group,
+        })

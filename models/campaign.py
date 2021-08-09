@@ -21,7 +21,7 @@ class Campaign(Model):
     relmon: str
     subcategories: list[str]
     reports: list[Report]
-    active: bool
+    is_open: bool
 
     _validation = {
         'name': [required(), regex(CAMPAIGN_NAME_FORMAT), unique()],

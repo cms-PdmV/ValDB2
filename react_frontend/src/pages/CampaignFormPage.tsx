@@ -60,7 +60,10 @@ export function CampaignFormPage (): ReactElement {
   )
 
   const handleCreateCampaign = (body: Partial<Campaign>) => {
-    campaignService.create(body).then(newCampaign => {
+    campaignService.create({
+      ...body,
+      is_open: true,
+    }).then(newCampaign => {
       if (newCampaign) {
         history.push(`/campaigns/${newCampaign.name}`)
       }
