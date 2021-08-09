@@ -18,7 +18,7 @@ export function CommentBox(prop: CommentBoxProp): ReactElement {
 
   const handleAddComment = () => {
     if (value && value !== '') {
-      logReport.comment(prop.reportId, prop.user, value).then(() => {
+      logReport.comment(prop.reportId, value).then(() => {
         prop.updateActivities()
         setValue('')
       })

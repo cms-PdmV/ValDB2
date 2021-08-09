@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Activity, Campaign, Category, Report, User, Attachment } from '../types'
 
-const serverUrl = `${process.env.REACT_APP_SERVER_URL || ''}/valdb/api`
+const serverUrl = `${process.env.REACT_APP_SERVER_URL || '/valdb'}/api`
 
 export interface CampaignResponse {
     campaign: Campaign
@@ -48,6 +48,7 @@ export const userService = {
     getAll: (skip: number, limit: number, search?: string): Promise<User[]> => axios.get(`${serverUrl}/users/?skip=${skip}&limit=${limit}&search=${search || ''}`).then(response).catch(error),
     get: (id: string): Promise<User> => axios.get(`${serverUrl}/users/${id}/`).then(response).catch(error),
     update: (id: string, body: Partial<User>): Promise<void> => axios.put(`${serverUrl}/users/${id}/`, body).then(response).catch(error),
+    me: (): Promise<User> => axios.get(`${serverUrl}/users/me/`).then(response).catch(error),
 }
 
 export const userGroupService = {

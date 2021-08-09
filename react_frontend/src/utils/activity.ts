@@ -1,50 +1,45 @@
 import { activityService } from "../services";
-import { Activity, ActivityType, ReportStatus, User } from "../types";
+import { Activity, ActivityType, ReportStatus } from "../types";
 import { reportStatusStyle } from "./report";
 
-const edit = async (reportId: string, user: User): Promise<void> => {
-    const body: Activity = {
+const edit = async (reportId: string): Promise<void> => {
+    const body: Partial<Activity> = {
         type: ActivityType.ACTIVITY,
-        user,
         content: 'edited report content.'
     }
-    return activityService.create(reportId, body).catch(error => alert(error))
+    return activityService.create(reportId, body)
 }
 
-const addAttachment = async (reportId: string, user: User, attachmentCount: number): Promise<void> => {
-    const body: Activity = {
+const addAttachment = async (reportId: string, attachmentCount: number): Promise<void> => {
+    const body: Partial<Activity> = {
         type: ActivityType.ACTIVITY,
-        user,
         content: `added ${attachmentCount} attachment(s).`
     }
-    return activityService.create(reportId, body).catch(error => alert(error))
+    return activityService.create(reportId, body)
 }
 
-const removeAttachment = async (reportId: string, user: User): Promise<void> => {
-    const body: Activity = {
+const removeAttachment = async (reportId: string): Promise<void> => {
+    const body: Partial<Activity> = {
         type: ActivityType.ACTIVITY,
-        user,
         content: `removed attachment.`
     }
-    return activityService.create(reportId, body).catch(error => alert(error))
+    return activityService.create(reportId, body)
 }
 
-const changeStatus = async (reportId: string, user: User, statusFrom: ReportStatus, statusTo: ReportStatus): Promise<void> => {
-    const body: Activity = {
+const changeStatus = async (reportId: string, statusFrom: ReportStatus, statusTo: ReportStatus): Promise<void> => {
+    const body: Partial<Activity> = {
         type: ActivityType.ACTIVITY,
-        user,
         content: `change report status from '${reportStatusStyle[statusFrom].label}' to '${reportStatusStyle[statusTo].label}'`
     }
-    return activityService.create(reportId, body).catch(error => alert(error))
+    return activityService.create(reportId, body)
 }
 
-const comment = async (reportId: string, user: User, commentText: string): Promise<void> => {
-    const body: Activity = {
+const comment = async (reportId: string, commentText: string): Promise<void> => {
+    const body: Partial<Activity> = {
         type: ActivityType.COMMENT,
-        user,
         content: commentText
     }
-    return activityService.create(reportId, body).catch(error => alert(error))
+    return activityService.create(reportId, body)
 }
 
 export const logReport = {

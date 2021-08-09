@@ -6,9 +6,11 @@ import pymongo
 from flask_restx import Resource
 
 from utils.query import add_skip_and_limit, build_query
+from utils.user import require_permission
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
+from models.user import UserRole
 from data.group import group
 
 
@@ -42,6 +44,7 @@ class CampaignListAPI(Resource):
         '''
         Create campaign
         '''
+        require_permission(request, [UserRole.ADMIN])
         data = api.payload
         campaign = Campaign(data)
         campaign.parse_datetime()
@@ -107,5 +110,11 @@ class CampaignAPI(Resource):
         '''
         Update campaign by id
         '''
-        Campaign.get(campaignid).update(api.payload)
+        require_permission(request, [UserRole.ADMIN])
+        campaign = Campaign.get(campaignid)
+        campaign.update(api.payload)
+        if 'name' in api.payload:
+            for report in campaign.reports:
+                report.campaign_name = campaign.name
+                report.save()
         return 'ok'

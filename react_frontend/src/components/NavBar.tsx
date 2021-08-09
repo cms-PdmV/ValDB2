@@ -7,7 +7,7 @@ import { User, UserRole } from '../types';
 import { ReactElement } from 'react';
 
 interface NavBarProp {
-  user: User
+  user?: User
 }
 
 export function NavBar(prop: NavBarProp): ReactElement {
@@ -25,7 +25,7 @@ export function NavBar(prop: NavBarProp): ReactElement {
   return (
     <Box height="64px" boxShadow={boxShadow} display="flex" alignItems="center" padding="0 1rem" style={{background: '#ffffff'}}>
       <Box color={primaryColor} fontWeight={800} fontSize="1.5rem"><FontAwesomeIcon icon={faFeather} />&nbsp;&nbsp;ValDB</Box>
-      <Box marginLeft="auto" display="flex">
+      { prop.user && <Box marginLeft="auto" display="flex">
         <Button onClick={() => history.push('/campaigns')} style={currentPath === 'campaigns' ? selectedPathStyle : {}}>Campaigns</Button>
         <Box width="1rem" />
         { !(prop.user.role === UserRole.USER) && <>
@@ -37,7 +37,7 @@ export function NavBar(prop: NavBarProp): ReactElement {
           <Box width="1rem" />
         </>}
         <Button onClick={() => history.push('/user')} style={currentPath === 'user' ? selectedPathStyle : {}}>{prop.user.fullname}&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>{prop.user.fullname[0] || ' '}</Avatar></Button>
-      </Box>
+      </Box>}
     </Box>
   )
 }
