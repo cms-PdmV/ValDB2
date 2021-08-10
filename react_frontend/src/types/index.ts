@@ -109,3 +109,10 @@ export interface AttachmentType {
     icon: IconDefinition
     types: string[]
 }
+
+export type SortingType = 'asc' | 'desc' | null | undefined
+
+export interface Sorting {
+    value: string
+    type: SortingType
+}

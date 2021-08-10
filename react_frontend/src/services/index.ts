@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Activity, Campaign, Category, Report, User, Attachment } from '../types'
+import { Activity, Campaign, Category, Report, User, Attachment, Sorting } from '../types'
+import { parseSortingParam } from '../utils/request'
 
 const serverUrl = `${process.env.REACT_APP_SERVER_URL || '/valdb'}/api`
 
@@ -29,7 +30,7 @@ const error = (errorData: AxiosError) => {
 export const campaignService = {
     create: (body: Partial<Campaign>): Promise<Campaign> => axios.post(`${serverUrl}/campaigns/`, body).then(response).catch(error),
     update: (id: string, body: Partial<Campaign>): Promise<Campaign> => axios.put(`${serverUrl}/campaigns/${id}/`, body).then(response).catch(error),
-    getAll: (skip: number, limit: number, search?: string): Promise<Campaign[]> => axios.get(`${serverUrl}/campaigns/?skip=${skip}&limit=${limit}&search=${search || ''}`).then(response).catch(error),
+    getAll: (skip: number, limit: number, sort: Sorting[], search?: string): Promise<Campaign[]> => axios.get(`${serverUrl}/campaigns/?skip=${skip}&limit=${limit}&search=${search || ''}&sort=${parseSortingParam(sort)}`).then(response).catch(error),
     get: (campaignName: string): Promise<CampaignResponse> => axios.get(`${serverUrl}/campaigns/get/${campaignName}/`).then(response).catch(error),
 }
 
@@ -46,7 +47,7 @@ export const categoryService = {
 }
 
 export const userService = {
-    getAll: (skip: number, limit: number, search?: string): Promise<User[]> => axios.get(`${serverUrl}/users/?skip=${skip}&limit=${limit}&search=${search || ''}`).then(response).catch(error),
+    getAll: (skip: number, limit: number, sort: Sorting[], search?: string): Promise<User[]> => axios.get(`${serverUrl}/users/?skip=${skip}&limit=${limit}&search=${search || ''}&sort=${parseSortingParam(sort)}`).then(response).catch(error),
     get: (id: string): Promise<User> => axios.get(`${serverUrl}/users/${id}/`).then(response).catch(error),
     update: (id: string, body: Partial<User>): Promise<void> => axios.put(`${serverUrl}/users/${id}/`, body).then(response).catch(error),
     me: (): Promise<User> => axios.get(`${serverUrl}/users/me/`).then(response).catch(error),

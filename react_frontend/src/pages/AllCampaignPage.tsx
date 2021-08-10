@@ -5,15 +5,33 @@ import { ReactElement } from "react";
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { useParams } from "react-router-dom";
+import { CampaignStatus } from "../components/CampaignStatus";
 import { Container } from "../components/Container";
+import { DatetimeSpan } from "../components/DatetimeSpan";
 import { Spacer } from "../components/Spacer";
+import { TableSortingButton } from "../components/TableSortingButton";
 import { UserContext } from "../context/user";
 import { campaignService } from "../services";
-import { Campaign, UserRole } from "../types";
+import { Campaign, Sorting, SortingType, UserRole } from "../types";
 import { PageLimit } from "../utils/constant";
 
 
 const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) === i) : []
+
+const defaultSorting: Sorting[] = [
+  {
+    value: 'is_open',
+    type: 'desc',
+  },
+  {
+    value: 'name',
+    type: null,
+  },
+  {
+    value: 'created_at',
+    type: 'desc',
+  },
+]
 
 export function AllCampaignPage (): ReactElement {
 
@@ -25,6 +43,7 @@ export function AllCampaignPage (): ReactElement {
   const history = useHistory()
   const [skip, setSkip] = useState<number>(0)
   const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
+  const [sorting, setSorting] = useState<Sorting[]>(defaultSorting)
 
   const handleClickCampaign = (campaignName: string) => {
     history.push(`/campaigns/${campaignName}`)
@@ -38,11 +57,11 @@ export function AllCampaignPage (): ReactElement {
     setCampaigns([])
     setSkip(0)
     setIsMaxPage(false)
-    handleLoadCampaign(0, currentSearch, [])
-  }, [currentSearch])
+    handleLoadCampaign(0, currentSearch, sorting, [])
+  }, [sorting, currentSearch])
 
-  const handleLoadCampaign = (recordSkip: number, searchKeyword: string, targetCampaigns: Campaign[]) => {
-    campaignService.getAll(recordSkip, PageLimit, searchKeyword).then(fetchedCampaings => {
+  const handleLoadCampaign = (recordSkip: number, searchKeyword: string, sortingOption: Sorting[], targetCampaigns: Campaign[]) => {
+    campaignService.getAll(recordSkip, PageLimit, sortingOption, searchKeyword).then(fetchedCampaings => {
       const loadedCampaign = targetCampaigns.concat(fetchedCampaings)
       setCampaigns(loadedCampaign)
       if (fetchedCampaings.length < PageLimit) {
@@ -64,6 +83,15 @@ export function AllCampaignPage (): ReactElement {
     }
   }
 
+  const handleChangeSort = (value: string, type: SortingType) => {
+    const newSorting = [...sorting]
+    const target = newSorting.find(e => e.value === value)
+    if (target) {
+      target.type = type
+    }
+    setSorting(newSorting)
+  }
+
   return (
     <Container>
       <h1>Campaigns</h1>
@@ -78,20 +106,22 @@ export function AllCampaignPage (): ReactElement {
         <Table>
           <TableHead style={{fontWeight: 'bold'}}>
             <TableRow>
-              <TableCell>Campaign Name</TableCell>
+              <TableCell><TableSortingButton label="Campaign Name" value="name" sorting={sorting.find(e => e.value === 'name')?.type} onChange={handleChangeSort}/></TableCell>
               <TableCell align="left">Categories</TableCell>
-              <TableCell align="right">Create Date</TableCell>
+              <TableCell align="right"><TableSortingButton label="Status" value="is_open" sorting={sorting.find(e => e.value === 'is_open')?.type} onChange={handleChangeSort}/></TableCell>
+              <TableCell align="right"><TableSortingButton label="Created Date" value="created_at" sorting={sorting.find(e => e.value === 'created_at')?.type} onChange={handleChangeSort}/></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {campaigns.map((campaign) => (
               <TableRow key={campaign.id} onClick={() => handleClickCampaign(campaign.name)} style={{cursor: 'pointer'}}>
-                <TableCell component="th" scope="row">{campaign.name}</TableCell>
+                <TableCell component="th" scope="row"><strong>{campaign.name}</strong></TableCell>
                 <TableCell align="left">{getCategoryLabel(campaign.subcategories).map(label => <Chip label={label} style={{marginRight: '0.5rem'}} />)}</TableCell>
-                <TableCell align="right">{campaign.created_at.split('.')[0]}</TableCell>
+                <TableCell align="right"><CampaignStatus isOpen={campaign.is_open} /></TableCell>
+                <TableCell align="right"><DatetimeSpan datetime={campaign.created_at} updateDatetime={campaign.updated_at}/></TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={() => { handleLoadCampaign(skip, currentSearch, campaigns) }} style={{cursor: 'pointer'}}>
+            { !isMaxPage && <a onClick={() => { handleLoadCampaign(skip, currentSearch, sorting, campaigns) }} style={{cursor: 'pointer'}}>
               <Box padding="1rem">
                 Load More
               </Box>

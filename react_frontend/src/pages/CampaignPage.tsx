@@ -13,6 +13,7 @@ import { UserContext } from "../context/user";
 import { campaignService } from "../services";
 import { Campaign, Category, UserRole } from "../types";
 import { Modal, message } from "antd"
+import { CampaignStatus } from "../components/CampaignStatus";
 
 const { confirm } = Modal
 
@@ -83,7 +84,7 @@ export function CampaignPage(): ReactElement {
 
   return (
     <Container>
-      { campaign && <Box fontWeight="bold" fontSize="2rem">{campaign.name}&nbsp;&nbsp;<Chip color={isClosed ? 'secondary' : 'default'} label={isClosed ? 'Closed' : 'Open'} style={{fontWeight: 'normal'}} /></Box>}
+      { campaign && <Box fontWeight="bold" fontSize="2rem">{campaign.name}&nbsp;&nbsp;<CampaignStatus isOpen={!isClosed} /></Box>}
       <Box height="1rem" />
       <Box fontSize="1rem" color="#505050">{campaign?.description}</Box>
       <Spacer rem={2} />
