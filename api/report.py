@@ -79,27 +79,6 @@ class AssignedReportAPI(Resource):
                     assigned_reports.append(report.dict())
         return assigned_reports
 
-@DeprecationWarning
-@api.route('/user/<string:userid>/')
-@api.param('userid', 'Report id')
-class ReportUserAPI(Resource):
-    '''
-    Report of users API
-    '''
-    @api.marshal_list_with(report_model)
-    def get(self, userid):
-        '''
-        Get report related to user
-        '''
-        query_params = request.args
-        query_result = get_database().database[Report.get_collection_name()] \
-            .find(
-                {'authors': ObjectId(userid)},
-                {'content': False, 'authors': False, 'activities': False, 'attachments': False}) \
-            .sort([('created_at', pymongo.DESCENDING)])
-        add_skip_and_limit(query_result, query_params)
-        return serialize_raw_query(query_result)
-
 @api.route('/search/<string:campaign>/<string:group>/')
 @api.param('campaign', 'Campaign name')
 @api.param('group', 'Group path related to the report')
