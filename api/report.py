@@ -2,14 +2,11 @@
 Report API
 '''
 import pymongo
-from bson.objectid import ObjectId
 from flask.globals import request
 from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
 
-from utils.query import add_skip_and_limit, serialize_raw_query
 from utils.group import get_subcategory_from_group
-from core.database import get_database
 from core import Namespace
 from models.report import Report, ReportStatus
 from models.campaign import Campaign
