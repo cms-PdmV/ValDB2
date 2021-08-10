@@ -87,7 +87,7 @@ export function UserGroupList(prop: UserGroupListProp): ReactElement {
   return (<>
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown}/>}>
-        { !expanded && prop.group.split('.')[prop.group.split('.').length - 1]}
+        { !expanded && <strong>{prop.group.split('.')[prop.group.split('.').length - 1]}</strong>}
         { expanded && <strong>{prop.group.replaceAll('.', '/')}</strong>}
       </AccordionSummary>
       <AccordionDetails>

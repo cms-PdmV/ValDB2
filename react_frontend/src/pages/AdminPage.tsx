@@ -17,7 +17,7 @@ export function AdminPage(): ReactElement {
             <ListItemSecondaryAction><FontAwesomeIcon icon={faChevronRight}/></ListItemSecondaryAction>
           </ListItem>
           <ListItem onClick={() => history.push('/admin/usergroups')} button>
-            <ListItemText primary="User Permission Group Management" />
+            <ListItemText primary="Add/Remove Permission" />
             <ListItemSecondaryAction><FontAwesomeIcon icon={faChevronRight}/></ListItemSecondaryAction>
           </ListItem>
         </List>
