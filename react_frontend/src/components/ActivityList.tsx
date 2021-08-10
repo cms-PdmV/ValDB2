@@ -44,7 +44,7 @@ export function ActivityList(prop: ActivityListProp): ReactElement {
   )
 
   return (<>
-    <a onClick={() => setFilter('all')} style={{textDecoration: filter === 'all' ? 'underline' : ''}}>All Activitis</a>
+    <a onClick={() => setFilter('all')} style={{textDecoration: filter === 'all' ? 'underline' : ''}}>All Activities</a>
     <Spacer inline />
     <a onClick={() => setFilter('activity')} style={{textDecoration: filter === 'activity' ? 'underline' : ''}}>Only Histories</a>
     <Spacer inline />
