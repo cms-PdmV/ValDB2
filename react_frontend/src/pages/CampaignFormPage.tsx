@@ -1,7 +1,7 @@
 import 'date-fns';
 import { faPlus, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Box, TextField } from "@material-ui/core";
+import { Button, Box, TextField, TextareaAutosize } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { CampaignCategoryList } from "../components/CampaignCategoryList";
 import { Container } from "../components/Container";
@@ -45,7 +45,9 @@ export function CampaignFormPage (): ReactElement {
   const isEdit: boolean = useMemo(() => mode === 'edit', [mode])
 
   const history = useHistory()
-  const { register, handleSubmit } = useForm<FormValue>();
+  const { register, handleSubmit, watch } = useForm<FormValue>();
+
+  const watchDescription = watch('description', '');
 
   const campaignSummary = (data: FormValue) => (
     <LabelGroup data={{
@@ -53,7 +55,7 @@ export function CampaignFormPage (): ReactElement {
       'Target Release': data.target_release|| campaign?.target_release || 'Empty',
       'Reference Release': data.reference_release|| campaign?.reference_release || 'Empty',
       Deadline: moment(selectedDate).format('YYYY-MM-DD'),
-      Description: data.description || campaign?.description || 'Empty',
+      Description: `\n${data.description}` || campaign?.description || 'Empty',
       Relmon: data.relmon || campaign?.relmon || 'Empty',
       Categories: selectedCategories?.join(', ') || (campaignCategories && getSubcategoriesPathFromCategories(campaignCategories).join(', ')) || '',
     }} />
@@ -124,17 +126,20 @@ export function CampaignFormPage (): ReactElement {
         <Spacer />
         <TextField {...register('name')} defaultValue={campaign?.name} variant="outlined" size="small" label="Campaign Name" placeholder="XX_XX_XX_xxxxx" style={{minWidth: '500px'}}/>
         <Spacer />
-        <TextField {...register('target_release')} defaultValue={campaign?.target_release} variant="outlined" size="small" label="Target Release"/>
+        <TextField {...register('target_release')} defaultValue={campaign?.target_release} variant="outlined" size="small" label="Target Release" style={{minWidth: '300px'}}/>
         <Spacer inline />
-        <TextField {...register('reference_release')} defaultValue={campaign?.reference_release} variant="outlined" size="small" label="Reference Release"/>
+        <TextField {...register('reference_release')} defaultValue={campaign?.reference_release} variant="outlined" size="small" label="Reference Release" style={{minWidth: '300px'}}/>
         <Spacer />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDatePicker disableToolbar format="yyyy-MM-dd" size="small" label="Deadline" value={selectedDate} inputVariant="outlined" onChange={handleDateChange} />
+          <KeyboardDatePicker minDate={campaign?.created_at || Date.now()} format="yyyy-MM-dd" size="small" label="Deadline" value={selectedDate} inputVariant="outlined" onChange={handleDateChange} />
         </MuiPickersUtilsProvider>
         <Spacer />
-        <TextField {...register('description')} defaultValue={campaign?.description} variant="outlined" size="small" fullWidth multiline rows={3} label="Description"/>
+        <Box position="relative">
+          <TextareaAutosize {...register('description')} className="text-area" defaultValue={campaign?.description} rowsMin={3} placeholder="Description"/>
+          { watchDescription && <Box position="absolute" top="-8px" left="12px" borderRadius="8px" fontSize="12px" color="dimgray" style={{background: 'white'}}>Description</Box>}
+        </Box>
         <Spacer />
-        <TextField {...register('relmon')} defaultValue={campaign?.relmon} variant="outlined" size="small" label="Relmon" style={{width: '280px'}} />
+        <TextField {...register('relmon')} defaultValue={campaign?.relmon} variant="outlined" size="small" label="Relmon" style={{minWidth: '600px'}} />
         {/* Campaign's Categories */}
         <Spacer rem={2} />
         <Box fontWeight="bold">Select target categories</Box>
