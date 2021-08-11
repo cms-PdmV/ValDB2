@@ -85,7 +85,8 @@ export function ReportHeader(prop: ReportHeaderProp): ReactElement {
 
   return (
     <Box marginTop="1rem" marginBottom="2rem">
-      <Box fontSize="2rem" fontWeight="bold">{prop.report.campaign_name}&nbsp;&nbsp;<CampaignStatus isOpen={prop.isCampaignOpen} /></Box>
+      <Box>Campaign Name:</Box>
+      <Box fontSize="2rem" fontWeight="bold" marginTop="-6px">{prop.report.campaign_name}&nbsp;&nbsp;<CampaignStatus isOpen={prop.isCampaignOpen} /></Box>
       <Spacer />
       <Chip label={prop.report.group.split('.').join(' / ')}/>
       <Spacer />

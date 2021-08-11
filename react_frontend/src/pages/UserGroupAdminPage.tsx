@@ -20,7 +20,7 @@ export function UserGroupAdminPage(): ReactElement {
   return (
     <Container>
       <Box display="flex">
-        <h1>User Groups</h1>
+        <h1>Add/Remove Permission</h1>
       </Box>
       <Spacer />
       { categories && <>

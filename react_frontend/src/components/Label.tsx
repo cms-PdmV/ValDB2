@@ -6,5 +6,5 @@ interface LabelProp {
 }
 
 export function Label(prop: LabelProp): ReactElement {
-  return (<p><strong>{prop.label}:</strong> {prop.value}</p>)
+  return (<p style={{ whiteSpace: 'break-spaces' }}><strong>{prop.label}:</strong> {prop.value}</p>)
 }

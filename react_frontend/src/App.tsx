@@ -23,7 +23,6 @@ import { UserGroupAdminPage } from "./pages/UserGroupAdminPage";
 import { ReactElement } from "react-markdown";
 import { useEffect } from "react";
 import { userService } from "./services";
-import { AssignedReportPage } from "./pages/AssignedReportPage";
 
 const theme = createMuiTheme({
   typography: {
@@ -76,11 +75,8 @@ function App(): ReactElement {
             <Route path="/campaigns">
               <AllCampaignPage />
             </Route>
-            <Route path="/assigned">
-              { require([UserRole.VALIDATOR]) && <AssignedReportPage /> }
-            </Route>
             <Route path="/reports">
-              { require([UserRole.ADMIN, UserRole.VALIDATOR]) && <MyReportPage /> }
+              { require([UserRole.VALIDATOR]) && <MyReportPage /> }
             </Route>
             <Route path="/admin/users/:id/edit">
               { require([UserRole.ADMIN]) && <UserFormAdminPage /> }

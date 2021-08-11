@@ -14,6 +14,8 @@ import { campaignService } from "../services";
 import { Campaign, Category, UserRole } from "../types";
 import { Modal, message } from "antd"
 import { CampaignStatus } from "../components/CampaignStatus";
+import { ReadMore } from "../components/ReadMore";
+import Linkify from "react-linkify";
 
 const { confirm } = Modal
 
@@ -84,9 +86,10 @@ export function CampaignPage(): ReactElement {
 
   return (
     <Container>
-      { campaign && <Box fontWeight="bold" fontSize="2rem">{campaign.name}&nbsp;&nbsp;<CampaignStatus isOpen={!isClosed} /></Box>}
+      <Box>Campaign Name:</Box>
+      { campaign && <Box fontWeight="bold" fontSize="2rem" marginTop="-6px">{campaign.name}&nbsp;&nbsp;<CampaignStatus isOpen={!isClosed} /></Box>}
       <Box height="1rem" />
-      <Box fontSize="1rem" color="#505050">{campaign?.description}</Box>
+      { campaign && <ReadMore text={campaign.description}/> }
       <Spacer rem={2} />
       <Chip label={`Target Release: ${campaign?.target_release || ''}`} />
       <Spacer inline />
@@ -96,7 +99,7 @@ export function CampaignPage(): ReactElement {
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign?.deadline && campaign?.deadline.split(' ')[0]}</Box>
       <Spacer rem={0.5} />
-      <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: {campaign?.relmon}</Box>
+      <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: <Linkify>{campaign?.relmon}</Linkify></Box>
       { user?.role === UserRole.ADMIN && <>
         <Spacer />
         <Button onClick={isClosed ? handleReopenCampaign : handleCloseCampaign} variant="contained" color="primary"><FontAwesomeIcon icon={isClosed ? faRedoAlt : faCheck} />&nbsp;&nbsp;{isClosed ? 'Reopen' : 'Close'}</Button>

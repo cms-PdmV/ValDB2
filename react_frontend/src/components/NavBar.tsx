@@ -28,12 +28,8 @@ export function NavBar(prop: NavBarProp): ReactElement {
       { prop.user && <Box marginLeft="auto" display="flex">
         <Button onClick={() => history.push('/campaigns')} style={currentPath === 'campaigns' ? selectedPathStyle : {}}>Campaigns</Button>
         <Box width="1rem" />
-        {/* { !(prop.user.role === UserRole.USER) && <>
-          <Button onClick={() => history.push('/reports')} style={currentPath === 'reports' ? selectedPathStyle : {}}>Reports</Button>
-          <Box width="1rem" />
-        </>} */}
         { prop.user.role === UserRole.VALIDATOR && <>
-          <Button onClick={() => history.push('/assigned')} style={currentPath === 'assigned' ? selectedPathStyle : {}}>Assigned Reports</Button>
+          <Button onClick={() => history.push('/reports')} style={currentPath === 'reports' ? selectedPathStyle : {}}>My Reports</Button>
           <Box width="1rem" />
         </>}
         { prop.user.role === UserRole.ADMIN && <>

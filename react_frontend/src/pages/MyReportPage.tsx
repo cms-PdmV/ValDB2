@@ -1,42 +1,22 @@
 import { Container } from "../components/Container";
-import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Box, Chip } from "@material-ui/core";
+import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, Chip } from "@material-ui/core";
 import { ReactElement, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { reportService } from "../services";
 import { Report } from "../types";
-import { PageLimit } from "../utils/constant";
-import { useContext } from "react";
-import { UserContext } from "../context/user";
-import { useCallback } from "react";
 import { DatetimeSpan } from "../components/DatetimeSpan";
 import { ReportStatusLabel } from "../components/ReportStatusLabel";
 
 export function MyReportPage(): ReactElement {
   const [reports, setReports] = useState<Report[]>([])
-  const [skip, setSkip] = useState<number>(0)
-  const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
 
-  const user = useContext(UserContext)
   const history = useHistory()
 
   useEffect(() => {
-    handleLoadReport()
-  }, [user])
-
-  const handleLoadReport =  useCallback(() => {
-    if (user) {
-      reportService.getByUser(skip, PageLimit, user.id).then(fetchedReports => {
-        const loadedReports = reports.concat(fetchedReports)
-        setReports(loadedReports)
-        if (fetchedReports.length < PageLimit) {
-          setSkip(skip + PageLimit)
-          setIsMaxPage(true)
-        } else {
-          setSkip(skip + PageLimit)
-        }
-      }).catch(error => alert(error))
-    }
-  }, [reports, skip, isMaxPage, user])
+    reportService.getAssigned().then(fetchedReports => {
+      setReports(fetchedReports)
+    })
+  }, [])
 
   return (
     <Container>
@@ -57,14 +37,9 @@ export function MyReportPage(): ReactElement {
                 <TableCell align="left"><strong>{report.campaign_name}</strong></TableCell>
                 <TableCell align="left"><Chip label={report.group.replaceAll('.', ' / ')}/></TableCell>
                 <TableCell align="left"><ReportStatusLabel status={report.status} /></TableCell>
-                <TableCell align="left"><DatetimeSpan datetime={report.created_at} /></TableCell>
+                <TableCell align="left">{report.created_at ? <DatetimeSpan datetime={report.created_at} updateDatetime={report.updated_at} /> : 'Not Created Yet'}</TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={handleLoadReport} style={{cursor: 'pointer'}}>
-              <Box padding="1rem">
-                Load More
-              </Box>
-            </a>}
           </TableBody>
         </Table>
       </TableContainer>

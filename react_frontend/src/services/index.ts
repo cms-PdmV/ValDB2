@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { Activity, Campaign, Category, Report, User, Attachment, Sorting } from '../types'
 import { parseSortingParam } from '../utils/request'
+import { Modal } from 'antd'
 
 const serverUrl = `${process.env.REACT_APP_SERVER_URL || '/valdb'}/api`
 
@@ -24,7 +25,10 @@ const response = <Type>(responseData: AxiosResponse<Type>): Type => {
 }
 
 const error = (errorData: AxiosError) => {
-    alert(`Error: ${errorData.response?.data.message || 'Unknown error'}`)
+    Modal.error({
+        title: 'Error!',
+        content: `${errorData.response?.data.message || 'Unknown error'}`,
+    })
 }
 
 export const campaignService = {
@@ -66,4 +70,5 @@ export const activityService = {
 
 export const attachmentService = {
     create: (body: FormData): Promise<Attachment> => axios.post(`${serverUrl}/attachment/`, body).then(response).catch(error),
+    remove: (attachmnetId: string): Promise<string> => axios.delete(`${serverUrl}/attachment/${attachmnetId}/`).then(response).catch(error),
 }

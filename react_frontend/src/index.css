@@ -50,6 +50,10 @@
   padding-bottom: 8px !important;
 }
 
+.MuiPickersModal-dialogRoot {
+  border-radius: 8px !important;
+}
+
 .ant-btn {
   background: #e5e5e5 !important;
   border-radius: 4px;
@@ -98,6 +102,13 @@
 
 .attachment-item:hover {
   box-shadow: rgb(100 100 111 / 20%) 0px 6px 10px 0px !important;
+}
+
+.text-area {
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 100%;
+  border: solid 1px lightgray;
 }
 
 h1 { 

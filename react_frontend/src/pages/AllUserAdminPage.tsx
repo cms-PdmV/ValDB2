@@ -76,7 +76,7 @@ export function AllUserAdminPage(): ReactElement {
   return (
     <Container>
       <Box display="flex" alignItems="center">
-        <h1>Users</h1>
+        <h1>All Users</h1>
         <Spacer inline grow />
         <Box>
           <TextField value={searchValue} onChange={e => setSearchValue(e.target.value)} onKeyPressCapture={e => { if (e.key === 'Enter') { handleSearch(); } }} placeholder="Search..." variant="outlined" size="small" style={{minWidth: '300px', height: '36px'}}></TextField>
