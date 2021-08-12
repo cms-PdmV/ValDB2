@@ -34,7 +34,8 @@ class CampaignListAPI(Resource):
         sorting = parse_list_of_tuple(query_params.get('sort'))
         database_query = build_query(['name'], query_params)
         query = get_database().database[Campaign.get_collection_name()] \
-            .find(database_query, {'reports': False})
+            .find(database_query, {'reports': False}) \
+            .collation({'locale': 'en_US', 'numericOrdering': True})
         if sorting:
             query.sort(build_sort(sorting))
         add_skip_and_limit(query, query_params)
