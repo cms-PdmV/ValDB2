@@ -17,5 +17,6 @@ class Attachment(Model):
     def dict(self):
         dict_data = super().dict()
         dict_data.pop('content')
-        dict_data['url'] = f'{os.getenv("HOST_URL")}/file/{dict_data["id"]}'
+        host_url = os.getenv('HOST_URL', '')
+        dict_data['url'] = f'{host_url}file/{dict_data["id"]}'
         return dict_data
