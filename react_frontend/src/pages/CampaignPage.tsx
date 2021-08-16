@@ -53,13 +53,13 @@ export function CampaignPage(): ReactElement {
   const handleCloseCampaign = () => {
     if (campaign) {
       confirm({
-        title: 'Do you want to close this campaign?',
-        content: 'Validators cannot modify report on closed campaigns. You can also choose to reopen the campaign again.',
-        okText: 'Close Campaign',
+        title: 'Do you want to sign off this campaign?',
+        content: 'Validators cannot modify report on singed off campaigns. You can also choose to reopen the campaign again.',
+        okText: 'Sign Off',
         onOk: () => {
           campaignService.update(campaign.id, { is_open: false }).then(updatedCampaign => {
             setCampaign(updatedCampaign)
-            message.success('This campaign is closed')
+            message.success('This campaign is signed off')
           })
         }
       })
@@ -102,7 +102,7 @@ export function CampaignPage(): ReactElement {
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: <Linkify>{campaign?.relmon}</Linkify></Box>
       { user?.role === UserRole.ADMIN && <>
         <Spacer />
-        <Button onClick={isClosed ? handleReopenCampaign : handleCloseCampaign} variant="contained" color="primary"><FontAwesomeIcon icon={isClosed ? faRedoAlt : faCheck} />&nbsp;&nbsp;{isClosed ? 'Reopen' : 'Close'}</Button>
+        <Button onClick={isClosed ? handleReopenCampaign : handleCloseCampaign} variant="contained" color="primary"><FontAwesomeIcon icon={isClosed ? faRedoAlt : faCheck} />&nbsp;&nbsp;{isClosed ? 'Reopen' : 'Sign Off'}</Button>
         <Spacer inline />
         <Button onClick={handleEditCampaign} variant="contained" color="primary"><FontAwesomeIcon icon={faPen} />&nbsp;&nbsp;Edit</Button>
       </>}
