@@ -53,13 +53,13 @@ export function CampaignPage(): ReactElement {
   const handleCloseCampaign = () => {
     if (campaign) {
       confirm({
-        title: 'Do you want to close this campaign?',
-        content: 'Validators cannot modify report on closed campaigns. You can also choose to reopen the campaign again.',
-        okText: 'Close Campaign',
+        title: 'Do you want to sign off this campaign?',
+        content: 'Validators cannot modify report on singed off campaigns. You can also choose to reopen the campaign again.',
+        okText: 'Sign Off',
         onOk: () => {
           campaignService.update(campaign.id, { is_open: false }).then(updatedCampaign => {
             setCampaign(updatedCampaign)
-            message.success('This campaign is closed')
+            message.success('This campaign is signed off')
           })
         }
       })
