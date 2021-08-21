@@ -23,7 +23,7 @@ class AuthorizationMiddleware:
 
         if email and username:
             environ['user'] = {
-                'email': email,
+                'email': email.lower(),
                 'username': username,
                 'fullname': fullname,
             }
