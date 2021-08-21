@@ -9,8 +9,8 @@ interface ReadMoreProp {
 
 export function ReadMore(prop: ReadMoreProp): ReactElement {
     const length = prop.length || 250
-    const shouldShowReadMore = prop.text.length > length
-    const [text, setText] = useState<string>(prop.text.slice(0, length))
+    const shouldShowReadMore = prop.text ? prop.text.length > length : false
+    const [text, setText] = useState<string>(prop.text ? prop.text.slice(0, length) : '')
     const [showAll, setShowAll] = useState<boolean>(false)
 
     const handleShowHide = () => {
