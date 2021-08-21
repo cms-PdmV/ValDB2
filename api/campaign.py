@@ -86,6 +86,8 @@ class CampaignGetAPI(Resource):
                     'subcategories': [],
                 }
             subcategory = category_subcategory.split('.')[1]
+            if subcategory not in group[category]:
+                continue
             groups = [f'{category_subcategory}.{each_group}'
                 for each_group in group[category][subcategory]
             ]
