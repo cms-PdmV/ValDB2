@@ -18,7 +18,7 @@ export const DatetimeSpan = (prop: { datetime: string, updateDatetime?: string }
   }, 60000)
 
   return (
-    <Tooltip title={`${datetimeToString(prop.datetime)}${prop.updateDatetime && ` (Last Update: ${updateText})`}`}>
+    <Tooltip title={`${datetimeToString(prop.datetime)}${prop.updateDatetime ? ` (Last Update: ${updateText})` : ''}`}>
       <span>{text}</span>
     </Tooltip>
   )
