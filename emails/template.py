@@ -2,6 +2,7 @@ from services.email import EmailService
 
 class EmailAddress:
     forum = 'hn-cms-relval@cern.ch'
+    dev = 'chanchana.wicha@cern.ch'
 
 def render_template(template_path, **kwargs):
     with open(template_path) as f:
