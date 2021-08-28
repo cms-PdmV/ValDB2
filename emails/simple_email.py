@@ -7,3 +7,5 @@ class SimpleEmailTemplate(EmailTemplate):
         self.subject = f'[TEST] {subject}'
         self.recipients = ['wic.chanchana@gmail.com']
         self.body = render_template(SIMPLE_TEMPLATE, content=content)
+        return self
+
