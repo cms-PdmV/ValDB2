@@ -9,3 +9,6 @@ class SimpleEmailTemplate(EmailTemplate):
         self.body = render_template(SIMPLE_TEMPLATE, content=content)
         return self
 
+
+from emails.simple_email import SimpleEmailTemplate
+SimpleEmailTemplate().build(content='<br>abc', subject='cern 1').send()
