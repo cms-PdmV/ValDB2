@@ -29,5 +29,5 @@ class AuthorizationMiddleware:
             }
             return self.app(environ, start_response)
 
-        res = Response(u'Authorization failed', mimetype= 'text/plain', status=401)
+        res = Response('Authorization failed', mimetype= 'text/plain', status=401)
         return res(environ, start_response)
