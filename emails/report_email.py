@@ -1,4 +1,8 @@
-from models.report import Report
+import markdown
+
+from utils.datetime import format_datetime
+from models.activity import Activity
+from models.report import Report, REPORT_STATUS_LABEL, ReportStatus
 from emails.template import EmailAddress, EmailTemplate, render_template
 
 MODIFY_REPORT_TEMPLATE = 'emails/templates/modify_report_template.html'
@@ -27,6 +31,14 @@ class ModifyReportEmailTemplate(EmailTemplate):
         self.subject = f'[ValDB][{report.campaign_name}][{group_label(report.group)}] Report has been modified'
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [EmailAddress.dev] + get_author_emails(report)
+        self.body = render_template(MODIFY_REPORT_TEMPLATE,
+            campaign_name=report.campaign_name,
+            group=group_label(report.group),
+            status=REPORT_STATUS_LABEL[report.status],
+            authors=', '.join([user.fullname for user in report.authors]),
+            updated_at_string=format_datetime(report.updated_at),
+            content=markdown.markdown(report.content)
+        )
         return self
 
 class ChangeStatusReportEmailTemplate(EmailTemplate):
@@ -36,10 +48,18 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
     Recipients: forum, report's authors
     Template: change_status_report_template.html
     '''
-    def build(self, report: Report):
+    def build(self, report: Report, previous_status: ReportStatus):
         self.subject = f'[ValDB][{report.campaign_name}][{group_label(report.group)}] Report\'s status has been changed'
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [EmailAddress.dev] + get_author_emails(report)
+        self.body = render_template(CHANGE_STATUS_REPORT_TEMPLATE,
+            campaign_name=report.campaign_name,
+            group=group_label(report.group),
+            old_status=REPORT_STATUS_LABEL[previous_status],
+            new_status=REPORT_STATUS_LABEL[report.status],
+            authors=', '.join([user.fullname for user in report.authors]),
+            updated_at_string=format_datetime(report.updated_at)
+        )
         return self
 
 class NewCommentReportEmailTemplate(EmailTemplate):
@@ -49,8 +69,19 @@ class NewCommentReportEmailTemplate(EmailTemplate):
     Recipients: forum, report's authors, related users
     Template: new_comment_report_template.html
     '''
-    def build(self, report: Report):
+    def build(self, report: Report, activity: Activity):
         self.subject = f'[ValDB][{report.campaign_name}][{group_label(report.group)}] New comment'
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [EmailAddress.dev] + get_related_emails(report)
+        self.body = render_template(NEW_COMMENT_REPORT_TEMPLATE,
+            campaign_name=report.campaign_name,
+            group=group_label(report.group),
+            status=REPORT_STATUS_LABEL[report.status],
+            authors=', '.join([user.fullname for user in report.authors]),
+            updated_at_string=format_datetime(report.updated_at),
+            comment_created_at_string=format_datetime(activity.created_at),
+            user_fullname=activity.user.fullname,
+            user_email=activity.user.email,
+            comment=activity.content,
+        )
         return self

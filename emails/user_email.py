@@ -1,4 +1,4 @@
-from models.user import User
+from models.user import USER_ROLE_LABEL, User
 from emails.template import EmailAddress, EmailTemplate, render_template
 
 CHANGE_USER_ROLE_TEMPLATE = 'emails/templates/change_user_role_template.html'
@@ -15,6 +15,9 @@ class ChangeUserRoleEmailTemplate(EmailTemplate):
         self.subject = f'[ValDB] Your role has been modified'
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [user.email]
+        self.body = render_template(CHANGE_USER_ROLE_TEMPLATE,
+            role=USER_ROLE_LABEL[user.role]
+        )
         return self
 
 class ChangeUserPermissionEmailTemplate(EmailTemplate):
@@ -24,8 +27,13 @@ class ChangeUserPermissionEmailTemplate(EmailTemplate):
     Recipients: target user
     Template: change_user_permission_template.html
     '''
-    def build(self, user: User):
+    def build(self, user: User, action: str, group: str):
         self.subject = f'[ValDB] Your permission group has been modified'
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [user.email]
+        self.body = render_template(CHANGE_USER_PERMISSION_TEMPLATE,
+            action='added' if action == 'add' else 'removed',
+            prep='to' if action == 'add' else 'from',
+            group=group
+        )
         return self

@@ -20,6 +20,15 @@ class ReportStatus(Enum):
     IN_PROGRESS = 5
     KNOWN_ISSUE = 6
 
+REPORT_STATUS_LABEL = {
+    ReportStatus.OK: 'OK',
+    ReportStatus.NOT_YET_DONE: 'Not Yet Done',
+    ReportStatus.FAILURE: 'Failure',
+    ReportStatus.CHANGES_EXPECTED: 'Changes Expected',
+    ReportStatus.IN_PROGRESS: 'In Progress',
+    ReportStatus.KNOWN_ISSUE: 'Known Issue',
+}
+
 class Report(Model):
     '''
     Report model
