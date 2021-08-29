@@ -25,6 +25,10 @@ class OpenCampaignEmailTemplate(EmailTemplate):
             created_at_string=format_datetime(campaign.created_at),
             description=campaign.description
         )
+        # TODO: remove debug print
+        print('Email Event')
+        print(self.subject)
+        print([EmailAddress.forum])
         return self
 
 class SignOffCampaignEmailTemplate(EmailTemplate):
@@ -47,4 +51,8 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
             updated_at_string=format_datetime(campaign.updated_at),
             description=campaign.description
         )
+        # TODO: remove debug print
+        print('Email Event')
+        print(self.subject)
+        print([EmailAddress.forum])
         return self

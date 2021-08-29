@@ -18,6 +18,10 @@ class ChangeUserRoleEmailTemplate(EmailTemplate):
         self.body = render_template(CHANGE_USER_ROLE_TEMPLATE,
             role=USER_ROLE_LABEL[user.role]
         )
+        # TODO: remove debug print
+        print('Email Event')
+        print(self.subject)
+        print([user.email])
         return self
 
 class ChangeUserPermissionEmailTemplate(EmailTemplate):
@@ -36,4 +40,8 @@ class ChangeUserPermissionEmailTemplate(EmailTemplate):
             prep='to' if action == 'add' else 'from',
             group=group
         )
+        # TODO: remove debug print
+        print('Email Event')
+        print(self.subject)
+        print([user.email])
         return self
