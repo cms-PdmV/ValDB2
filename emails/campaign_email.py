@@ -1,5 +1,5 @@
 from models.campaign import Campaign
-from emails.template import EmailAddress, EmailTemplate, render_template
+from emails.template import EmailAddress, EmailTemplate, render_template, format_new_line
 from utils.datetime import format_datetime
 
 OPEN_CAMPAIGN_TEMPLATE = 'emails/templates/open_campaign_template.html'
@@ -23,7 +23,7 @@ class OpenCampaignEmailTemplate(EmailTemplate):
             target_groups=', '.join(campaign.subcategories),
             deadline_string=format_datetime(campaign.deadline),
             created_at_string=format_datetime(campaign.created_at),
-            description=campaign.description
+            description=format_new_line(campaign.description)
         )
         # TODO: remove debug print
         print('Email Event')
@@ -49,7 +49,7 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
             target_groups=', '.join(campaign.subcategories),
             deadline_string=format_datetime(campaign.deadline),
             updated_at_string=format_datetime(campaign.updated_at),
-            description=campaign.description
+            description=format_new_line(campaign.description)
         )
         # TODO: remove debug print
         print('Email Event')

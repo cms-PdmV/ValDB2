@@ -4,6 +4,9 @@ class EmailAddress:
     forum = 'hn-cms-relval@cern.ch'
     dev = 'chanchana.wicha@cern.ch'
 
+def format_new_line(html):
+    return html.replace('\n', '<br>')
+
 def render_template(template_path, **kwargs):
     with open(template_path) as f:
         html_template = f.read()

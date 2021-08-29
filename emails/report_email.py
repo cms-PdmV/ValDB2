@@ -3,7 +3,7 @@ import markdown
 from utils.datetime import format_datetime
 from models.activity import Activity
 from models.report import Report, REPORT_STATUS_LABEL, ReportStatus
-from emails.template import EmailAddress, EmailTemplate, render_template
+from emails.template import EmailAddress, EmailTemplate, render_template, format_new_line
 
 MODIFY_REPORT_TEMPLATE = 'emails/templates/modify_report_template.html'
 CHANGE_STATUS_REPORT_TEMPLATE = 'emails/templates/change_status_report_template.html'
@@ -37,7 +37,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
             status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=', '.join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
-            content=markdown.markdown(report.content)
+            content=format_new_line(markdown.markdown(report.content))
         )
         # TODO: remove debug print
         print('Email Event')
