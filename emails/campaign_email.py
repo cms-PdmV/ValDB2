@@ -16,9 +16,12 @@ class OpenCampaignEmailTemplate(EmailTemplate):
     Template: open_campaign_template.html
     '''
     def build(self, campaign: Campaign):
+        '''
+        build email
+        '''
         self.subject = f'[ValDB][{campaign.name}] Campaign is now open'
         self.recipients = [EmailAddress.forum]
-        self.body = render_template(OPEN_CAMPAIGN_TEMPLATE, 
+        self.body = render_template(OPEN_CAMPAIGN_TEMPLATE,
             name=campaign.name,
             target_release=campaign.target_release,
             reference_release=campaign.reference_release,
@@ -37,9 +40,12 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
     Template: sign_off_campaign_template.html
     '''
     def build(self, campaign: Campaign):
+        '''
+        build email
+        '''
         self.subject = f'[ValDB][{campaign.name}] Campaign has been signed off'
         self.recipients = [EmailAddress.forum]
-        self.body = render_template(SIGN_OFF_CAMPAIGN_TEMPLATE, 
+        self.body = render_template(SIGN_OFF_CAMPAIGN_TEMPLATE,
             name=campaign.name,
             target_release=campaign.target_release,
             reference_release=campaign.reference_release,

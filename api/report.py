@@ -105,7 +105,7 @@ class ReportAPI(Resource):
         body: Report
         '''
         report = Report.get(reportid)
-        previous_report_Status = report.status
+        previous_report_status = report.status
         user = User.get_from_request(request)
         if report.group not in user.groups:
             raise Forbidden()
@@ -121,5 +121,5 @@ class ReportAPI(Resource):
             report.save()
             ModifyReportEmailTemplate().build(report).send()
         if 'status' in api.payload:
-            ChangeStatusReportEmailTemplate().build(report, previous_report_Status).send()
+            ChangeStatusReportEmailTemplate().build(report, previous_report_status).send()
         return report.dict()

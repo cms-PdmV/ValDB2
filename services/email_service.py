@@ -1,9 +1,9 @@
 """
 Email Service
 """
+from email.message import EmailMessage
 import logging
 import smtplib
-from email.message import EmailMessage
 
 _logger = logging.getLogger('service.email')
 

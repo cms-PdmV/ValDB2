@@ -16,7 +16,10 @@ class ChangeUserRoleEmailTemplate(EmailTemplate):
     Template: change_user_role_template.html
     '''
     def build(self, user: User):
-        self.subject = f'[ValDB] Your role has been modified'
+        '''
+        build email
+        '''
+        self.subject = '[ValDB] Your role has been modified'
         self.recipients = [user.email]
         self.body = render_template(CHANGE_USER_ROLE_TEMPLATE,
             role=USER_ROLE_LABEL[UserRole(user.role)]
@@ -31,7 +34,10 @@ class ChangeUserPermissionEmailTemplate(EmailTemplate):
     Template: change_user_permission_template.html
     '''
     def build(self, user: User, action: str, group: str):
-        self.subject = f'[ValDB] Your permission group has been modified'
+        '''
+        build email
+        '''
+        self.subject = '[ValDB] Your permission group has been modified'
         self.recipients = [user.email]
         self.body = render_template(CHANGE_USER_PERMISSION_TEMPLATE,
             action='added' if action == 'add' else 'removed',
