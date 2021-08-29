@@ -40,7 +40,7 @@ class ActivityAPI(Resource):
         if not report.activities:
             report.activities = []
         report.activities.append(activity)
-        report.save()
-        if activity.type == ActivityType.COMMENT:
+        report = report.save()
+        if activity.type == ActivityType.COMMENT.value:
             NewCommentReportEmailTemplate().build(report, activity).send()
         return 'ok'

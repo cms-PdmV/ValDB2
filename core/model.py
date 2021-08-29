@@ -181,7 +181,7 @@ class Model():
                 self._get_data_store_object(self.__dict__)
             )
             self.id = saved_data_id # pylint: disable=C0103
-        return self
+        return self.get(self.id)
 
     def update(self: T, data: Dict, validate=True) -> T:
         '''
@@ -190,8 +190,7 @@ class Model():
         for key in data:
             if key in self.get_annotations():
                 setattr(self, key, data[key])
-        self.save(validate=validate)
-        return self
+        return self.save(validate=validate)
 
     @classmethod
     def get_collection_name(cls: T):

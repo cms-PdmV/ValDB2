@@ -1,3 +1,4 @@
+from services.email import EmailService
 from core import TestCase
 from models.user import User, UserRole
 from lookup.user_group import UserGroupLookup
@@ -8,6 +9,9 @@ administrator_key = 'Administrator'
 group1 = 'Reconstruction.Data.Tracker'
 group2 = 'Reconstruction.Data.Ecal'
 group3 = 'HLT.FullSim.Top'
+
+def send_mock(subjecy, body, recipients):
+    pass
 
 class UserGroupAPITest(TestCase):
 
@@ -70,6 +74,7 @@ class UserGroupAPITest(TestCase):
         self.assertEqual(self.lookup.table[group1].count(result[0].id), 1)
 
     def test_add_user_to_group(self):
+        EmailService.send = send_mock
         UserGroupController.add_user_to_group(self.user3.email, group1)
         user3 = User.get(self.user3.id)
         self.assertEqual(user3.role, UserRole.VALIDATOR)
@@ -77,6 +82,7 @@ class UserGroupAPITest(TestCase):
         self.assertIn(user3.id, self.lookup.table[group1])
 
     def test_remove_user_to_group(self):
+        EmailService.send = send_mock
         UserGroupController.remove_user_from_group(self.user1.id, group1)
         user1 = User.get(self.user1.id)
         self.assertEqual(user1.role, UserRole.VALIDATOR)
