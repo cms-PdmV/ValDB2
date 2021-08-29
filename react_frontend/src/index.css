@@ -180,6 +180,10 @@ pre {
   border-radius: 4px;
 }
 
+p {
+  white-space: pre-wrap;
+}
+
 input {
   background: #ffffff !important;
 }
