@@ -119,6 +119,7 @@ class UserGroupController():
                     user.role = UserRole.USER
                     user.groups = []
                     user.save()
+                    ChangeUserRoleEmailTemplate().build(user).send()
                 else:
                     if group in user.groups:
                         user.groups.remove(group)
