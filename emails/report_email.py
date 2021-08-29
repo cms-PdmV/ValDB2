@@ -34,7 +34,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
         self.body = render_template(MODIFY_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
             group=group_label(report.group),
-            status=REPORT_STATUS_LABEL[report.status],
+            status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=', '.join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
             content=markdown.markdown(report.content)
@@ -59,8 +59,8 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
         self.body = render_template(CHANGE_STATUS_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
             group=group_label(report.group),
-            old_status=REPORT_STATUS_LABEL[previous_status],
-            new_status=REPORT_STATUS_LABEL[report.status],
+            old_status=REPORT_STATUS_LABEL[ReportStatus(previous_status)],
+            new_status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=', '.join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at)
         )
@@ -84,7 +84,7 @@ class NewCommentReportEmailTemplate(EmailTemplate):
         self.body = render_template(NEW_COMMENT_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
             group=group_label(report.group),
-            status=REPORT_STATUS_LABEL[report.status],
+            status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=', '.join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
             comment_created_at_string=format_datetime(activity.created_at),

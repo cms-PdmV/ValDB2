@@ -1,4 +1,4 @@
-from models.user import USER_ROLE_LABEL, User
+from models.user import USER_ROLE_LABEL, User, UserRole
 from emails.template import EmailAddress, EmailTemplate, render_template
 
 CHANGE_USER_ROLE_TEMPLATE = 'emails/templates/change_user_role_template.html'
@@ -16,7 +16,7 @@ class ChangeUserRoleEmailTemplate(EmailTemplate):
         self.recipients = [EmailAddress.dev] # TODO: change to actual
         # self.recipients = [user.email]
         self.body = render_template(CHANGE_USER_ROLE_TEMPLATE,
-            role=USER_ROLE_LABEL[user.role]
+            role=USER_ROLE_LABEL[UserRole(user.role)]
         )
         # TODO: remove debug print
         print('Email Event')
