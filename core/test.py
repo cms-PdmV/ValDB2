@@ -21,7 +21,7 @@ class TestCase(unittest.TestCase):
         '''
         Check that test database should not be the same as running database
         '''
-        with open('.env') as file:
+        with open('.env', encoding='utf-8') as file:
             for line in file:
                 line = line.split('=')
                 if line[0] == DATABASE_NAME_KEY:
