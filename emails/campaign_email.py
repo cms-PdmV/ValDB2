@@ -1,3 +1,6 @@
+'''
+Campaign Emails
+'''
 from models.campaign import Campaign
 from emails.template import EmailAddress, EmailTemplate, render_template, format_new_line
 from utils.datetime import format_datetime
@@ -14,8 +17,7 @@ class OpenCampaignEmailTemplate(EmailTemplate):
     '''
     def build(self, campaign: Campaign):
         self.subject = f'[ValDB][{campaign.name}] Campaign is now open'
-        self.recipients = [EmailAddress.dev] # TODO: change to actual
-        # self.recipients = [EmailAddress.forum]
+        self.recipients = [EmailAddress.forum]
         self.body = render_template(OPEN_CAMPAIGN_TEMPLATE, 
             name=campaign.name,
             target_release=campaign.target_release,
@@ -25,10 +27,6 @@ class OpenCampaignEmailTemplate(EmailTemplate):
             created_at_string=format_datetime(campaign.created_at),
             description=format_new_line(campaign.description)
         )
-        # TODO: remove debug print
-        print('Email Event')
-        print(self.subject)
-        print([EmailAddress.forum])
         return self
 
 class SignOffCampaignEmailTemplate(EmailTemplate):
@@ -40,8 +38,7 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
     '''
     def build(self, campaign: Campaign):
         self.subject = f'[ValDB][{campaign.name}] Campaign has been signed off'
-        self.recipients = [EmailAddress.dev] # TODO: change to actual
-        # self.recipients = [EmailAddress.forum]
+        self.recipients = [EmailAddress.forum]
         self.body = render_template(SIGN_OFF_CAMPAIGN_TEMPLATE, 
             name=campaign.name,
             target_release=campaign.target_release,
@@ -51,8 +48,4 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
             updated_at_string=format_datetime(campaign.updated_at),
             description=format_new_line(campaign.description)
         )
-        # TODO: remove debug print
-        print('Email Event')
-        print(self.subject)
-        print([EmailAddress.forum])
         return self

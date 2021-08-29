@@ -23,7 +23,7 @@ class EmailService():
         message['Subject'] = subject
         message['From'] = 'PdmV Service Account <pdmvserv@cern.ch>'
         message['To'] = ', '.join(recipients)
-        # message['Cc'] = 'pdmvserv@cern.ch' # TODO: uncomment
+        message['Cc'] = 'pdmvserv@cern.ch'
 
         smtp = smtplib.SMTP()
         smtp.connect()
