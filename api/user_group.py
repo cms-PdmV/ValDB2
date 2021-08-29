@@ -5,7 +5,7 @@ from flask.globals import request
 from flask_restx import Resource
 from werkzeug.exceptions import BadRequest
 
-from emails.user_email import ChangeUserPermissionEmailTemplate
+from emails.user_email import ChangeUserPermissionEmailTemplate, ChangeUserRoleEmailTemplate
 from data.group import get_all_groups
 from models.user import User, UserRole
 from lookup.user_group import UserGroupLookup, ADMINISTRATOR_KEY
@@ -95,6 +95,7 @@ class UserGroupController():
 
             if target_role == UserRole.ADMIN:
                 user.groups = get_all_groups()
+                ChangeUserRoleEmailTemplate().build(user).send()
             elif target_role == UserRole.VALIDATOR:
                 if group not in user.groups:
                     user.groups.append(group)
