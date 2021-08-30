@@ -1,0 +1,33 @@
+<html style="font-family: sans-serif">
+    <strong style="font-size: 24px;">New comment has been added to the following report.</strong>
+    <br><br>
+    <table>
+        <tr>
+            <td><strong>Campaign Name:</strong></td>
+            <td>{{campaign_name}}</td>
+        </tr>
+        <tr>
+            <td><strong>Group:</strong></td>
+            <td>{{group}}</td>
+        </tr>
+        <tr>
+            <td><strong>Status:</strong></td>
+            <td>{{status}}</td>
+        </tr>
+        <tr>
+            <td><strong>Authors:</strong></td>
+            <td>{{authors}}</td>
+        </tr>
+        <tr>
+            <td><strong>Updated at:</strong></td>
+            <td>{{updated_at_string}}</td>
+        </tr>
+    </table>
+    <br><br>
+    <div style="font-family: sans-serif;border: rgb(126, 126, 126) 2px solid;padding: 10px 8px;border-radius: 8px;">
+        {{comment_created_at_string}}<br>
+        <strong>{{user_fullname}}</strong> ({{user_email}}) <span style="color:rgb(199, 199, 199)">add new comment.</span><br>
+        <br>
+        {{comment}}
+    </div>
+</html>

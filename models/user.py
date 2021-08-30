@@ -18,6 +18,12 @@ class UserRole(Enum):
     VALIDATOR = 2
     USER = 3
 
+USER_ROLE_LABEL = {
+    UserRole.ADMIN: 'Administrator',
+    UserRole.VALIDATOR: 'Validator',
+    UserRole.USER: 'Base User',
+}
+
 class User(Model):
     '''
     User model

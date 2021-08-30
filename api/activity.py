@@ -4,8 +4,9 @@ Activity API
 from flask.globals import request
 from flask_restx import Resource
 
+from emails.report_email import NewCommentReportEmailTemplate
 from models.report import Report
-from models.activity import Activity
+from models.activity import Activity, ActivityType
 from models.user import User
 from core import Namespace
 
@@ -39,5 +40,7 @@ class ActivityAPI(Resource):
         if not report.activities:
             report.activities = []
         report.activities.append(activity)
-        report.save()
+        report = report.save()
+        if activity.type == ActivityType.COMMENT:
+            NewCommentReportEmailTemplate().build(report, activity).send()
         return 'ok'

@@ -43,7 +43,8 @@ class UserGroupLookup():
         self.table[ADMINISTRATOR_KEY] = [administrator.id for administrator in administrators]
         for validator in validators:
             for group in validator.groups:
-                self.table[group].append(validator.id)
+                if group in self.table:
+                    self.table[group].append(validator.id)
 
     def add_user_to_group(self, user_id: ObjectId, group: str):
         '''

@@ -6,6 +6,7 @@ import logging
 from flask.globals import request
 from flask_restx import Resource
 
+from emails.user_email import ChangeUserRoleEmailTemplate
 from utils.query import add_skip_and_limit, build_query, build_sort, serialize_raw_query
 from utils.user import require_permission
 from utils.request import parse_list_of_tuple
@@ -120,6 +121,8 @@ class UserAPI(Resource):
         user.update(body)
         lookup = UserGroupLookup()
         lookup.update()
+        if 'role' in api.payload:
+            ChangeUserRoleEmailTemplate().build(user).send()
         return user.dict()
 
     def delete(self, userid):

@@ -6,6 +6,7 @@ from flask.globals import request
 from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
 
+from emails.report_email import ModifyReportEmailTemplate, ChangeStatusReportEmailTemplate
 from utils.group import get_subcategory_from_group
 from core import Namespace
 from models.report import Report, ReportStatus
@@ -104,6 +105,7 @@ class ReportAPI(Resource):
         body: Report
         '''
         report = Report.get(reportid)
+        previous_report_status = report.status
         user = User.get_from_request(request)
         if report.group not in user.groups:
             raise Forbidden()
@@ -117,4 +119,7 @@ class ReportAPI(Resource):
             new_authors = [user] + previous_authors
             report.authors = new_authors
             report.save()
+            ModifyReportEmailTemplate().build(report).send()
+        if 'status' in api.payload:
+            ChangeStatusReportEmailTemplate().build(report, previous_report_status).send()
         return report.dict()

@@ -4,6 +4,7 @@ Campaign API
 from flask.globals import request
 from flask_restx import Resource
 
+from emails.campaign_email import OpenCampaignEmailTemplate, SignOffCampaignEmailTemplate
 from utils.query import add_skip_and_limit, build_query, build_sort
 from utils.user import require_permission
 from utils.request import parse_list_of_tuple
@@ -53,6 +54,7 @@ class CampaignListAPI(Resource):
         campaign.parse_datetime()
         campaign.reports = []
         campaign.save()
+        OpenCampaignEmailTemplate().build(campaign).send()
         return campaign.dict()
 
 
@@ -86,6 +88,8 @@ class CampaignGetAPI(Resource):
                     'subcategories': [],
                 }
             subcategory = category_subcategory.split('.')[1]
+            if subcategory not in group[category]:
+                continue
             groups = [f'{category_subcategory}.{each_group}'
                 for each_group in group[category][subcategory]
             ]
@@ -120,4 +124,6 @@ class CampaignAPI(Resource):
             for report in campaign.reports:
                 report.campaign_name = campaign.name
                 report.save()
+        if 'is_open' in api.payload and api.payload['is_open'] is False:
+            SignOffCampaignEmailTemplate().build(campaign).send()
         return campaign.dict()
