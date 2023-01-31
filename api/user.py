@@ -22,12 +22,13 @@ _logger = logging.getLogger('api.user')
 
 user_model = api.model(User)
 
-def precess_payload(body):
+def process_payload(body):
     '''
     Process payload from api
     - if role is admin, then append all roles to user
     - if role is user, then remoce all roles from user
     '''
+    # TODO: What happens with the validator role?
     if 'role' in body:
         if body['role'] == UserRole.ADMIN.value:
             body['groups'] = get_all_groups()
@@ -57,14 +58,20 @@ class UserListAPI(Resource):
     @api.marshal_with(user_model)
     def post(self):
         '''
-        Create new user
+        Create new user. This endpoint could be usefull to bulk and migrate data.
         '''
+        # TODO: For the future, allow this operation only to some type of "super admin"
         require_permission(request, [UserRole.ADMIN])
+        # Check if user already exists
+        # For this moment, assume you will receive the username inside the body
         body = api.payload
-        precess_payload(body)
-        user = User(body).save()
-        lookup = UserGroupLookup()
-        lookup.update()
+        new_username = body.get('username')
+        user = User.get_by_username(new_username)
+        if not user:
+            process_payload(body)
+            user = User(body).save()
+            lookup = UserGroupLookup()
+            lookup.update()
         return user.dict()
 
 @api.route('/me/')
@@ -77,12 +84,18 @@ class UserInfoAPI(Resource):
         Get current user info from request
         '''
         email = request.environ.get('user').get('email')
+        username = request.environ.get('user').get('username')
         fullname = request.environ.get('user').get('fullname')
-        _logger.info('User info request: %s', email)
-        existed_user = User.get_by_email(email)
+        _logger.info('User info request - Username: %s - Email: %s', username, email)
+        existed_user = User.get_by_username(username=username)
         if not existed_user:
-            _logger.info('User not existed. Create new user with email: %s', email)
+            _logger.info(
+                'User is not registered in the app. Register user: %s - email: %s',
+                username,
+                email
+            )
             existed_user = User({
+                'username': username,
                 'role': UserRole.USER,
                 'email': email,
                 'fullname': fullname,
@@ -116,7 +129,7 @@ class UserAPI(Resource):
         '''
         require_permission(request, [UserRole.ADMIN])
         body = api.payload
-        precess_payload(body)
+        process_payload(body)
         user = User.get(userid)
         user.update(body)
         lookup = UserGroupLookup()

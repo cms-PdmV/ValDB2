@@ -28,6 +28,7 @@ class User(Model):
     '''
     User model
     '''
+    username: str
     role: UserRole
     email: str
     fullname: str
@@ -35,7 +36,15 @@ class User(Model):
 
     _validation = {
         'email': [required(), regex(CERN_EMAIL_FORMAT, example='example@cern.ch')],
+        'username': [required()],
     }
+
+    @classmethod
+    def get_by_username(cls, username: str):
+        '''
+        Get user by email
+        '''
+        return cls.query_one({'username': username})
 
     @classmethod
     def get_by_email(cls, email):
