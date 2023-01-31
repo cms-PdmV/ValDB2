@@ -38,6 +38,7 @@ class ReportListAPI(Resource):
         group = api.payload['group']
         campaign = Campaign.get_by_name(campaign_name)
         new_report = Report()
+        new_report.authors = []
         new_report.status = DEFAULT_REPORT_STATUS
         new_report.campaign_name = campaign_name
         new_report.content = ''
