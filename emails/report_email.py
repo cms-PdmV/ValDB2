@@ -17,7 +17,10 @@ def get_author_emails(report: Report):
     '''
     Get authors
     '''
-    return [author.email for author in report.authors]
+    if not report.authors:
+        return []
+    else:
+        return [author.email for author in report.authors]
 
 def get_related_emails(report: Report):
     '''
