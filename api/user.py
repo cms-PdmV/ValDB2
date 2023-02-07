@@ -2,6 +2,7 @@
 User API
 '''
 import logging
+import os
 
 from flask.globals import request
 from flask_restx import Resource
@@ -22,7 +23,7 @@ _logger = logging.getLogger('api.user')
 
 user_model = api.model(User)
 
-def precess_payload(body):
+def process_payload(body):
     '''
     Process payload from api
     - if role is admin, then append all roles to user
@@ -57,14 +58,21 @@ class UserListAPI(Resource):
     @api.marshal_with(user_model)
     def post(self):
         '''
-        Create new user
+        Create new user. This endpoint could be usefull to bulk and migrate data.
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(
+            request=request,
+            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            from_sso=True
+        )
         body = api.payload
-        precess_payload(body)
-        user = User(body).save()
-        lookup = UserGroupLookup()
-        lookup.update()
+        email = body.get('email')
+        user = User.get_by_email(email)
+        if not user:
+            process_payload(body)
+            user = User(body).save()
+            lookup = UserGroupLookup()
+            lookup.update()
         return user.dict()
 
 @api.route('/me/')
@@ -78,10 +86,13 @@ class UserInfoAPI(Resource):
         '''
         email = request.environ.get('user').get('email')
         fullname = request.environ.get('user').get('fullname')
-        _logger.info('User info request: %s', email)
-        existed_user = User.get_by_email(email)
+        _logger.info('User info request - Email: %s', email)
+        existed_user = User.get_by_email(email=email)
         if not existed_user:
-            _logger.info('User not existed. Create new user with email: %s', email)
+            _logger.info(
+                'User is not registered in the app. Register email: %s',
+                email
+            )
             existed_user = User({
                 'role': UserRole.USER,
                 'email': email,
@@ -116,7 +127,7 @@ class UserAPI(Resource):
         '''
         require_permission(request, [UserRole.ADMIN])
         body = api.payload
-        precess_payload(body)
+        process_payload(body)
         user = User.get(userid)
         user.update(body)
         lookup = UserGroupLookup()

@@ -9,6 +9,7 @@ Jinja2==2.11.3
 jsonschema==3.2.0
 Markdown==3.3.4
 MarkupSafe==2.0.1
+PyJWT==2.6.0
 pymongo==3.11.4
 pyrsistent==0.17.3
 python-dotenv==0.17.1

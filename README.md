@@ -2,9 +2,9 @@
 Validation report database tool of PdmV
 
 ## Prerequisites
-- Python 3.9
-- Node 12+
-- Yarn
+- Python >= 3.9 
+- Node 16
+- Yarn 3.3
 
 ## Installation
 1. Create virtual env for python (optional)
@@ -21,7 +21,8 @@ Validation report database tool of PdmV
     yarn install
     cd ..
     ```
-1. Config database connection, default connection value will be set.
+1. Configure database connection. For properly displaying of attachments, set the environment variable **HOST_URL** with the public 
+   entrypoint to the application.
     ```
     cp template.env .env
     nano .env
