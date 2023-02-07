@@ -65,8 +65,8 @@ class UserListAPI(Resource):
         # Check if user already exists
         # For this moment, assume you will receive the username inside the body
         body = api.payload
-        new_username = body.get('username')
-        user = User.get_by_username(new_username)
+        email = body.get('email')
+        user = User.get_by_email(email)
         if not user:
             process_payload(body)
             user = User(body).save()
@@ -84,18 +84,15 @@ class UserInfoAPI(Resource):
         Get current user info from request
         '''
         email = request.environ.get('user').get('email')
-        username = request.environ.get('user').get('username')
         fullname = request.environ.get('user').get('fullname')
-        _logger.info('User info request - Username: %s - Email: %s', username, email)
-        existed_user = User.get_by_username(username=username)
+        _logger.info('User info request - Email: %s', email)
+        existed_user = User.get_by_email(email=email)
         if not existed_user:
             _logger.info(
-                'User is not registered in the app. Register user: %s - email: %s',
-                username,
+                'User is not registered in the app. Register email: %s',
                 email
             )
             existed_user = User({
-                'username': username,
                 'role': UserRole.USER,
                 'email': email,
                 'fullname': fullname,
