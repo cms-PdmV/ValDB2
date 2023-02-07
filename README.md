@@ -22,7 +22,7 @@ Validation report database tool of PdmV
     cd ..
     ```
 1. Configure database connection. For properly displaying of attachments, set the environment variable **HOST_URL** with the public 
-   entrypoint to the application. If this application is going to be behind a reverse proxy, set it with the proxy pass path.
+   entrypoint to the application.
     ```
     cp template.env .env
     nano .env
