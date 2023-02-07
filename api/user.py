@@ -2,6 +2,7 @@
 User API
 '''
 import logging
+import os
 
 from flask.globals import request
 from flask_restx import Resource
@@ -28,7 +29,6 @@ def process_payload(body):
     - if role is admin, then append all roles to user
     - if role is user, then remoce all roles from user
     '''
-    # TODO: What happens with the validator role?
     if 'role' in body:
         if body['role'] == UserRole.ADMIN.value:
             body['groups'] = get_all_groups()
@@ -60,10 +60,11 @@ class UserListAPI(Resource):
         '''
         Create new user. This endpoint could be usefull to bulk and migrate data.
         '''
-        # TODO: For the future, allow this operation only to some type of "super admin"
-        require_permission(request, [UserRole.ADMIN])
-        # Check if user already exists
-        # For this moment, assume you will receive the username inside the body
+        require_permission(
+            request=request,
+            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            from_sso=True
+        )
         body = api.payload
         email = body.get('email')
         user = User.get_by_email(email)

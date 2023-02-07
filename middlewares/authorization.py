@@ -7,6 +7,7 @@ from werkzeug.wrappers import Request, Response
 ADFS_EMAIL_HEADER_KEY = "Adfs-Email"
 ADFS_USERNAME_HEADER_KEY = "Adfs-Login"
 ADFS_FULLNAME_KEY = "Adfs-Fullname"
+ADFS_EGROUPS_KEY = "Adfs-Group"
 KEYCLOAK_TOKEN_HEADER_KEY = "X-Forwarded-Access-Token"
 
 
@@ -34,11 +35,14 @@ class AuthorizationMiddleware:
         username = decoded_token.get("cern_upn")
         fullname = decoded_token.get("name")
         email = decoded_token.get("email")
+        groups = decoded_token.get("cern_roles", [])
+        
         if email and username:
             return {
                 "email": email.lower(),
                 "username": username,
                 "fullname": fullname,
+                "groups": groups,
             }
         return None
 
@@ -47,11 +51,15 @@ class AuthorizationMiddleware:
         email = request.headers.get(ADFS_EMAIL_HEADER_KEY)
         username = request.headers.get(ADFS_USERNAME_HEADER_KEY)
         fullname = request.headers.get(ADFS_FULLNAME_KEY)
+        groups = request.headers.get(ADFS_EGROUPS_KEY, "").split(";")
+        groups = [x.strip().lower() for x in groups if x.strip()]
+
         if email and username:
             return {
                 "email": email.lower(),
                 "username": username,
                 "fullname": fullname,
+                "groups": groups,
             }
         return None
 
