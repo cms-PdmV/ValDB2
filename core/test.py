@@ -28,7 +28,7 @@ class TestCase(unittest.TestCase):
                     database_name_dotenv = line[1].strip()
                     database_name_env = os.getenv(DATABASE_NAME_KEY)
                     if database_name_dotenv == database_name_env:
-                        raise Exception(
+                        raise EnvironmentError(
                             'Test database is the same as application database.' \
                             ' Consider using different name for tests'
                         )

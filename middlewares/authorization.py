@@ -36,7 +36,6 @@ class AuthorizationMiddleware:
         fullname = decoded_token.get("name")
         email = decoded_token.get("email")
         groups = decoded_token.get("cern_roles", [])
-        
         if email and username:
             return {
                 "email": email.lower(),
