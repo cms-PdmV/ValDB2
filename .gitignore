@@ -129,3 +129,12 @@ dmypy.json
 .pyre/
 
 **/.DS_Store
+
+# Ignore VSCode files
+.vscode/
+
+# Ignore credentials for migration
+credentials.json
+
+# Ignore admins information
+admins.csv
