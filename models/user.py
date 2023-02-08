@@ -8,7 +8,7 @@ from werkzeug.exceptions import Forbidden
 from core.validation import regex, required
 from core import Model
 
-CERN_EMAIL_FORMAT = r'\b[A-Za-z0-9._%+-]+@cern\.ch\b'
+EMAIL_FORMAT = r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 
 class UserRole(Enum):
     '''
@@ -34,7 +34,7 @@ class User(Model):
     groups: list[str]
 
     _validation = {
-        'email': [required(), regex(CERN_EMAIL_FORMAT, example='example@cern.ch')],
+        'email': [required(), regex(EMAIL_FORMAT, example='example@cern.ch')],
     }
 
     @classmethod
