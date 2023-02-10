@@ -1,6 +1,9 @@
 '''
 Campaign API
 '''
+import os
+from copy import deepcopy
+
 from flask.globals import request
 from flask_restx import Resource
 
@@ -11,7 +14,8 @@ from utils.request import parse_list_of_tuple
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
-from models.user import UserRole
+from models.user import UserRole, User
+from models.report import Report
 from data.group import group
 
 
@@ -126,4 +130,53 @@ class CampaignAPI(Resource):
                 report.save()
         if 'is_open' in api.payload and api.payload['is_open'] is False:
             SignOffCampaignEmailTemplate().build(campaign).send()
+        return campaign.dict()
+
+
+@api.route('/migrate/')
+class CampaignMigrationAPI(Resource):
+    '''
+    Migrate a campaign with asociated reports
+    '''
+    def post(self):
+        '''
+        Create campaign
+        '''
+        require_permission(
+            request=request,
+            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            from_sso=True
+        )
+        # Create a default campaign
+        data = api.payload
+        reports_to_create = data["reports"]
+        campaign_data = deepcopy(data)
+        campaign_reports: list[Report] = []
+        campaign_data["reports"] = []
+        campaign = Campaign(campaign_data)
+        campaign.save()
+
+        for report in reports_to_create:
+            report_authors_emails = report["authors"]
+            report_authors: list[User] = []
+            for email in report_authors_emails:
+                user = User.get_by_email(email)
+                if user:
+                    report_authors.append(user)
+
+            report["authors"] = report_authors
+            new_report: Report = Report(report)
+            campaign_to_link = Campaign.get_by_name(campaign_data["name"])
+            new_report.campaign = campaign_to_link
+            new_report.save()
+            print("Campaign linked")
+            # Seems we have to refresh the reference....
+            report_link = Report.search(report["campaign_name"], report["group"])
+            campaign_reports.append(report_link)
+        
+        print("Reports going to be linked")
+        campaign = Campaign.get_by_name(campaign_data["name"])
+        campaign.reports = campaign_reports
+        campaign.parse_datetime()
+        campaign.save()
         return campaign.dict()
