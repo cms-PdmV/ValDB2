@@ -169,12 +169,10 @@ class CampaignMigrationAPI(Resource):
             campaign_to_link = Campaign.get_by_name(campaign_data["name"])
             new_report.campaign = campaign_to_link
             new_report.save()
-            print("Campaign linked")
             # Seems we have to refresh the reference....
             report_link = Report.search(report["campaign_name"], report["group"])
             campaign_reports.append(report_link)
         
-        print("Reports going to be linked")
         campaign = Campaign.get_by_name(campaign_data["name"])
         campaign.reports = campaign_reports
         campaign.parse_datetime()
