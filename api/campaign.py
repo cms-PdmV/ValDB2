@@ -149,12 +149,13 @@ class CampaignMigrationAPI(Resource):
         )
         # Create a default campaign
         data = api.payload
-        reports_to_create = data["reports"]
+        reports_to_create = data.pop("reports")
         campaign_data = deepcopy(data)
-        campaign_reports: list[Report] = []
-        campaign_data["reports"] = []
         campaign = Campaign(campaign_data)
-        campaign.save()
+        campaign = campaign.save()
+
+        # Campaign reports
+        campaign_reports: list[Report] = []
 
         for report in reports_to_create:
             report_authors_emails = report["authors"]
@@ -166,14 +167,11 @@ class CampaignMigrationAPI(Resource):
 
             report["authors"] = report_authors
             new_report: Report = Report(report)
-            campaign_to_link = Campaign.get_by_name(campaign_data["name"])
-            new_report.campaign = campaign_to_link
-            new_report.save()
-            # Seems we have to refresh the reference....
-            report_link = Report.search(report["campaign_name"], report["group"])
-            campaign_reports.append(report_link)
-        campaign = Campaign.get_by_name(campaign_data["name"])
+            new_report.campaign = campaign
+            new_report = new_report.save()
+            campaign_reports += [new_report]
+
         campaign.reports = campaign_reports
         campaign.parse_datetime()
-        campaign.save()
+        campaign = campaign.save()
         return campaign.dict()
