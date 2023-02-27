@@ -1,7 +1,7 @@
 '''
 Activity API
 '''
-from flask.globals import request
+from flask.globals import session
 from flask_restx import Resource
 
 from emails.report_email import NewCommentReportEmailTemplate
@@ -34,7 +34,7 @@ class ActivityAPI(Resource):
         body: Activity
         '''
         report = Report.get(reportid)
-        user = User.get_from_request(request)
+        user = User.get_from_session(session)
         api.payload['user'] = user.id
         activity = Activity(api.payload).save()
         if not report.activities:

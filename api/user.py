@@ -4,7 +4,7 @@ User API
 import logging
 import os
 
-from flask.globals import request
+from flask.globals import request, session
 from flask_restx import Resource
 
 from emails.user_email import ChangeUserRoleEmailTemplate
@@ -84,8 +84,8 @@ class UserInfoAPI(Resource):
         '''
         Get current user info from request
         '''
-        email = request.environ.get('user').get('email')
-        fullname = request.environ.get('user').get('fullname')
+        email = session.get('user').get('email')
+        fullname = session.get('user').get('fullname')
         _logger.info('User info request - Email: %s', email)
         existed_user = User.get_by_email(email=email)
         if not existed_user:

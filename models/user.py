@@ -45,11 +45,11 @@ class User(Model):
         return cls.query_one({'email': email})
 
     @classmethod
-    def get_from_request(cls, request):
+    def get_from_session(cls, session):
         '''
         Get user from request
         '''
-        email = request.environ.get('user').get('email')
+        email = session.get('user').get('email')
         return cls.get_by_email(email)
 
     def requires(self, roles):
