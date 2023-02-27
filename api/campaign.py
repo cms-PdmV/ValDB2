@@ -52,7 +52,7 @@ class CampaignListAPI(Resource):
         '''
         Create campaign
         '''
-        require_permission(session, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         data = api.payload
         campaign = Campaign(data)
         campaign.parse_datetime()
@@ -121,7 +121,7 @@ class CampaignAPI(Resource):
         '''
         Update campaign by id
         '''
-        require_permission(session, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         campaign = Campaign.get(campaignid)
         campaign.update(api.payload)
         if 'name' in api.payload:
@@ -144,7 +144,7 @@ class CampaignMigrationAPI(Resource):
         '''
         require_permission(
             session=session,
-            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            roles=[os.getenv('MANAGEMENT_ROLE')],
             from_sso=True
         )
         # Create a default campaign

@@ -180,6 +180,9 @@ class AuthenticationMiddleware:
         username: str = decoded_token.get("cern_upn")
         roles: list[str] = decoded_token.get("cern_roles")
         email: str = decoded_token.get("email")
+        # Lowercase the email
+        email: str = email.lower()
+
         given_name: str = decoded_token.get("given_name")
         family_name: str = decoded_token.get("family_name")
         fullname: str = decoded_token.get("name")
