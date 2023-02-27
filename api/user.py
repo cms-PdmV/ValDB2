@@ -4,7 +4,7 @@ User API
 import logging
 import os
 
-from flask.globals import request
+from flask.globals import request, session
 from flask_restx import Resource
 
 from emails.user_email import ChangeUserRoleEmailTemplate
@@ -45,7 +45,7 @@ class UserListAPI(Resource):
         '''
         Get all users
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         query_params = request.args
         sorting = parse_list_of_tuple(query_params.get('sort'))
         database_query = build_query(['fullname', 'email'], query_params)
@@ -61,8 +61,8 @@ class UserListAPI(Resource):
         Create new user. This endpoint could be usefull to bulk and migrate data.
         '''
         require_permission(
-            request=request,
-            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            session=session,
+            roles=[os.getenv('MANAGEMENT_ROLE')],
             from_sso=True
         )
         body = api.payload
@@ -84,8 +84,8 @@ class UserInfoAPI(Resource):
         '''
         Get current user info from request
         '''
-        email = request.environ.get('user').get('email')
-        fullname = request.environ.get('user').get('fullname')
+        email = session.get('user').get('email')
+        fullname = session.get('user').get('fullname')
         _logger.info('User info request - Email: %s', email)
         existed_user = User.get_by_email(email=email)
         if not existed_user:
@@ -117,7 +117,7 @@ class UserAPI(Resource):
         '''
         Get user by id
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         return User.get(userid).dict()
 
     @api.marshal_with(user_model)
@@ -125,7 +125,7 @@ class UserAPI(Resource):
         '''
         Update user
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         body = api.payload
         process_payload(body)
         user = User.get(userid)
@@ -140,6 +140,6 @@ class UserAPI(Resource):
         '''
         Delete user
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         User.get(userid).unlink()
         return 'ok'

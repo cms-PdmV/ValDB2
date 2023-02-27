@@ -1,7 +1,7 @@
 '''
 User group API
 '''
-from flask.globals import request
+from flask.globals import request, session
 from flask_restx import Resource
 from werkzeug.exceptions import BadRequest
 
@@ -25,7 +25,7 @@ class UserGroupAPI(Resource):
         '''
         Get users from group path
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         lookup = UserGroupLookup()
         user_ids = lookup.table[group_path]
         users = [User.get(user_id) for user_id in user_ids]
@@ -44,7 +44,7 @@ class UserGroupAddAPI(Resource):
             group: string,
         }
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         email = api.payload['email']
         group = api.payload['group']
         UserGroupController.add_user_to_group(email, group)
@@ -62,7 +62,7 @@ class UserGroupRemoveAPI(Resource):
             group: string,
         }
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         userid = api.payload['userid']
         group = api.payload['group']
         UserGroupController.remove_user_from_group(userid, group)

@@ -2,7 +2,7 @@
 Report API
 '''
 import pymongo
-from flask.globals import request
+from flask.globals import session
 from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
 
@@ -57,7 +57,7 @@ class AssignedReportAPI(Resource):
         '''
         Get assign report
         '''
-        user = User.get_from_request(request)
+        user = User.get_from_session(session)
         user_subcategories = [get_subcategory_from_group(group) for group in user.groups]
         assigned_reports = []
         assigned_open_campaigns = Campaign.query({
@@ -107,7 +107,7 @@ class ReportAPI(Resource):
         '''
         report = Report.get(reportid)
         previous_report_status = report.status
-        user = User.get_from_request(request)
+        user = User.get_from_session(session=session)
         if report.group not in user.groups:
             raise Forbidden()
         if 'authors' in api.payload:

@@ -4,7 +4,7 @@ Campaign API
 import os
 from copy import deepcopy
 
-from flask.globals import request
+from flask.globals import request, session
 from flask_restx import Resource
 
 from emails.campaign_email import OpenCampaignEmailTemplate, SignOffCampaignEmailTemplate
@@ -52,7 +52,7 @@ class CampaignListAPI(Resource):
         '''
         Create campaign
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         data = api.payload
         campaign = Campaign(data)
         campaign.parse_datetime()
@@ -121,7 +121,7 @@ class CampaignAPI(Resource):
         '''
         Update campaign by id
         '''
-        require_permission(request, [UserRole.ADMIN])
+        require_permission(session=session, roles=[UserRole.ADMIN])
         campaign = Campaign.get(campaignid)
         campaign.update(api.payload)
         if 'name' in api.payload:
@@ -143,8 +143,8 @@ class CampaignMigrationAPI(Resource):
         Create campaign
         '''
         require_permission(
-            request=request,
-            roles=[os.getenv('MANAGEMENT_EGROUP')],
+            session=session,
+            roles=[os.getenv('MANAGEMENT_ROLE')],
             from_sso=True
         )
         # Create a default campaign
