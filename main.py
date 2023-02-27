@@ -45,7 +45,16 @@ auth: AuthenticationMiddleware = AuthenticationMiddleware(
 
 api.init_app(app)
 CORS(app, supports_credentials=True)
-app.before_request(lambda: auth(request=request, session=session))
+
+@app.before_request
+def auth_handler():
+    """
+    Disable authentication for static files
+    """
+    if "static" in request.endpoint:
+        return None
+    else:
+        return auth(request=request, session=session)
 
 @app.route('/', defaults={'_path': ''}, strict_slashes=False)
 @app.route('/<path:_path>')
