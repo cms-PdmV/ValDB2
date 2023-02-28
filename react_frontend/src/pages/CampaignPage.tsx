@@ -29,8 +29,10 @@ export function CampaignPage(): ReactElement {
 
   useEffect(() => {
     campaignService.get(id).then(fetchedCampaign => {
-      setCampaign(fetchedCampaign.campaign)
-      setGroups(fetchedCampaign.groups)
+      const campaignData = fetchedCampaign.campaign
+      const groupsData = fetchedCampaign.groups
+      setCampaign(campaignData)
+      setGroups(groupsData)
     })
   }, [])
 
@@ -98,6 +100,8 @@ export function CampaignPage(): ReactElement {
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Created: {campaign?.created_at && campaign?.created_at.split(' ')[0]}</Box>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign?.deadline && campaign?.deadline.split(' ')[0]}</Box>
+      <Spacer rem={0.5} />
+      <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Latest activity on report: {campaign?.latest_activities && campaign?.latest_activities[0][0]}</Box>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: <Linkify>{campaign?.relmon}</Linkify></Box>
       { user?.role === UserRole.ADMIN && <>

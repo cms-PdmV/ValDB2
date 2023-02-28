@@ -46,15 +46,15 @@ class ActivityAPI(Resource):
 
         # Append the latest activity inside the Queue
         latest_activities = []
-        if campaign.lastest_activities:
-            latest_activities = campaign.lastest_activities
-        campaign.lastest_activities = deque(
+        if campaign.latest_activities:
+            latest_activities = campaign.latest_activities
+        campaign.latest_activities = deque(
             latest_activities,
             maxlen=Campaign.MAX_LASTEST_ACTIVITY_QUEUE
         )
         record = (report.group, activity.created_at.isoformat())
-        campaign.lastest_activities.appendleft(record)
-        campaign.lastest_activities = list(campaign.lastest_activities)
+        campaign.latest_activities.appendleft(record)
+        campaign.latest_activities = list(campaign.latest_activities)
 
         report.activities.append(activity)
         report = report.save()

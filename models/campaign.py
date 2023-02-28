@@ -24,7 +24,7 @@ class Campaign(Model):
     subcategories: list[str]
     reports: list[Report]
     is_open: bool
-    lastest_activities: deque[tuple[str, datetime]]
+    latest_activities: deque[tuple[str, datetime]]
 
     MAX_LASTEST_ACTIVITY_QUEUE = 5
 
