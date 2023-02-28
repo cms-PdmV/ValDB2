@@ -2,12 +2,14 @@
 Campaign model
 '''
 from datetime import datetime
+from collections import deque
 
 from models.report import Report
 from core import Model
 from core.validation import regex, required, unique
 
 CAMPAIGN_NAME_FORMAT = r'[0-9]{1,3}_[0-9]{1,3}_[0-9]{1,3}.{0,20}'
+
 
 class Campaign(Model):
     '''
@@ -22,6 +24,9 @@ class Campaign(Model):
     subcategories: list[str]
     reports: list[Report]
     is_open: bool
+    latest_activities: deque[tuple[str, datetime]]
+
+    MAX_LASTEST_ACTIVITY_QUEUE = 5
 
     _validation = {
         'name': [required(), regex(CAMPAIGN_NAME_FORMAT), unique()],

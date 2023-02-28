@@ -1,11 +1,13 @@
 """
 Email Service
 """
+import os
 from email.message import EmailMessage
 import logging
 import smtplib
 
 _logger = logging.getLogger('service.email')
+enable_to_production = os.getenv('PRODUCTION')
 
 class EmailService():
     """
@@ -17,6 +19,8 @@ class EmailService():
         """
         Send email
         """
+        if not enable_to_production:
+            return
         message = EmailMessage()
         body = body.strip()
         message.set_content(body, subtype='html')

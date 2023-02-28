@@ -81,6 +81,7 @@ export interface Campaign {
     is_open: boolean
     created_at: string // 2020-21-2
     updated_at: string // 2020-21-2
+    latest_activities?: string[][] // [(<Report.group>, datetime.isoformat())]
 }
 
 export enum ActivityType {
