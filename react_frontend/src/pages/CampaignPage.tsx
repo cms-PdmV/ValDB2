@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { useMemo } from "react";
 import { ReactElement, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { LatestActivitySpan } from "../components/LatestActivitySpan";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
@@ -101,7 +102,7 @@ export function CampaignPage(): ReactElement {
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign?.deadline && campaign?.deadline.split(' ')[0]}</Box>
       <Spacer rem={0.5} />
-      <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Latest activity on report: {campaign?.latest_activities && campaign?.latest_activities[0][0]}</Box>
+      <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;Lastest activity on report:&nbsp;{campaign?.latest_activities && <LatestActivitySpan latestActivities={campaign.latest_activities} />}</p>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: <Linkify>{campaign?.relmon}</Linkify></Box>
       { user?.role === UserRole.ADMIN && <>
