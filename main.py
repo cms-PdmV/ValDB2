@@ -44,7 +44,11 @@ auth: AuthenticationMiddleware = AuthenticationMiddleware(
 )
 
 api.init_app(app)
-CORS(app, supports_credentials=True)
+CORS(
+    app,
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+    supports_credentials=True,
+)
 
 @app.before_request
 def auth_handler():
