@@ -1,0 +1,14 @@
+# Discard the following directories
+.vscode/
+venv/
+node_modules/
+.github/
+__pycache__/
+build/
+logs/
+migration/
+*.env
+.gitignore
+.nvmrc
+run.sh
+
