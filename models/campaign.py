@@ -8,7 +8,7 @@ from models.report import Report
 from core import Model
 from core.validation import regex, required, unique
 
-CAMPAIGN_NAME_FORMAT = r'[0-9]{1,3}_[0-9]{1,3}_[0-9]{1,3}.{0,20}'
+CAMPAIGN_NAME_FORMAT = r'[0-9]{1,3}_[0-9]{1,3}_[0-9]{1,3}.{0,40}'
 
 
 class Campaign(Model):
