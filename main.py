@@ -36,29 +36,23 @@ app.secret_key = os.getenv('SECRET_KEY')
 # Handle redirections from a reverse proxy
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-auth: AuthenticationMiddleware = AuthenticationMiddleware(
-    app=app,
-    client_id=os.getenv('CLIENT_ID'),
-    client_secret=os.getenv('CLIENT_SECRET'),
-    home_endpoint="catch_all"
-)
-
-api.init_app(app)
+# Enable CORS
 CORS(
     app,
     allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
     supports_credentials=True,
 )
 
-@app.before_request
-def auth_handler():
-    """
-    Disable authentication for static files
-    """
-    if "static" in request.endpoint:
-        return None
-    else:
-        return auth(request=request, session=session)
+# Enable OIDC authentication
+auth: AuthenticationMiddleware = AuthenticationMiddleware(
+    app=app,
+    client_id=os.getenv('CLIENT_ID'),
+    client_secret=os.getenv('CLIENT_SECRET'),
+    home_endpoint="catch_all"
+)
+app.before_request(lambda: auth(request=request, session=session))
+api.init_app(app)
+
 
 @app.route('/', defaults={'_path': ''}, strict_slashes=False)
 @app.route('/<path:_path>')
