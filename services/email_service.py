@@ -30,7 +30,7 @@ class EmailService:
             _logger.warning("[DEV] Original recipients: %s", recipients)
             _logger.warning("[DEV] Override recipients to: %s", dev_recipients)
             recipients = dev_recipients
-            subject = f"[DEV] {subject}"
+            subject = f"[DEV]{subject}"
 
         message = EmailMessage()
         body = body.strip()
