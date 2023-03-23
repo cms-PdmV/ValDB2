@@ -11,4 +11,5 @@ migration/
 .gitignore
 .nvmrc
 run.sh
-
+*.json
+*.yaml
