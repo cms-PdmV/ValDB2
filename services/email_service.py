@@ -16,6 +16,11 @@ class EmailService:
     Email service
     """
 
+    __smtp_host = os.getenv("EMAIL_SERVER", "smtp.cern.ch")
+    __smtp_port = int(os.getenv("EMAIL_PORT", "587"))
+    __smtp_user = os.getenv("EMAIL_ADDRESS")
+    __smtp_password = os.getenv("EMAIL_PASSWORD")
+
     @staticmethod
     def send(subject, body, recipients):
         """
@@ -31,12 +36,15 @@ class EmailService:
         body = body.strip()
         message.set_content(body, subtype="html")
         message["Subject"] = subject
-        message["From"] = "PdmV Service Account <pdmvserv@cern.ch>"
+        message["From"] = EmailService.__smtp_user
         message["To"] = ", ".join(recipients)
         message["Cc"] = "pdmvserv@cern.ch"
 
-        smtp = smtplib.SMTP()
-        smtp.connect()
+        smtp = smtplib.SMTP(
+            host=EmailService.__smtp_host, port=EmailService.__smtp_port
+        )
+        smtp.starttls()
+        smtp.login(user=EmailService.__smtp_user, password=EmailService.__smtp_password)
         _logger.info("Sending email %s to %s", message["Subject"], message["To"])
         smtp.send_message(message)
         smtp.quit()
