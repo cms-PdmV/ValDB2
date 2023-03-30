@@ -5,6 +5,7 @@ Report emails
 import markdown
 
 from utils.datetime import format_datetime
+from utils.email_content import parse_attachment_links
 from models.activity import Activity
 from models.report import Report, REPORT_STATUS_LABEL, ReportStatus
 from emails.template import (
@@ -60,6 +61,8 @@ class ModifyReportEmailTemplate(EmailTemplate):
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report has been modified"
         self.recipients = [EmailAddress.forum] + get_author_emails(report)
+
+        content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
             MODIFY_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
@@ -67,7 +70,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
             status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=", ".join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
-            content=format_new_line(markdown.markdown(report.content)),
+            content=format_new_line(markdown.markdown(content_markdown_no_links)),
         )
         return self
 
