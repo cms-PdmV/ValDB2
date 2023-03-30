@@ -17,8 +17,8 @@ class EmailAddress:
 
     enable_to_production = os.getenv("PRODUCTION")
     cms_talk = "cmstalk+relval@dovecotmta.cern.ch"
-    # dev_forum = "cmstalk+test@dovecotmta.cern.ch"
-    dev_forum = "pdmvserv@cern.ch"
+    dev_forum = "cmstalk+test@dovecotmta.cern.ch"
+    # dev_forum = "pdmvserv@cern.ch"
     forum = cms_talk if enable_to_production else dev_forum
 
 
