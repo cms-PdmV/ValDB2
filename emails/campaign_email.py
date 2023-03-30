@@ -3,12 +3,12 @@ Campaign Emails
 """
 from models.campaign import Campaign
 from emails.template import (
-    EmailAddress,
     EmailTemplate,
     render_template,
     format_new_line,
 )
 from utils.datetime import format_datetime
+from utils.email_content import EmailAddress
 
 OPEN_CAMPAIGN_TEMPLATE = "emails/templates/open_campaign_template.html"
 SIGN_OFF_CAMPAIGN_TEMPLATE = "emails/templates/sign_off_campaign_template.html"

@@ -3,13 +3,13 @@ Email Service
 """
 import os
 from email.message import EmailMessage
-from emails.template import EmailAddress
+from utils.email_content import EmailAddress
 import logging
 import smtplib
 
 _logger = logging.getLogger("service.email")
 enable_to_production = os.getenv("PRODUCTION")
-dev_recipients = ["pdmvserv@cern.ch"]
+custom_dev_subject_header = os.getenv("DEV_SUBJECT_HEADER")
 
 
 class EmailService:
@@ -35,8 +35,15 @@ class EmailService:
         Send email
         """
         if not enable_to_production:
-            _logger.warning("[DEV] Original recipients: %s", recipients)
-            subject = f"[DEV]{subject}"
+            _logger.debug("[DEV] Original recipients: %s", recipients)
+            if custom_dev_subject_header:
+                _logger.debug(
+                    "[DEV] Using a custom header for the subject: %s",
+                    custom_dev_subject_header,
+                )
+                subject = f"[{custom_dev_subject_header}]{subject}"
+            else:
+                subject = f"[DEV]{subject}"
 
         message = EmailMessage()
         body = body.strip()

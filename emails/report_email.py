@@ -9,11 +9,11 @@ from utils.email_content import parse_attachment_links
 from models.activity import Activity
 from models.report import Report, REPORT_STATUS_LABEL, ReportStatus
 from emails.template import (
-    EmailAddress,
     EmailTemplate,
     render_template,
     format_new_line,
 )
+from utils.email_content import EmailAddress
 
 MODIFY_REPORT_TEMPLATE = "emails/templates/modify_report_template.html"
 CHANGE_STATUS_REPORT_TEMPLATE = "emails/templates/change_status_report_template.html"
