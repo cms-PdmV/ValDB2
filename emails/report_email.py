@@ -58,6 +58,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
         original_email_id, new_email_id = report.get_email_reference_id()
         self.original_element_email_id = original_email_id
         self.new_email_id_for_reply = new_email_id
+        self.notification_references = report.latest_email_ids
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report has been modified"
         self.recipients = [EmailAddress.forum] + get_author_emails(report)
@@ -90,6 +91,7 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
         original_email_id, new_email_id = report.get_email_reference_id()
         self.original_element_email_id = original_email_id
         self.new_email_id_for_reply = new_email_id
+        self.notification_references = report.latest_email_ids
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report's status has been changed"
         self.recipients = [EmailAddress.forum] + get_author_emails(report)
@@ -120,6 +122,7 @@ class NewCommentReportEmailTemplate(EmailTemplate):
         original_email_id, new_email_id = report.get_email_reference_id()
         self.original_element_email_id = original_email_id
         self.new_email_id_for_reply = new_email_id
+        self.notification_references = report.latest_email_ids
         self.subject = (
             f"[ValDB][{report.campaign_name}][{group_label(report.group)}] New comment"
         )

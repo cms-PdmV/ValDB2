@@ -47,12 +47,14 @@ class EmailTemplate:
         recipients="",
         original_element_email_id=None,
         new_email_id_for_reply=None,
+        notification_references=None,
     ) -> None:
         self.subject = subject
         self.body = body
         self.recipients = recipients
         self.original_element_email_id = original_element_email_id
         self.new_email_id_for_reply = new_email_id_for_reply
+        self.notification_references = notification_references
 
     def send(self):
         """
@@ -64,4 +66,5 @@ class EmailTemplate:
             recipients=self.recipients,
             original_element_email_id=self.original_element_email_id,
             new_email_id_for_reply=self.new_email_id_for_reply,
+            notification_references=self.notification_references,
         )

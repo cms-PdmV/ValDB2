@@ -26,9 +26,10 @@ class OpenCampaignEmailTemplate(EmailTemplate):
         """
         build email
         """
-        _, new_email_id = campaign.get_email_reference_id()
-        self.original_element_email_id = campaign.reference_email_id
+        original_email_id, new_email_id = campaign.get_email_reference_id()
+        self.original_element_email_id = original_email_id
         self.new_email_id_for_reply = new_email_id
+        self.notification_references = campaign.latest_email_ids
         self.subject = f"[ValDB][{campaign.name}] Campaign is now open"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(
@@ -56,9 +57,10 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
         """
         build email
         """
-        _, new_email_id = campaign.get_email_reference_id()
-        self.original_element_email_id = campaign.reference_email_id
+        original_email_id, new_email_id = campaign.get_email_reference_id()
+        self.original_element_email_id = original_email_id
         self.new_email_id_for_reply = new_email_id
+        self.notification_references = campaign.latest_email_ids
         self.subject = f"[ValDB][{campaign.name}] Campaign has been signed off"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(

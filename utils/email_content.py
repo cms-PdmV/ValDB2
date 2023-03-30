@@ -31,17 +31,6 @@ def parse_attachment_links(content: str, reference_placeholder=True):
         return parsed
 
     # Use a placeholder instead
-    message_regex = r"Image available in the report through the web application: s\1"
+    message_regex = r"Image available in the report through the web application: \1"
     all_file_links = markdown_parser.sub(repl=message_regex, string=content)
     return all_file_links
-
-
-if __name__ == "__main__":
-    example: str = """
-    ![figure.png](https://cms-pdmv-dev.web.cern.ch/valdb/file/6425)
-    Primer mensaje
-    ![nFigure.pdf](https://cms-pdmv-dev.web.cern.ch/valdb/file/6425e123038a7fb98f2652ad)
-    Segundo mensaje
-    ![a.png](https://cms-pdmv-dev.web)
-    """
-    print(remove_attachment_links(content=example, reference_placeholder=True))

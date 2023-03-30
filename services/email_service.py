@@ -3,6 +3,7 @@ Email Service
 """
 import os
 from email.message import EmailMessage
+from emails.template import EmailAddress
 import logging
 import smtplib
 
@@ -28,6 +29,7 @@ class EmailService:
         recipients,
         original_element_email_id=None,
         new_email_id_for_reply=None,
+        notification_references=None,
     ):
         """
         Send email
@@ -42,15 +44,19 @@ class EmailService:
         message["Subject"] = subject
         message["From"] = EmailService.__smtp_user
         message["To"] = ", ".join(recipients)
-        message["Reply-To"] = ", ".join(recipients)
         message["Cc"] = "pdmvserv@cern.ch"
+
+        reply_to_addresses = [EmailService.__smtp_user, EmailAddress.forum]
+        message["Reply-To"] = ", ".join(reply_to_addresses)
 
         # If this email is a reply for a sent message
         # append the references
         if original_element_email_id and new_email_id_for_reply:
             message["In-Reply-To"] = original_element_email_id
-            message["References"] = original_element_email_id
             message["Message-ID"] = new_email_id_for_reply
+
+        if notification_references:
+            message["References"] = ", ".join(notification_references)
 
         smtp = smtplib.SMTP(
             host=EmailService.__smtp_host, port=EmailService.__smtp_port
