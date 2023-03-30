@@ -12,7 +12,8 @@ class EmailAddress:
 
     enable_to_production = os.getenv("PRODUCTION")
     cms_talk = "cmstalk+relval@dovecotmta.cern.ch"
-    dev_forum = "pdmvserv@cern.ch"
+    dev_forum = "cmstalk+test@dovecotmta.cern.ch"
+    # dev_forum = "pdmvserv@cern.ch"
     forum = cms_talk if enable_to_production else dev_forum
 
 
@@ -39,13 +40,28 @@ class EmailTemplate:
     Base email template
     """
 
-    def __init__(self, subject="", body="", recipients="") -> None:
+    def __init__(
+        self,
+        subject="",
+        body="",
+        recipients="",
+        original_element_email_id=None,
+        new_email_id_for_reply=None,
+    ) -> None:
         self.subject = subject
         self.body = body
         self.recipients = recipients
+        self.original_element_email_id = original_element_email_id
+        self.new_email_id_for_reply = new_email_id_for_reply
 
     def send(self):
         """
         Send email via email service
         """
-        EmailService.send(self.subject, self.body, self.recipients)
+        EmailService.send(
+            subject=self.subject,
+            body=self.body,
+            recipients=self.recipients,
+            original_element_email_id=self.original_element_email_id,
+            new_email_id_for_reply=self.new_email_id_for_reply,
+        )

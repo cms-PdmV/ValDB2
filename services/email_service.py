@@ -22,14 +22,18 @@ class EmailService:
     __smtp_password = os.getenv("EMAIL_PASSWORD")
 
     @staticmethod
-    def send(subject, body, recipients):
+    def send(
+        subject,
+        body,
+        recipients,
+        original_element_email_id=None,
+        new_email_id_for_reply=None,
+    ):
         """
         Send email
         """
         if not enable_to_production:
             _logger.warning("[DEV] Original recipients: %s", recipients)
-            _logger.warning("[DEV] Override recipients to: %s", dev_recipients)
-            recipients = dev_recipients
             subject = f"[DEV]{subject}"
 
         message = EmailMessage()
@@ -38,7 +42,15 @@ class EmailService:
         message["Subject"] = subject
         message["From"] = EmailService.__smtp_user
         message["To"] = ", ".join(recipients)
+        message["Reply-To"] = ", ".join(recipients)
         message["Cc"] = "pdmvserv@cern.ch"
+
+        # If this email is a reply for a sent message
+        # append the references
+        if original_element_email_id and new_email_id_for_reply:
+            message["In-Reply-To"] = original_element_email_id
+            message["References"] = original_element_email_id
+            message["Message-ID"] = new_email_id_for_reply
 
         smtp = smtplib.SMTP(
             host=EmailService.__smtp_host, port=EmailService.__smtp_port
