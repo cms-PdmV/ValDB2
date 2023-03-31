@@ -6,8 +6,12 @@ transform it into HTML
 import os
 import re
 
+CMS_TALK = "cmstalk+relval@dovecotmta.cern.ch"
+CMS_TALK_TEST = "cmstalk+test@dovecotmta.cern.ch"
+
 MARKDOWN_ATTACHMENT = r"!\[(.*?)\]\((.*?)\)"
 markdown_parser = re.compile(MARKDOWN_ATTACHMENT)
+keep_image_filenames = True if not os.getenv("DISCARD_LINKS") else False
 
 
 class EmailAddress:
@@ -16,13 +20,16 @@ class EmailAddress:
     """
 
     enable_to_production = os.getenv("PRODUCTION")
-    cms_talk = "cmstalk+relval@dovecotmta.cern.ch"
-    dev_forum = "cmstalk+test@dovecotmta.cern.ch"
-    # dev_forum = "pdmvserv@cern.ch"
-    forum = cms_talk if enable_to_production else dev_forum
+    custom_forum_address = os.getenv("CUSTOM_FORUM_ADDRESS")
+    if enable_to_production:
+        forum = CMS_TALK
+    elif custom_forum_address:
+        forum = custom_forum_address
+    else:
+        forum = CMS_TALK_TEST
 
 
-def parse_attachment_links(content: str, reference_placeholder=True):
+def parse_attachment_links(content: str, reference_placeholder=keep_image_filenames):
     """
     Remove all attachment links available into
     markdown content.
