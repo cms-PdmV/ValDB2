@@ -12,12 +12,14 @@ import { attachmentService } from "../services";
 const { confirm } = Modal
 
 interface AttachmentListProp {
+  reportId: string
   attachments: Attachment[]
   onUpdate: (removedAttachments: Attachment[]) => void
 }
 
 interface AttachmentItemProp {
   attachment: Attachment
+  reportId: string
 }
 
 
@@ -36,7 +38,7 @@ export function AttachmentList (prop: AttachmentListProp): ReactElement {
         okText: 'Remove',
         okType: 'danger',
         onOk: () => {
-          attachmentService.remove(itemProp.attachment.id).then(() => {
+          attachmentService.remove(itemProp.reportId, itemProp.attachment.id).then(() => {
             prop.onUpdate(prop.attachments.filter(e => e.id !== itemProp.attachment.id))
           })
         }
@@ -73,7 +75,7 @@ export function AttachmentList (prop: AttachmentListProp): ReactElement {
 
   return (
     <Box overflow="auto" whiteSpace="nowrap">
-      {prop.attachments.map((attachment) => <AttachmentItem attachment={attachment} />)}
+      {prop.attachments.map((attachment) => <AttachmentItem reportId={prop.reportId} attachment={attachment} />)}
       {prop.attachments.length === 0 && <Box color={color.gray} fontStyle="italic">No attachments</Box>}
     </Box>
   )
