@@ -63,7 +63,7 @@ class EmailService:
             message["Message-ID"] = new_email_id_for_reply
 
         if notification_references:
-            message["References"] = ", ".join(notification_references)
+            message["References"] = ", ".join(notification_references[-3:-1])
 
         smtp = smtplib.SMTP(
             host=EmailService.__smtp_host, port=EmailService.__smtp_port
