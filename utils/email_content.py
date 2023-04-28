@@ -8,6 +8,8 @@ import re
 
 CMS_TALK = "cmstalk+relval@dovecotmta.cern.ch"
 CMS_TALK_TEST = "cmstalk+test@dovecotmta.cern.ch"
+CMS_TALK_TRIGGER = "cmstalk+trigger-performance@dovecotmta.cern.ch"
+CMS_TALK_RECO_MUON = "cmstalk+muon-object-validation@dovecotmta.cern.ch"
 
 MARKDOWN_ATTACHMENT = r"!\[(.*?)\]\((.*?)\)"
 markdown_parser = re.compile(MARKDOWN_ATTACHMENT)
@@ -21,12 +23,23 @@ class EmailAddress:
 
     enable_to_production = os.getenv("PRODUCTION")
     custom_forum_address = os.getenv("CUSTOM_FORUM_ADDRESS")
+    custom_trigger_forum = os.getenv("CUSTOM_TRIGGER_FORUM_ADDRESS", "")
+    custom_reco_muon_forum = os.getenv("CUSTOM_RECO_MUON_FORUM_ADDRESS", "")
+
     if enable_to_production:
         forum = CMS_TALK
+        forum_trigger = CMS_TALK_TRIGGER
+        forum_reco_muon = CMS_TALK_RECO_MUON
     elif custom_forum_address:
         forum = custom_forum_address
+        # Only for testing purposes, link the extra channel addresses
+        # to the development team's email addresses
+        forum_trigger = custom_trigger_forum
+        forum_reco_muon = custom_reco_muon_forum
     else:
         forum = CMS_TALK_TEST
+        forum_trigger = ""
+        forum_reco_muon = ""
 
 
 def parse_attachment_links(content: str, reference_placeholder=keep_image_filenames):

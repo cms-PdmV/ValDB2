@@ -1,7 +1,9 @@
-'''
+"""
 Report model
-'''
+"""
 from enum import Enum
+from collections import namedtuple
+from typing import Type, Tuple
 
 from models.attachment import Attachment
 from models.activity import Activity
@@ -9,10 +11,12 @@ from models.user import User
 from core.validation import required
 from core import Model
 
+
 class ReportStatus(Enum):
-    '''
+    """
     Report status
-    '''
+    """
+
     OK = 1
     NOT_YET_DONE = 2
     FAILURE = 3
@@ -20,19 +24,22 @@ class ReportStatus(Enum):
     IN_PROGRESS = 5
     KNOWN_ISSUE = 6
 
+
 REPORT_STATUS_LABEL = {
-    ReportStatus.OK: 'OK',
-    ReportStatus.NOT_YET_DONE: 'Not Yet Done',
-    ReportStatus.FAILURE: 'Failure',
-    ReportStatus.CHANGES_EXPECTED: 'Changes Expected',
-    ReportStatus.IN_PROGRESS: 'In Progress',
-    ReportStatus.KNOWN_ISSUE: 'Known Issue',
+    ReportStatus.OK: "OK",
+    ReportStatus.NOT_YET_DONE: "Not Yet Done",
+    ReportStatus.FAILURE: "Failure",
+    ReportStatus.CHANGES_EXPECTED: "Changes Expected",
+    ReportStatus.IN_PROGRESS: "In Progress",
+    ReportStatus.KNOWN_ISSUE: "Known Issue",
 }
 
+
 class Report(Model):
-    '''
+    """
     Report model
-    '''
+    """
+
     authors: list[User]
     group: str
     campaign_name: str
@@ -42,17 +49,39 @@ class Report(Model):
     attachments: list[Attachment]
 
     _validation = {
-        'group': [required()],
-        'campaign_name': [required()],
-        'status': [required()],
+        "group": [required()],
+        "campaign_name": [required()],
+        "status": [required()],
     }
 
     @classmethod
     def search(cls, campaign_name, group):
-        '''
+        """
         Search report by campaign name and group path
-        '''
-        return cls.query_one({
-            'campaign_name': campaign_name,
-            'group': group,
-        })
+        """
+        return cls.query_one(
+            {
+                "campaign_name": campaign_name,
+                "group": group,
+            }
+        )
+
+    def get_group_components(self) -> Type[Tuple[str]]:
+        ReportGroup = namedtuple("ReportGroup", ["category", "subcategory", "pwg"])
+
+        # self.group := Category.Subcategory.PWG
+        parsed_group = self.group.strip().split(".")
+
+        if len(parsed_group) == 3:
+            category = parsed_group[0]
+            subcategory = parsed_group[1]
+            pwg = parsed_group[2]
+        else:
+            category = ""
+            subcategory = ""
+            pwg = ""
+
+        group_components = ReportGroup(
+            category=category, subcategory=subcategory, pwg=pwg
+        )
+        return group_components

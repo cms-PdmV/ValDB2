@@ -61,7 +61,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
         self.notification_references = report.latest_email_ids
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report has been modified"
-        self.recipients = [EmailAddress.forum] + get_author_emails(report)
+        self.recipients = self.get_email_recipients_for_report(report=report)
 
         content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
@@ -94,7 +94,7 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
         self.notification_references = report.latest_email_ids
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report's status has been changed"
-        self.recipients = [EmailAddress.forum] + get_author_emails(report)
+        self.recipients = self.get_email_recipients_for_report(report=report)
         self.body = render_template(
             CHANGE_STATUS_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
