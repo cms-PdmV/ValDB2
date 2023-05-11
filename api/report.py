@@ -71,11 +71,12 @@ class AssignedReportAPI(Resource):
             get_subcategory_from_group(group) for group in user.groups
         ]
         assigned_reports = []
-        assigned_open_campaigns = Campaign.query(
+        all_assigned_open_campaigns = Campaign.query(
             {"is_open": True, "subcategories": {"$in": user_subcategories}},
             sort=[("created_at", pymongo.DESCENDING)],
             option={"reports": False},
         )
+        assigned_open_campaigns = all_assigned_open_campaigns[:20]
         for campaign in assigned_open_campaigns:
             for group in user.groups:
                 user_subcategory = get_subcategory_from_group(group)
