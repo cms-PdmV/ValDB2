@@ -9,6 +9,7 @@ export const color = {
     blue: primaryColor,
     yellow: '#fa8c16',
     purple: '#722ed1',
+    brown: '#9b2107',
 }
 
 export const buttonStyle = {
