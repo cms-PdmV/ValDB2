@@ -24,7 +24,7 @@ export function NavBar(prop: NavBarProp): ReactElement {
 
   return (
     <Box height="64px" boxShadow={boxShadow} display="flex" alignItems="center" padding="0 1rem" style={{background: '#ffffff'}}>
-      <Box color={primaryColor} fontWeight={800} fontSize="1.5rem"><FontAwesomeIcon icon={faFeather} />&nbsp;&nbsp;ValDB</Box>
+      <Button onClick={() => history.push('/')}><Box color={primaryColor} fontWeight={800} fontSize="1.5rem"><FontAwesomeIcon icon={faFeather} />&nbsp;&nbsp;ValDB</Box></Button>
       { prop.user && <Box marginLeft="auto" display="flex">
         <Button onClick={() => history.push('/campaigns')} style={currentPath === 'campaigns' ? selectedPathStyle : {}}>Campaigns</Button>
         <Box width="1rem" />
@@ -36,6 +36,8 @@ export function NavBar(prop: NavBarProp): ReactElement {
           <Button onClick={() => history.push('/admin')} style={currentPath === 'admin' ? selectedPathStyle : {}}>Administator</Button>
           <Box width="1rem" />
         </>}
+        <Button onClick={() => history.push('/contact')} style={currentPath === 'contact' ? selectedPathStyle : {}}>Contact Us</Button>
+        <Box width="1rem" />
         <Button onClick={() => history.push('/user')} style={currentPath === 'user' ? selectedPathStyle : {}}>{prop.user.fullname}&nbsp;&nbsp;<Avatar style={{width: '32px', height: '32px'}}>{prop.user.fullname[0] || ' '}</Avatar></Button>
       </Box>}
     </Box>

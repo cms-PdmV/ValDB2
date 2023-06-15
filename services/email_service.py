@@ -17,10 +17,11 @@ class EmailService:
     Email service
     """
 
-    __smtp_host = os.getenv("EMAIL_SERVER", "smtp.cern.ch")
-    __smtp_port = int(os.getenv("EMAIL_PORT", "587"))
+    __smtp_host = os.getenv("EMAIL_SERVER", "cernmx.cern.ch")
+    __smtp_port = int(os.getenv("EMAIL_PORT", "25"))
     __smtp_user = os.getenv("EMAIL_ADDRESS")
     __smtp_password = os.getenv("EMAIL_PASSWORD")
+    __smtp_auth_required = os.getenv("EMAIL_AUTH_REQUIRED")
 
     @staticmethod
     def send(
@@ -69,7 +70,10 @@ class EmailService:
             host=EmailService.__smtp_host, port=EmailService.__smtp_port
         )
         smtp.starttls()
-        smtp.login(user=EmailService.__smtp_user, password=EmailService.__smtp_password)
+        if EmailService.__smtp_auth_required:
+            smtp.login(
+                user=EmailService.__smtp_user, password=EmailService.__smtp_password
+            )
         _logger.info("Sending email %s to %s", message["Subject"], message["To"])
         smtp.send_message(message)
         smtp.quit()

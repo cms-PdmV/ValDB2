@@ -15,6 +15,7 @@ import { User, UserRole } from "./types";
 import { NavBar } from "./components/NavBar";
 import { UserContext } from "./context/user";
 import { UserPage } from "./pages/UserPage";
+import { ContactPage } from "./pages/ContactPage";
 import { MyReportPage } from "./pages/MyReportPage";
 import { AllUserAdminPage } from "./pages/AllUserAdminPage";
 import { UserFormAdminPage } from "./pages/UserFormAdminPage";
@@ -95,6 +96,9 @@ function App(): ReactElement {
             </Route>
             <Route path="/user">
               <UserPage />
+            </Route>
+            <Route path="/contact">
+              <ContactPage />
             </Route>
             <Route path="/">
               <AllCampaignPage />
