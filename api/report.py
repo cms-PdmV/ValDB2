@@ -9,7 +9,6 @@ from werkzeug.exceptions import Forbidden
 
 from emails.report_email import (
     ModifyReportEmailTemplate,
-    ChangeStatusReportEmailTemplate,
 )
 from utils.group import get_subcategory_from_group
 from core import Namespace
@@ -142,10 +141,6 @@ class ReportAPI(Resource):
             report.authors = new_authors
             report.save()
             ModifyReportEmailTemplate().build(report).send()
-        if "status" in api.payload:
-            ChangeStatusReportEmailTemplate().build(
-                report, previous_report_status
-            ).send()
         return report.dict()
 
 
