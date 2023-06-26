@@ -1,10 +1,12 @@
 # Build web application bundle
-FROM node:16-buster-slim@sha256:1417528032837e47462ea8cfe983108b0152f989e95cba2ddfbe0f0ddc2dcfbd AS frontend
+FROM node:18.16.1-alpine3.18@sha256:bf6c61feabc1a1bd565065016abe77fa378500ec75efa67f5b04e5e5c4d447cd AS frontend
 
 WORKDIR /usr/app
 
 COPY react_frontend .
 
+# Enable corepack and yarn stable version (~3.X)
+RUN corepack enable && corepack prepare yarn@stable --activate 
 RUN yarn install
 RUN yarn build
 
