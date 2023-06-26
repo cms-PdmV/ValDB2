@@ -26,9 +26,9 @@ class OpenCampaignEmailTemplate(EmailTemplate):
         """
         build email
         """
-        self.original_email_id = campaign.first_email_id
+        self.original_email_id = campaign.reference_email_id
         # This is the first email, we will attach all the notifications below it
-        self.email_id = campaign.first_email_id
+        self.email_id = campaign.reference_email_id
         self.subject = f"[ValDB][{campaign.name}] Campaign is now open"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(
@@ -56,7 +56,7 @@ class SignOffCampaignEmailTemplate(EmailTemplate):
         """
         build email
         """
-        self.original_email_id = campaign.first_email_id
+        self.original_email_id = campaign.reference_email_id
         self.subject = f"[ValDB][{campaign.name}] Campaign has been signed off"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(

@@ -12,7 +12,7 @@ from email.utils import make_msgid
 
 from .database import get_database
 
-PREFILLED_FIELDS = ["id", "created_at", "updated_at", "first_email_id"]
+PREFILLED_FIELDS = ["id", "created_at", "updated_at", "reference_email_id"]
 FILTER_OUT_LOAD_OBJECT_KEY = ["_fields", "_validation"]
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ["id"]
 _database = get_database()
@@ -191,7 +191,7 @@ class Model:
             )
         else:
             self.created_at = current_utc_time
-            self.first_email_id = make_msgid()
+            self.reference_email_id = make_msgid()
             saved_data_id = _database.create(
                 self.get_collection_name(), self._get_data_store_object(self.__dict__)
             )

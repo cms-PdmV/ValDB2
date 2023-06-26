@@ -90,7 +90,9 @@ class EmailService:
 
         # If this email is a reply for a sent message
         # append the references
-        message["In-Reply-To"] = original_email_id
+        if original_email_id:
+            message["In-Reply-To"] = original_email_id
+
         message["Message-ID"] = email_id if email_id else make_msgid()
 
         smtp = smtplib.SMTP(

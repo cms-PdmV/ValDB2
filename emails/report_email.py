@@ -39,7 +39,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
         """
         build email
         """
-        self.original_email_id = report_campaign.first_email_id
+        self.original_email_id = report_campaign.reference_email_id
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report has been modified"
         content_markdown_no_links = parse_attachment_links(content=report.content)
@@ -69,7 +69,7 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
         """
         build email
         """
-        self.original_email_id = report_campaign.first_email_id
+        self.original_email_id = report_campaign.reference_email_id
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report's status has been changed"
         self.body = render_template(
@@ -96,7 +96,7 @@ class NewCommentReportEmailTemplate(EmailTemplate):
         """
         build email
         """
-        self.original_email_id = report_campaign.first_email_id
+        self.original_email_id = report_campaign.reference_email_id
         self.subject = (
             f"[ValDB][{report.campaign_name}][{group_label(report.group)}] New comment"
         )
