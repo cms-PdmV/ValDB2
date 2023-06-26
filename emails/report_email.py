@@ -8,32 +8,16 @@ from utils.datetime import format_datetime
 from utils.email_content import parse_attachment_links
 from models.activity import Activity
 from models.report import Report, REPORT_STATUS_LABEL, ReportStatus
+from models.campaign import Campaign
 from emails.template import (
     EmailTemplate,
     render_template,
     format_new_line,
 )
-from utils.email_content import EmailAddress
 
 MODIFY_REPORT_TEMPLATE = "emails/templates/modify_report_template.html"
 CHANGE_STATUS_REPORT_TEMPLATE = "emails/templates/change_status_report_template.html"
 NEW_COMMENT_REPORT_TEMPLATE = "emails/templates/new_comment_report_template.html"
-
-
-def get_author_emails(report: Report):
-    """
-    Get authors
-    """
-    return [author.email for author in report.authors]
-
-
-def get_related_emails(report: Report):
-    """
-    Get related email: authors, commentor
-    """
-    activity_user_emails = [activity.user.email for activity in report.activities]
-    author_emails = get_author_emails(report)
-    return list(set(activity_user_emails + author_emails))
 
 
 def group_label(group_path_string):
@@ -51,18 +35,13 @@ class ModifyReportEmailTemplate(EmailTemplate):
     Template: modify_report_template.html
     """
 
-    def build(self, report: Report):
+    def build(self, report: Report, report_campaign: Campaign):
         """
         build email
         """
-        original_email_id, new_email_id = report.get_email_reference_id()
-        self.original_element_email_id = original_email_id
-        self.new_email_id_for_reply = new_email_id
-        self.notification_references = report.latest_email_ids
+        self.original_email_id = report_campaign.first_email_id
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report has been modified"
-        self.recipients = self.get_email_recipients_for_report(report=report)
-
         content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
             MODIFY_REPORT_TEMPLATE,
@@ -84,17 +63,15 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
     Template: change_status_report_template.html
     """
 
-    def build(self, report: Report, previous_status: ReportStatus):
+    def build(
+        self, report: Report, previous_status: ReportStatus, report_campaign: Campaign
+    ):
         """
         build email
         """
-        original_email_id, new_email_id = report.get_email_reference_id()
-        self.original_element_email_id = original_email_id
-        self.new_email_id_for_reply = new_email_id
-        self.notification_references = report.latest_email_ids
+        self.original_email_id = report_campaign.first_email_id
         self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
             Report's status has been changed"
-        self.recipients = self.get_email_recipients_for_report(report=report)
         self.body = render_template(
             CHANGE_STATUS_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
@@ -115,18 +92,14 @@ class NewCommentReportEmailTemplate(EmailTemplate):
     Template: new_comment_report_template.html
     """
 
-    def build(self, report: Report, activity: Activity):
+    def build(self, report: Report, activity: Activity, report_campaign: Campaign):
         """
         build email
         """
-        original_email_id, new_email_id = report.get_email_reference_id()
-        self.original_element_email_id = original_email_id
-        self.new_email_id_for_reply = new_email_id
-        self.notification_references = report.latest_email_ids
+        self.original_email_id = report_campaign.first_email_id
         self.subject = (
             f"[ValDB][{report.campaign_name}][{group_label(report.group)}] New comment"
         )
-        self.recipients = [EmailAddress.forum] + get_related_emails(report)
         self.body = render_template(
             NEW_COMMENT_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,

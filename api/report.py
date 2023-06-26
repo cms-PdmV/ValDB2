@@ -124,6 +124,7 @@ class ReportAPI(Resource):
         body: Report
         """
         report = Report.get(reportid)
+        report_campaign: Campaign = Campaign.get_by_name(report.campaign_name)
         previous_report_status = report.status
         user = User.get_from_session(session=session)
         if report.group not in user.groups:
@@ -140,7 +141,9 @@ class ReportAPI(Resource):
             new_authors = [user] + previous_authors
             report.authors = new_authors
             report.save()
-            ModifyReportEmailTemplate().build(report).send()
+            ModifyReportEmailTemplate().build(
+                report=report, report_campaign=report_campaign
+            ).send_for_report(report=report)
         return report.dict()
 
 

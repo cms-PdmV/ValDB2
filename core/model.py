@@ -12,13 +12,7 @@ from email.utils import make_msgid
 
 from .database import get_database
 
-PREFILLED_FIELDS = [
-    "id",
-    "created_at",
-    "updated_at",
-    "reference_email_id",
-    "latest_email_ids",
-]
+PREFILLED_FIELDS = ["id", "created_at", "updated_at", "first_email_id"]
 FILTER_OUT_LOAD_OBJECT_KEY = ["_fields", "_validation"]
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ["id"]
 _database = get_database()
@@ -50,8 +44,7 @@ class Model:
     id: ObjectId  # pylint: disable=C0103
     created_at: datetime
     updated_at: datetime
-    reference_email_id: str
-    latest_email_ids: List[str]
+    first_email_id: str
 
     def __init__(self, data: Dict = None):
         self._fields = self._get_fields()
@@ -198,28 +191,13 @@ class Model:
             )
         else:
             self.created_at = current_utc_time
-            self.reference_email_id = make_msgid()
-            self.latest_email_ids = []
+            self.first_email_id = make_msgid()
             saved_data_id = _database.create(
                 self.get_collection_name(), self._get_data_store_object(self.__dict__)
             )
             self.id = saved_data_id  # pylint: disable=C0103
 
         return self.get(self.id)
-
-    def get_email_reference_id(self: T, validate=True) -> List[str]:
-        """
-        Return a pair with the original MessageID reference for an email reply,
-        an a new MessageID: (original_email_id, new_email_id). If this is the first
-        notification (original_email_id and new_email_id) will be the same
-        """
-        new_reference_id = make_msgid()
-        if not self.latest_email_ids:
-            new_reference_id = self.reference_email_id
-
-        self.latest_email_ids += [new_reference_id]
-        self.save(validate=validate)
-        return self.reference_email_id, new_reference_id
 
     def update(self: T, data: Dict, validate=True) -> T:
         """

@@ -9,7 +9,7 @@ RUN yarn install
 RUN yarn build
 
 # Build dependencies
-FROM python:3.11.2-slim-buster@sha256:8f827e9cc31e70c5bdbed516d7d6627b10afad9b837395ac19315685d13b40c2 AS build
+FROM python:3.11.3-alpine3.18@sha256:caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7 AS build
 
 WORKDIR /usr/app
 RUN python -m venv /usr/app/venv
@@ -19,16 +19,16 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Create image for deployment
-FROM python:3.11.2-slim-buster@sha256:8f827e9cc31e70c5bdbed516d7d6627b10afad9b837395ac19315685d13b40c2 AS backend
+FROM python:3.11.3-alpine3.18@sha256:caafba876f841774905f73df0fcaf7fe3f55aaf9cb48a9e369a41077f860d4a7 AS backend
 
-RUN groupadd -g 999 python && useradd -r -u 999 -g python python
+RUN addgroup -g 1001 pdmv && adduser --disabled-password -u 1001 -G pdmv pdmv
 
-RUN mkdir /usr/app && chown python:python /usr/app
+RUN mkdir /usr/app && chown pdmv:pdmv /usr/app
 WORKDIR /usr/app
 
-COPY --chown=python:python --from=frontend /usr/app/build ./build
-COPY --chown=python:python --from=build /usr/app/venv ./venv
-COPY --chown=python:python . .
+COPY --chown=pdmv:pdmv --from=frontend /usr/app/build ./build
+COPY --chown=pdmv:pdmv --from=build /usr/app/venv ./venv
+COPY --chown=pdmv:pdmv . .
 
 RUN rm -rf react_frontend/
 

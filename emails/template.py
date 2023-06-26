@@ -4,7 +4,7 @@ Email template base model
 from services.email_service import EmailService
 from models.report import Report
 from utils.email_content import EmailAddress
-from typing import List
+from typing import List, Optional
 
 
 def format_new_line(html):
@@ -32,27 +32,25 @@ class EmailTemplate:
 
     def __init__(
         self,
-        subject="",
-        body="",
-        recipients="",
-        original_element_email_id=None,
-        new_email_id_for_reply=None,
-        notification_references=None,
+        subject: str = "",
+        body: str = "",
+        recipients: List[str] = [],
+        original_email_id: str = "",
+        email_id: Optional[str] = None,
     ) -> None:
         self.subject = subject
         self.body = body
         self.recipients = recipients
-        self.original_element_email_id = original_element_email_id
-        self.new_email_id_for_reply = new_email_id_for_reply
-        self.notification_references = notification_references
+        self.original_email_id = original_email_id
+        self.email_id = email_id
 
-    def __get_author_emails(self, report: Report):
+    def __get_author_emails(self, report: Report) -> List[str]:
         """
         Get authors
         """
         return [author.email for author in report.authors]
 
-    def __get_related_emails(self, report: Report):
+    def __get_related_emails(self, report: Report) -> List[str]:
         """
         Get related email: authors, commentor
         """
@@ -80,7 +78,7 @@ class EmailTemplate:
             )
         )
 
-    def get_email_recipients_for_report(
+    def __get_email_recipients_for_report(
         self, report: Report, include_commentors=False
     ) -> List[str]:
         """
@@ -100,11 +98,8 @@ class EmailTemplate:
             else self.__get_author_emails(report=report)
         )
 
-        # Forums for extra notifications
-        extra_notifications = self.__send_extra_notifications(report=report)
-
         # Build final recipient list
-        all_recipients += default_forum + related_authors + extra_notifications
+        all_recipients += default_forum + related_authors
         all_recipients = list(set(all_recipients))
         all_recipients = [r for r in all_recipients if r]
 
@@ -118,7 +113,31 @@ class EmailTemplate:
             subject=self.subject,
             body=self.body,
             recipients=self.recipients,
-            original_element_email_id=self.original_element_email_id,
-            new_email_id_for_reply=self.new_email_id_for_reply,
-            notification_references=self.notification_references,
+            original_email_id=self.original_email_id,
+            email_id=self.email_id,
         )
+
+    def send_for_report(self, report: Report, include_commentors: bool = False):
+        """
+        Send a notification related to the reports.
+        Send an e-mail notification to each of the additional categories that need to be notified.
+        """
+        # Send an email to the main forum
+        EmailService.send(
+            subject=self.subject,
+            body=self.body,
+            recipients=self.__get_email_recipients_for_report(
+                report=report, include_commentors=include_commentors
+            ),
+            original_email_id=self.original_email_id,
+            email_id=self.email_id,
+        )
+
+        # Send an email to each extra category
+        for category_forum_email in self.__send_extra_notifications(report=report):
+            EmailService.send(
+                subject=self.subject,
+                body=self.body,
+                recipients=category_forum_email,
+                original_email_id=self.original_email_id,
+            )

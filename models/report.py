@@ -67,6 +67,16 @@ class Report(Model):
         )
 
     def get_group_components(self) -> Type[Tuple[str]]:
+        """
+        Parse report's groups into its components
+        The report group field is related to the category, subcategory and physics working group (PWG)
+        the report belongs to.
+
+        Returns:
+            ReportGroup: Namedtuple containing the report's category, subcategory and PWG
+                If for some reason, the group name cannot be parse to extract this three components
+                they will be assigned with empty strings.
+        """
         ReportGroup = namedtuple("ReportGroup", ["category", "subcategory", "pwg"])
 
         # self.group := Category.Subcategory.PWG
