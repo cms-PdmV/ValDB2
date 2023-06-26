@@ -138,6 +138,6 @@ class EmailTemplate:
             EmailService.send(
                 subject=self.subject,
                 body=self.body,
-                recipients=category_forum_email,
+                recipients=[category_forum_email],
                 original_email_id=self.original_email_id,
             )
