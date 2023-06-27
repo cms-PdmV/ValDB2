@@ -36,16 +36,16 @@ class EmailService:
         __smtp_port (int): Email gateway server port
         __smtp_auth_required (Optional[str]): If provided, authenticate
             the SMTP client against the email gateway server
-        __smtp_user (Optional[str]): If it is require to authenticate,
+        __smtp_user (str): If it is require to authenticate,
             this user will be used to perform a basic authentication
-        __smtp_password (Optional[str]): If it is require to authenticate,
+        __smtp_password (str): If it is require to authenticate,
             this password will be used to perform a basic authentication
     """
 
     __smtp_host: str = os.getenv("EMAIL_SERVER", "cernmx.cern.ch")
     __smtp_port: int = int(os.getenv("EMAIL_PORT", "25"))
-    __smtp_user: Optional[str] = os.getenv("EMAIL_ADDRESS")
-    __smtp_password: Optional[str] = os.getenv("EMAIL_PASSWORD")
+    __smtp_user: str = os.getenv("EMAIL_ADDRESS", "")
+    __smtp_password: str = os.getenv("EMAIL_PASSWORD", "")
     __smtp_auth_required: Optional[str] = os.getenv("EMAIL_AUTH_REQUIRED")
 
     @staticmethod
