@@ -9,6 +9,7 @@ from werkzeug.exceptions import Forbidden
 
 from emails.report_email import (
     ModifyReportEmailTemplate,
+    ChangeStatusReportEmailTemplate,
 )
 from utils.group import get_subcategory_from_group
 from core import Namespace
@@ -144,6 +145,10 @@ class ReportAPI(Resource):
             ModifyReportEmailTemplate().build(
                 report=report, report_campaign=report_campaign
             ).send_for_report(report=report)
+        if "status" in api.payload:
+            ChangeStatusReportEmailTemplate().build(
+                report, previous_report_status
+            ).send()
         return report.dict()
 
 
