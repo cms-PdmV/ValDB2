@@ -49,6 +49,7 @@ class Campaign(Model):
         for subcategory in self.subcategories:
             if "HLT" in subcategory:
                 return True
+        return False
 
     def notification_to_reconstruction(self) -> bool:
         """
@@ -58,3 +59,4 @@ class Campaign(Model):
         for subcategory in self.subcategories:
             if "Reconstruction" in subcategory:
                 return True
+        return False
