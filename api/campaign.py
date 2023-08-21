@@ -67,7 +67,9 @@ class CampaignListAPI(Resource):
         campaign.parse_datetime()
         campaign.reports = []
         campaign.save()
-        OpenCampaignEmailTemplate().build(campaign).send()
+        OpenCampaignEmailTemplate().build(campaign).send_campaign_notification(
+            campaign=campaign, open_campaign=True
+        )
         return campaign.dict()
 
 
@@ -150,7 +152,9 @@ class CampaignAPI(Resource):
                 report.campaign_name = campaign.name
                 report.save()
         if "is_open" in api.payload and api.payload["is_open"] is False:
-            SignOffCampaignEmailTemplate().build(campaign).send()
+            SignOffCampaignEmailTemplate().build(campaign).send_campaign_notification(
+                campaign=campaign
+            )
         return campaign.dict()
 
 

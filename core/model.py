@@ -3,7 +3,7 @@ Base model class for ORM
 """
 from datetime import datetime
 from enum import Enum
-from typing import Dict, TypeVar, Union, get_args, List
+from typing import Dict, TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
 from flask_restx import fields
@@ -12,11 +12,16 @@ from email.utils import make_msgid
 
 from .database import get_database
 
-PREFILLED_FIELDS = ["id", "created_at", "updated_at", "reference_email_id"]
+PREFILLED_FIELDS = [
+    "id",
+    "created_at",
+    "updated_at",
+    "reference_email_id",
+    "channel_email_id",
+]
 FILTER_OUT_LOAD_OBJECT_KEY = ["_fields", "_validation"]
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ["id"]
 _database = get_database()
-
 T = TypeVar("T")  # pylint: disable=C0103
 
 
@@ -192,6 +197,11 @@ class Model:
         else:
             self.created_at = current_utc_time
             self.reference_email_id = make_msgid()
+            self.channel_email_id: dict = {
+                "cms_talk_relval_pdmv": self.reference_email_id,
+                "cms_talk_trigger": make_msgid(),
+                "cms_talk_reco_muon": make_msgid(),
+            }
             saved_data_id = _database.create(
                 self.get_collection_name(), self._get_data_store_object(self.__dict__)
             )

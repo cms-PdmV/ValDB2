@@ -95,3 +95,19 @@ class Report(Model):
             category=category, subcategory=subcategory, pwg=pwg
         )
         return group_components
+
+    def notification_to_trigger(self) -> bool:
+        """
+        Check that "HLT" category is included into report's
+        group.
+        """
+        group = self.get_group_components()
+        return group.category == "HLT"
+
+    def notification_to_reconstruction(self) -> bool:
+        """
+        Check that "Reconstruction" category and "Muon" PWG are included
+        into report's group.
+        """
+        group = self.get_group_components()
+        return group.category == "Reconstruction" and group.pwg == "Muon"

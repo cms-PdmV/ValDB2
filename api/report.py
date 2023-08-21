@@ -8,7 +8,6 @@ from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
 
 from emails.report_email import (
-    ModifyReportEmailTemplate,
     ChangeStatusReportEmailTemplate,
 )
 from utils.group import get_subcategory_from_group
@@ -142,13 +141,12 @@ class ReportAPI(Resource):
             new_authors = [user] + previous_authors
             report.authors = new_authors
             report.save()
-            ModifyReportEmailTemplate().build(
-                report=report, report_campaign=report_campaign
-            ).send_for_report(report=report)
         if "status" in api.payload:
             ChangeStatusReportEmailTemplate().build(
-                report, previous_report_status
-            ).send()
+                report=report,
+                previous_status=previous_report_status,
+                report_campaign=report_campaign,
+            ).send_report_notification(report=report, campaign=report_campaign)
         return report.dict()
 
 

@@ -30,9 +30,11 @@ def group_label(group_path_string):
 class ModifyReportEmailTemplate(EmailTemplate):
     """
     Report of group is modified
-    Subject: [ValDB][1_2_3_abc][Reconstruction.Data.Tracker] Report has been modified
+    Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum, report's authors
     Template: modify_report_template.html
+
+    Use the same subject to group all emails under the same thread
     """
 
     def build(self, report: Report, report_campaign: Campaign):
@@ -40,8 +42,7 @@ class ModifyReportEmailTemplate(EmailTemplate):
         build email
         """
         self.original_email_id = report_campaign.reference_email_id
-        self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
-            Report has been modified"
+        self.subject = f"[ValDB][{report.campaign_name}] Campaign notification"
         content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
             MODIFY_REPORT_TEMPLATE,
@@ -58,9 +59,11 @@ class ModifyReportEmailTemplate(EmailTemplate):
 class ChangeStatusReportEmailTemplate(EmailTemplate):
     """
     Report's status is modified
-    Subject: [ValDB][1_2_3_abc][Reconstruction.Data.Tracker] Report's status has been changed
+    Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum, report's authors
     Template: change_status_report_template.html
+
+    Use the same subject to group all emails under the same thread
     """
 
     def build(
@@ -70,8 +73,8 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
         build email
         """
         self.original_email_id = report_campaign.reference_email_id
-        self.subject = f"[ValDB][{report.campaign_name}][{group_label(report.group)}] \
-            Report's status has been changed"
+        self.subject = f"[ValDB][{report.campaign_name}] Campaign notification"
+        content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
             CHANGE_STATUS_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
@@ -80,6 +83,7 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
             new_status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=", ".join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
+            content=format_new_line(markdown.markdown(content_markdown_no_links)),
         )
         return self
 
@@ -87,9 +91,11 @@ class ChangeStatusReportEmailTemplate(EmailTemplate):
 class NewCommentReportEmailTemplate(EmailTemplate):
     """
     New comment has been added to the report
-    Subject: [ValDB][1_2_3_abc][Reconstruction.Data.Tracker] New comment
+    Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum, report's authors, related users
     Template: new_comment_report_template.html
+
+    Use the same subject to group all emails under the same thread
     """
 
     def build(self, report: Report, activity: Activity, report_campaign: Campaign):
@@ -97,9 +103,7 @@ class NewCommentReportEmailTemplate(EmailTemplate):
         build email
         """
         self.original_email_id = report_campaign.reference_email_id
-        self.subject = (
-            f"[ValDB][{report.campaign_name}][{group_label(report.group)}] New comment"
-        )
+        self.subject = f"[ValDB][{report.campaign_name}] Campaign notification"
         self.body = render_template(
             NEW_COMMENT_REPORT_TEMPLATE,
             campaign_name=report.campaign_name,

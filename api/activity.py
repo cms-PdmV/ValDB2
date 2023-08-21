@@ -63,5 +63,7 @@ class ActivityAPI(Resource):
         if activity.type == ActivityType.COMMENT:
             NewCommentReportEmailTemplate().build(
                 report=report, activity=activity, report_campaign=campaign
-            ).send_for_report(report=report)
+            ).send_report_notification(
+                report=report, campaign=campaign, include_commentors=True
+            )
         return "ok"
