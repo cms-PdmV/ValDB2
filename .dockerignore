@@ -1,0 +1,16 @@
+# Discard the following directories
+.vscode/
+venv/
+node_modules/
+react_frontend/node_modules/
+.github/
+__pycache__/
+build/
+logs/
+migration/
+*.env
+.gitignore
+.nvmrc
+run.sh
+*.json
+*.yaml

@@ -1,4 +1,4 @@
-import { faCheck, faExclamation, faPen, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faExclamation, faPen, faSearch, faTimes, faBell } from "@fortawesome/free-solid-svg-icons";
 import { ReportStatus } from "../types";
 import { color } from "./css";
 
@@ -45,10 +45,10 @@ export const reportStatusStyle = {
     },
     [ReportStatus.CHANGES_EXPECTED]: {
         label: 'Changes Expected',
-        icon: faExclamation,
+        icon: faBell,
         style: {
             color: 'white',
-            background: color.red,
+            background: color.brown,
         },
     }
 }

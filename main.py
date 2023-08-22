@@ -4,7 +4,8 @@ Main module for valdb
 import os
 import logging
 
-from flask import Flask, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import Flask, request, session, render_template
 from jinja2.exceptions import TemplateNotFound
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ from api import api
 from api.static import serve_file
 from database.index import database_index_setup
 from lookup.user_group import UserGroupLookup
-from middlewares.authorization import AuthorizationMiddleware
+from middlewares.auth import AuthenticationMiddleware
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -28,10 +29,30 @@ lookup.update()
 app = Flask(__name__,
     static_folder='./build/static',
     template_folder='./build')
-app.wsgi_app = AuthorizationMiddleware(app.wsgi_app)
 
+# Set secret key for session cookie
+app.secret_key = os.getenv('SECRET_KEY')
+
+# Handle redirections from a reverse proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+# Enable CORS
+CORS(
+    app,
+    allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+    supports_credentials=True,
+)
+
+# Enable OIDC authentication
+auth: AuthenticationMiddleware = AuthenticationMiddleware(
+    app=app,
+    client_id=os.getenv('CLIENT_ID'),
+    client_secret=os.getenv('CLIENT_SECRET'),
+    home_endpoint="catch_all"
+)
+app.before_request(lambda: auth(request=request, session=session))
 api.init_app(app)
-CORS(app, supports_credentials=True)
+
 
 @app.route('/', defaults={'_path': ''}, strict_slashes=False)
 @app.route('/<path:_path>')

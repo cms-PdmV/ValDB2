@@ -32,11 +32,11 @@ Validation report database tool of PdmV
 ## Run Development
 This command will start backend and frontend in development mode. No build required for frontend. Hot-reload is enabled for both.
 ```
-./run dev
+./run.sh dev
 ```
 
 ## Run Test
 This command will run test for backend. The test file located in `tests/` will be executed.
 ```
-./run test
+./run.sh test
 ```

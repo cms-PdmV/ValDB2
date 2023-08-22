@@ -165,12 +165,13 @@ export function ReportPage(): ReactElement {
           })
           return
         } else {
+          const reportId = report?.id || ''
           const data = new FormData()
           data.append('file', file)
           data.append('name', file.name)
           data.append('type', file.type)
           data.append('size', file.size.toFixed())
-          await attachmentService.create(data).then(attactment => {
+          await attachmentService.create(reportId, data).then(attactment => {
             message.success(`Uploaded ${attactment.name}`)
             uploadedAttachments.push(attactment)
             if (mdeInstance) {
@@ -194,7 +195,7 @@ export function ReportPage(): ReactElement {
         { (mode === 'view' || mode === 'readonly') && <ReportContentViewer content={content} />}
       </Box>}
       <h3>Attachments</h3>
-      <AttachmentList attachments={attachments} onUpdate={handleUpdateAttachmentForReport} />
+      <AttachmentList reportId={report?.id || ''} attachments={attachments} onUpdate={handleUpdateAttachmentForReport} />
       <h3>Activities</h3>
       { activities && <ActivityList activities={activities} /> }
       <HorizontalLine />

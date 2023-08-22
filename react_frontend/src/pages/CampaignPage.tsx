@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { useMemo } from "react";
 import { ReactElement, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { LatestActivitySpan } from "../components/LatestActivitySpan";
 import { CategoryView } from "../components/CategoryView";
 import { Container } from "../components/Container";
 import { HorizontalLine } from "../components/HorizontalLine";
@@ -29,8 +30,10 @@ export function CampaignPage(): ReactElement {
 
   useEffect(() => {
     campaignService.get(id).then(fetchedCampaign => {
-      setCampaign(fetchedCampaign.campaign)
-      setGroups(fetchedCampaign.groups)
+      const campaignData = fetchedCampaign.campaign
+      const groupsData = fetchedCampaign.groups
+      setCampaign(campaignData)
+      setGroups(groupsData)
     })
   }, [])
 
@@ -98,6 +101,8 @@ export function CampaignPage(): ReactElement {
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Created: {campaign?.created_at && campaign?.created_at.split(' ')[0]}</Box>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faCalendar} style={{ color: '#b0b0b0' }} />&nbsp;Deadline: {campaign?.deadline && campaign?.deadline.split(' ')[0]}</Box>
+      <Spacer rem={0.5} />
+      <p><FontAwesomeIcon icon={faCalendar} style={{color: '#b0b0b0'}}/>&nbsp;Lastest activity on report:&nbsp;{campaign?.latest_activities && <LatestActivitySpan latestActivities={campaign.latest_activities} />}</p>
       <Spacer rem={0.5} />
       <Box fontSize="0.8rem"><FontAwesomeIcon icon={faInfo} style={{ color: '#b0b0b0' }} />&nbsp;Relmon: <Linkify>{campaign?.relmon}</Linkify></Box>
       { user?.role === UserRole.ADMIN && <>
