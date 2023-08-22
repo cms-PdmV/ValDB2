@@ -67,6 +67,16 @@ class Report(Model):
         )
 
     def get_group_components(self) -> Type[Tuple[str]]:
+        """
+        Parse report's groups into its components
+        The report group field is related to the category, subcategory and physics working group (PWG)
+        the report belongs to.
+
+        Returns:
+            ReportGroup: Namedtuple containing the report's category, subcategory and PWG
+                If for some reason, the group name cannot be parse to extract this three components
+                they will be assigned with empty strings.
+        """
         ReportGroup = namedtuple("ReportGroup", ["category", "subcategory", "pwg"])
 
         # self.group := Category.Subcategory.PWG
@@ -85,3 +95,19 @@ class Report(Model):
             category=category, subcategory=subcategory, pwg=pwg
         )
         return group_components
+
+    def notification_to_trigger(self) -> bool:
+        """
+        Check that "HLT" category is included into report's
+        group.
+        """
+        group = self.get_group_components()
+        return group.category == "HLT"
+
+    def notification_to_reconstruction(self) -> bool:
+        """
+        Check that "Reconstruction" category and "Muon" PWG are included
+        into report's group.
+        """
+        group = self.get_group_components()
+        return group.category == "Reconstruction" and group.pwg == "Muon"

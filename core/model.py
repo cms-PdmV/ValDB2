@@ -3,7 +3,7 @@ Base model class for ORM
 """
 from datetime import datetime
 from enum import Enum
-from typing import Dict, TypeVar, Union, get_args, List
+from typing import Dict, TypeVar, Union, get_args
 import re
 from bson.objectid import ObjectId
 from flask_restx import fields
@@ -17,12 +17,11 @@ PREFILLED_FIELDS = [
     "created_at",
     "updated_at",
     "reference_email_id",
-    "latest_email_ids",
+    "channel_email_id",
 ]
 FILTER_OUT_LOAD_OBJECT_KEY = ["_fields", "_validation"]
 FILTER_OUT_STORE_OBJECT_KEY = FILTER_OUT_LOAD_OBJECT_KEY + ["id"]
 _database = get_database()
-
 T = TypeVar("T")  # pylint: disable=C0103
 
 
@@ -50,8 +49,7 @@ class Model:
     id: ObjectId  # pylint: disable=C0103
     created_at: datetime
     updated_at: datetime
-    reference_email_id: str
-    latest_email_ids: List[str]
+    first_email_id: str
 
     def __init__(self, data: Dict = None):
         self._fields = self._get_fields()
@@ -199,27 +197,17 @@ class Model:
         else:
             self.created_at = current_utc_time
             self.reference_email_id = make_msgid()
-            self.latest_email_ids = []
+            self.channel_email_id: dict = {
+                "cms_talk_relval_pdmv": self.reference_email_id,
+                "cms_talk_trigger": make_msgid(),
+                "cms_talk_reco_muon": make_msgid(),
+            }
             saved_data_id = _database.create(
                 self.get_collection_name(), self._get_data_store_object(self.__dict__)
             )
             self.id = saved_data_id  # pylint: disable=C0103
 
         return self.get(self.id)
-
-    def get_email_reference_id(self: T, validate=True) -> List[str]:
-        """
-        Return a pair with the original MessageID reference for an email reply,
-        an a new MessageID: (original_email_id, new_email_id). If this is the first
-        notification (original_email_id and new_email_id) will be the same
-        """
-        new_reference_id = make_msgid()
-        if not self.latest_email_ids:
-            new_reference_id = self.reference_email_id
-
-        self.latest_email_ids += [new_reference_id]
-        self.save(validate=validate)
-        return self.reference_email_id, new_reference_id
 
     def update(self: T, data: Dict, validate=True) -> T:
         """

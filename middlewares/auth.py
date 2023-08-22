@@ -49,7 +49,7 @@ class AuthenticationMiddleware:
         client_id: str,
         client_secret: str,
         home_endpoint: str,
-        valid_audiences: list[str] = None,
+        valid_audiences: list[str] = [],
     ):
         self.oidc_config: str = os.getenv(
             "REALM_OIDC_CONFIG", AuthenticationMiddleware.OIDC_CONFIG_DEFAULT
@@ -64,13 +64,13 @@ class AuthenticationMiddleware:
         self.client_id: str = client_id
         self.client_secret: str = client_secret
         self.valid_audiences: list[str] = (
-            [self.client_id] if valid_audiences is None else valid_audiences
+            [self.client_id] if not valid_audiences else valid_audiences
         )
         self.jwk: jwt.PyJWK = self.__retrieve_jwk()
         self.oauth_client: OAuth = self.__register_oauth_client()
         self.oauth_blueprint: Blueprint = self.__register_blueprint()
 
-    def __auth(self):
+    def __auth(self) -> Response:
         """
         This endpoint starts the communication with the OAuth 2.0 Authorization Server
         to request an access and refresh token.
@@ -78,7 +78,7 @@ class AuthenticationMiddleware:
         redirect_uri: str = url_for("oauth.callback", _external=True)
         return self.oauth_client.cern.authorize_redirect(redirect_uri)
 
-    def __callback(self):
+    def __callback(self) -> Response:
         """
         This endpoint handles the callback from the OAuth 2.0 Authorization Server and
         stores the access and refresh tokens inside a cookie handled by the Flask.
@@ -177,15 +177,15 @@ class AuthenticationMiddleware:
         :return CERN user information
         :rtype dict
         """
-        username: str = decoded_token.get("sub")
-        roles: list[str] = decoded_token.get("cern_roles")
-        email: str = decoded_token.get("email")
+        username: str = decoded_token.get("sub", "")
+        roles: list[str] = decoded_token.get("cern_roles", [])
+        email: str = decoded_token.get("email", "")
         # Lowercase the email
-        email: str = email.lower()
+        email = email.lower()
 
-        given_name: str = decoded_token.get("given_name")
-        family_name: str = decoded_token.get("family_name")
-        fullname: str = decoded_token.get("name")
+        given_name: str = decoded_token.get("given_name", "")
+        family_name: str = decoded_token.get("family_name", "")
+        fullname: str = decoded_token.get("name", "")
         return {
             "username": username,
             "roles": roles,
@@ -195,7 +195,7 @@ class AuthenticationMiddleware:
             "fullname": fullname,
         }
 
-    def __decode_token(self, access_token: str) -> dict:
+    def __decode_token(self, access_token: str) -> dict | None:
         """
         Decodes a JWT access token and validates it using a JWK and the
         valid audiences.
@@ -245,19 +245,19 @@ class AuthenticationMiddleware:
         """
         session_cookie: dict = session.get("token")
         if session_cookie:
-            access_token: str = session_cookie.get("access_token")
+            access_token: str = session_cookie.get("access_token", "")
             try:
                 user_info: dict | None = self.__decode_token(access_token=access_token)
                 return user_info
             except ExpiredSignatureError:
                 # Try to refresh the token via refresh token claim
                 try:
-                    refresh_token: str = session_cookie.get("refresh_token")
+                    refresh_token: str = session_cookie.get("refresh_token", "")
                     new_token: dict = self.oauth_client.cern.fetch_access_token(
                         refresh_token=refresh_token, grant_type="refresh_token"
                     )
                     # Update the new token
-                    new_access_token: str = new_token.get("access_token")
+                    new_access_token: str = new_token.get("access_token", "")
                     session["token"].update(new_token)
                     return self.__decode_token(access_token=new_access_token)
                 except Exception:
@@ -287,7 +287,7 @@ class AuthenticationMiddleware:
                 return None
         return None
 
-    def __call__(self, request: Request, session: SessionMixin) -> None:
+    def __call__(self, request: Request, session: SessionMixin) -> Response | None:
         """
         Validate the access token and force a token request if necessary.
         :return None if there is a valid access token to authenticate the user or if the user is
@@ -307,13 +307,12 @@ class AuthenticationMiddleware:
             # redirect loops.
             return None
 
-        user_data: dict = None
         user_data: dict | None = self.__retrieve_token_from_request(request=request)
         if user_data:
             session["user"] = user_data
             return None
         # Check if authentication comes from a cookie session
-        user_data: dict | None = self.__retrieve_token_from_session(session=session)
+        user_data = self.__retrieve_token_from_session(session=session)
         if user_data:
             session["user"] = user_data
             return None

@@ -17,20 +17,21 @@ SIGN_OFF_CAMPAIGN_TEMPLATE = "emails/templates/sign_off_campaign_template.html"
 class OpenCampaignEmailTemplate(EmailTemplate):
     """
     Campaign is now open, create
-    Subject: [ValDB][1_2_3_abc] Campaign is now open
+    Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum
     Template: open_campaign_template.html
+
+    Use the same subject to group all emails under the same thread
     """
 
     def build(self, campaign: Campaign):
         """
         build email
         """
-        original_email_id, new_email_id = campaign.get_email_reference_id()
-        self.original_element_email_id = original_email_id
-        self.new_email_id_for_reply = new_email_id
-        self.notification_references = campaign.latest_email_ids
-        self.subject = f"[ValDB][{campaign.name}] Campaign is now open"
+        self.original_email_id = campaign.reference_email_id
+        # This is the first email, we will attach all the notifications below it
+        self.email_id = campaign.reference_email_id
+        self.subject = f"[ValDB][{campaign.name}] Campaign notification"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(
             OPEN_CAMPAIGN_TEMPLATE,
@@ -48,20 +49,19 @@ class OpenCampaignEmailTemplate(EmailTemplate):
 class SignOffCampaignEmailTemplate(EmailTemplate):
     """
     Campaign has been sign off
-    Subject: [ValDB][1_2_3_abc] Campaign has been signed off
+    Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum
     Template: sign_off_campaign_template.html
+
+    Use the same subject to group all emails under the same thread
     """
 
     def build(self, campaign: Campaign):
         """
         build email
         """
-        original_email_id, new_email_id = campaign.get_email_reference_id()
-        self.original_element_email_id = original_email_id
-        self.new_email_id_for_reply = new_email_id
-        self.notification_references = campaign.latest_email_ids
-        self.subject = f"[ValDB][{campaign.name}] Campaign has been signed off"
+        self.original_email_id = campaign.reference_email_id
+        self.subject = f"[ValDB][{campaign.name}] Campaign notification"
         self.recipients = [EmailAddress.forum]
         self.body = render_template(
             SIGN_OFF_CAMPAIGN_TEMPLATE,
