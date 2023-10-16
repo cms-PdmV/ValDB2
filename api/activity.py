@@ -4,17 +4,16 @@ Activity API
 from collections import deque
 from flask.globals import session
 from flask_restx import Resource
-
 from emails.report_email import NewCommentReportEmailTemplate
 from models.report import Report
 from models.campaign import Campaign
 from models.activity import Activity, ActivityType
 from models.user import User
 from core import Namespace
-
+from utils.logger import api_logger
 
 api = Namespace("reports", description="Report in the system")
-
+_logger = api_logger
 activity_model = api.model(Activity)
 
 
@@ -29,8 +28,13 @@ class ActivityAPI(Resource):
         """
         Get activity by id
         """
-        report = Report.get(reportid).dict()
-        return report["activities"] or []
+        report = Report.get(reportid)
+        report_content = report.dict()
+        _logger.info(
+            "Retriving all activities for report: %s",
+            f"{report.campaign_name} {report.group}",
+        )
+        return report_content["activities"] or []
 
     def post(self, reportid):
         """
@@ -38,6 +42,10 @@ class ActivityAPI(Resource):
         body: Activity
         """
         report = Report.get(reportid)
+        _logger.info(
+            "Creating a new activity for report: %s",
+            f"{report.campaign_name} {report.group}",
+        )
         campaign = Campaign.get_by_name(report.campaign_name)
         user = User.get_from_session(session)
 

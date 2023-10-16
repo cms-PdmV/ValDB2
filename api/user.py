@@ -1,16 +1,14 @@
 '''
 User API
 '''
-import logging
 import os
-
 from flask.globals import request, session
 from flask_restx import Resource
-
 from emails.user_email import ChangeUserRoleEmailTemplate
 from utils.query import add_skip_and_limit, build_query, build_sort, serialize_raw_query
 from utils.user import require_permission
 from utils.request import parse_list_of_tuple
+from utils.logger import LoggerManager
 from core import Namespace
 from core.database import get_database
 from data.group import get_all_groups
@@ -19,8 +17,7 @@ from lookup.user_group import UserGroupLookup
 
 
 api = Namespace('users', description='Users and their permission groups')
-_logger = logging.getLogger('api.user')
-
+_logger = LoggerManager(name='api.user').logger
 user_model = api.model(User)
 
 def process_payload(body):
@@ -86,12 +83,11 @@ class UserInfoAPI(Resource):
         '''
         email = session.get('user').get('email')
         fullname = session.get('user').get('fullname')
-        _logger.info('User info request - Email: %s', email)
+        _logger.info('Checking if user is already registered')
         existed_user = User.get_by_email(email=email)
         if not existed_user:
             _logger.info(
-                'User is not registered in the app. Register email: %s',
-                email
+                'User is not registered in the app. Register its data',
             )
             existed_user = User({
                 'role': UserRole.USER,

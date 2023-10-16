@@ -3,10 +3,8 @@ Campaign API
 """
 import os
 from copy import deepcopy
-
 from flask.globals import request, session
 from flask_restx import Resource
-
 from emails.campaign_email import (
     OpenCampaignEmailTemplate,
     SignOffCampaignEmailTemplate,
@@ -14,6 +12,7 @@ from emails.campaign_email import (
 from utils.query import add_skip_and_limit, build_query, build_sort
 from utils.user import require_permission
 from utils.request import parse_list_of_tuple
+from utils.logger import api_logger
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
@@ -26,7 +25,7 @@ api = Namespace(
     "campaigns",
     description="Manager can create, read, update and delete campaign in the system",
 )
-
+_logger = api_logger
 campaign_model = api.model(Campaign)
 
 
@@ -42,6 +41,7 @@ class CampaignListAPI(Resource):
         Get all campaign list
         """
         query_params = request.args
+        _logger.info("Retriving all campaigns - Query: %s", query_params)
         sorting = parse_list_of_tuple(query_params.get("sort"))
         database_query = build_query(["name"], query_params)
         query = (
@@ -64,6 +64,7 @@ class CampaignListAPI(Resource):
         require_permission(session=session, roles=[UserRole.ADMIN])
         data = api.payload
         campaign = Campaign(data)
+        _logger.info("Creating campaign: %s", campaign.name)
         campaign.parse_datetime()
         campaign.reports = []
         campaign.save()
@@ -85,7 +86,9 @@ class CampaignGetAPI(Resource):
         Get campaign by id
         """
         campaign = Campaign.get_by_name(campaignname)
+        _logger.info("Retriving campaign: %s", campaign.name)
         if not campaign:
+            _logger.error("Campaign %s not found", campaign.name)
             return {"message": "not found"}, 404
 
         # report lookup table
@@ -145,6 +148,7 @@ class CampaignAPI(Resource):
         """
         require_permission(session=session, roles=[UserRole.ADMIN])
         campaign = Campaign.get(campaignid)
+        _logger.info("Updating campaign: %s", campaign.name)
         campaign.parse_datetime()
         campaign.update(api.payload)
         if "name" in api.payload:
@@ -176,6 +180,7 @@ class CampaignMigrationAPI(Resource):
         reports_to_create = data.pop("reports")
         campaign_data = deepcopy(data)
         campaign = Campaign(campaign_data)
+        _logger.info("Bulking campaign: %s", campaign.name)
         campaign = campaign.save()
 
         # Campaign reports

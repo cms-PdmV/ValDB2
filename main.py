@@ -2,8 +2,6 @@
 Main module for valdb
 '''
 import os
-import logging
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, request, session, render_template
 from jinja2.exceptions import TemplateNotFound
@@ -17,7 +15,6 @@ from lookup.user_group import UserGroupLookup
 from middlewares.auth import AuthenticationMiddleware
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
 
 # setup database indexes
 database_index_setup()
