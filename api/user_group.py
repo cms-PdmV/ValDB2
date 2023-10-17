@@ -4,16 +4,16 @@ User group API
 from flask.globals import request, session
 from flask_restx import Resource
 from werkzeug.exceptions import BadRequest
-
 from emails.user_email import ChangeUserPermissionEmailTemplate, ChangeUserRoleEmailTemplate
 from data.group import get_all_groups
 from models.user import User, UserRole
 from lookup.user_group import UserGroupLookup, ADMINISTRATOR_KEY
 from core import Namespace
 from utils.user import require_permission
-
+from utils.logger import api_logger
 
 api = Namespace('user permission groups', description='Get group of users in each group')
+_logger = api_logger
 
 @api.route('/get/<string:group_path>/')
 @api.param('group_path', 'Group path string or "Administrator"')
@@ -94,10 +94,16 @@ class UserGroupController():
                     )
 
             if target_role == UserRole.ADMIN:
+                _logger.info("Including %s as administrator", email)
                 user.groups = get_all_groups()
                 ChangeUserRoleEmailTemplate().build(user).send()
             elif target_role == UserRole.VALIDATOR:
                 if group not in user.groups:
+                    _logger.info(
+                        "Including %s as validator for group %s",
+                        email,
+                        group
+                    )
                     user.groups.append(group)
                     ChangeUserPermissionEmailTemplate().build(user, 'add', group).send()
             user.role = target_role
@@ -116,12 +122,18 @@ class UserGroupController():
             user = User.get(user_id)
             if user:
                 if group == ADMINISTRATOR_KEY:
+                    _logger.info("Removing %s as administrator", user.email)
                     user.role = UserRole.USER
                     user.groups = []
                     user.save()
                     ChangeUserRoleEmailTemplate().build(user).send()
                 else:
                     if group in user.groups:
+                        _logger.info(
+                            "Removing %s as validator for group %s",
+                            user.email,
+                            group
+                        )
                         user.groups.remove(group)
                         ChangeUserPermissionEmailTemplate().build(user, 'remove', group).send()
                         user.save()

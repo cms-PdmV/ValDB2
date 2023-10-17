@@ -6,11 +6,11 @@ import pymongo
 from flask.globals import request, session
 from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
-
 from emails.report_email import (
     ChangeStatusReportEmailTemplate,
 )
 from utils.group import get_subcategory_from_group
+from utils.logger import api_logger
 from core import Namespace
 from models.report import Report, ReportStatus
 from models.campaign import Campaign
@@ -21,7 +21,7 @@ from models.attachment import Attachment
 DEFAULT_REPORT_STATUS = ReportStatus.NOT_YET_DONE
 
 api = Namespace("reports", description="Report in the system")
-
+_logger = api_logger
 report_model = api.model(Report)
 
 
@@ -65,6 +65,7 @@ class AssignedReportAPI(Resource):
         """
         Get assign report
         """
+        _logger.info("Retrieving all assigned reports")
         user = User.get_from_session(session)
         user_subcategories = [
             get_subcategory_from_group(group) for group in user.groups
@@ -105,6 +106,11 @@ class ReportSearchAPI(Resource):
         """
         Search report by campaign name and group name
         """
+        _logger.info(
+            "Looking for the report %s included into the campaign %s",
+            group,
+            campaign,
+        )
         report = Report.search(campaign, group)
         if not report:
             return None
@@ -125,9 +131,19 @@ class ReportAPI(Resource):
         """
         report = Report.get(reportid)
         report_campaign: Campaign = Campaign.get_by_name(report.campaign_name)
+        _logger.info(
+            "Updating report's content - Report: %s - Campaign: %s",
+            report.group,
+            report_campaign.name,
+        )
         previous_report_status = report.status
         user = User.get_from_session(session=session)
         if report.group not in user.groups:
+            _logger.error(
+                "You are not allowed to modify the report %s for campaign %s",
+                report.group,
+                report_campaign.name,
+            )
             raise Forbidden()
         if "authors" in api.payload:
             api.payload.pop("authors")
@@ -165,7 +181,11 @@ class AttachmentCreateAPI(Resource):
         file = request.files.get("file")
         file_base64 = base64.b64encode(file.read())
         file_content = file_base64.decode("utf-8")
-
+        _logger.info(
+            "Including attachment for report - Report: %s - Campaign: %s",
+            report.group,
+            report.campaign_name,
+        )
         new_attachment = Attachment(
             {
                 "name": request.form.get("name"),

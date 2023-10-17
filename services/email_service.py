@@ -16,15 +16,18 @@ Attributes:
 import os
 from email.message import EmailMessage
 from utils.email_content import EmailAddress
+from utils.logger import LoggerManager
 from email.utils import make_msgid
 from typing import List, Optional
 import logging
 import smtplib
 
-_logger: logging.Logger = logging.getLogger("service.email")
 enable_to_production: Optional[str] = os.getenv("PRODUCTION")
 custom_dev_subject_header: Optional[str] = os.getenv("DEV_SUBJECT_HEADER")
-
+_logger: logging.Logger = LoggerManager(
+    name="service.email",
+    level=logging.DEBUG if enable_to_production else logging.INFO
+).logger
 
 class EmailService:
     """
