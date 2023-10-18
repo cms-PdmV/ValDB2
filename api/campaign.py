@@ -204,3 +204,127 @@ class CampaignMigrationAPI(Resource):
         campaign.parse_datetime()
         campaign = campaign.save()
         return campaign.dict()
+
+
+@api.route("/comparison/")
+class CampaignReportComparison(Resource):
+    """
+    Retrieve all the reports related to a group of campaigns
+    to compare the reports progress.
+    """
+
+    def get(self):
+        search_by: str = request.args.get("search", "")
+        if not search_by:
+            cause: str = "No search query provided"
+            _logger.error(cause)
+            return {"message": cause}, 400
+        try:
+            return self.__retrieve_comparison(search=search_by)
+        except Exception as e:
+            _logger.error(e, stack_info=True)
+            return {
+                "message": "Unable to retrieve a comparison from query"
+            }
+
+    def __retrieve_comparison(self, search: str):
+        """
+        Retrieve the information for the desired campaigns and format
+        the result as required.
+
+        Args:
+            search (str): Regex to filter the desired campaigns
+                by name.
+        """
+        campaigns: list[Campaign] = self.__get_campaigns_comparison(search=search)
+        grouped: dict = self.__group_campaigns_reports(campaigns=campaigns)
+        groups_arranged: list = self.__arrange_elements(grouped=grouped)
+        result: dict = {
+            "campaigns": [c.name for c in campaigns],
+            "categories": groups_arranged,
+            "regex": search,
+        }
+        return result
+
+    def __get_campaigns_comparison(self, search: str) -> list[Campaign]:
+        """
+        Retrieve the information related to all the campaigns
+        whose name matches the regex given
+        
+        Args:
+            search (str): Regex to filter the desired campaigns
+                by name.
+        Returns:
+            list[Campaign]: Related campaigns.
+        """
+        database_query = build_query(["name"], {"search": search})
+        campaign_query_result = (
+            get_database()
+            .database[Campaign.get_collection_name()]
+            .find(database_query, {"reports": False})
+            .collation({"locale": "en_US", "numericOrdering": True})
+        )
+        campaigns: Campaign = [
+            Campaign.get_by_name(result.get("name"))
+            for result in campaign_query_result
+        ]
+        return campaigns
+    
+    def __group_campaigns_reports(self, campaigns: list[Campaign]) -> dict:
+        """
+        Group all the reports in the campaigns per category, subcategory 
+        and include the report status per each group.
+
+        Args:
+            campaings (list[Campaign]): Campaigns to compare.
+        Returns:
+            dict: Report's statuses for all the campaigns involved group by
+                category and subcategory.
+        """
+        category: dict = {}
+        for campaign in campaigns:
+            campaign_name: str = campaign.name
+            for report in campaign.reports:
+                report_category, report_subcategory, report_group = report.get_group_components()
+                campaign_progress = {"campaign": campaign_name, "status": report.status.value}
+                
+                stored_category = category.get(report_category, {})
+                stored_subcategory = stored_category.get(report_subcategory, {})
+                stored_group = stored_subcategory.get(report_group, [])
+                stored_group.append(campaign_progress)
+
+                stored_subcategory[report_group] = stored_group
+                stored_category[report_subcategory] = stored_subcategory
+                category[report_category] = stored_category
+        
+        return category
+    
+    def __arrange_elements(self, grouped: dict) -> dict:
+        """
+        Arranges the elements into another order
+
+        Args:
+            grouped (dict): Report's statuses for all the campaigns involved group by
+                category and subcategory.
+        """
+        result: list = []
+        for category, category_content in grouped.items():
+            subcategories_parsed: list = []
+            for subcategory, subcategory_content in category_content.items():
+                groups_parsed: list = []
+                for group, campaing_report_status in subcategory_content.items():
+                    groups_parsed.append({
+                        "group": group,
+                        "path": f"{category}.{subcategory}.{group}",
+                        "status": campaing_report_status
+                    })
+                subcategories_parsed.append({
+                    "subcategory": subcategory,
+                    "groups": groups_parsed
+                })
+            result.append({
+                "category": category,
+                "subcategories": subcategories_parsed
+            })
+        return result
+    

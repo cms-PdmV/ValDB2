@@ -14,6 +14,8 @@ import { UserContext } from "../context/user";
 import { campaignService } from "../services";
 import { Campaign, Sorting, SortingType, UserRole } from "../types";
 import { PageLimit } from "../utils/constant";
+import { HorizontalLine } from "../components/HorizontalLine";
+import { CampaignReportProgress } from "../components/CampaignReportProgress";
 
 
 const getCategoryLabel = (subcategories: string[]): string[] => subcategories ? subcategories.map(subcategory => subcategory.split('.')[0]).filter((x, i, a) => a.indexOf(x) === i) : []
@@ -129,6 +131,9 @@ export function AllCampaignPage (): ReactElement {
           </TableBody>
         </Table>
       </TableContainer>}
+      <HorizontalLine />
+      <Spacer rem={2} />
+      {search ? <CampaignReportProgress search={search}/> : null}
     </Container>
   )
 }

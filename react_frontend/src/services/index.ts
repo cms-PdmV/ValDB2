@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Activity, Campaign, Category, Report, User, Attachment, Sorting } from '../types'
+import { Activity, Campaign, Category, Report, User, Attachment, Sorting, ReportComparison } from '../types'
 import { parseSortingParam } from '../utils/request'
 import { Modal } from 'antd'
 
@@ -36,6 +36,7 @@ export const campaignService = {
     update: (id: string, body: Partial<Campaign>): Promise<Campaign> => axios.put(`${serverUrl}/campaigns/${id}/`, body).then(response).catch(error),
     getAll: (skip: number, limit: number, sort: Sorting[], search?: string): Promise<Campaign[]> => axios.get(`${serverUrl}/campaigns/?skip=${skip}&limit=${limit}&search=${search || ''}&sort=${parseSortingParam(sort)}`).then(response).catch(error),
     get: (campaignName: string): Promise<CampaignResponse> => axios.get(`${serverUrl}/campaigns/get/${campaignName}/`).then(response).catch(error),
+    comparison: (search: string): Promise<ReportComparison> => axios.get(`${serverUrl}/campaigns/comparison/?search=${search}`).then(response).catch(error)
 }
 
 export const reportService = {
@@ -48,6 +49,7 @@ export const reportService = {
 
 export const categoryService = {
     getAll: (): Promise<Category[]>  => axios.get(`${serverUrl}/groups/`).then(response).catch(error),
+    getHierachy: () => axios.get(`${serverUrl}/groups/hierarchy/`).then(response).catch(error),
 }
 
 export const userService = {

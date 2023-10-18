@@ -117,3 +117,43 @@ export interface Sorting {
     value: string
     type: SortingType
 }
+
+/**
+ * Types related to campaign comparison
+ * Re-arrange the content to include the campaign
+ * name at the bottom of the hierarchy.
+ */
+export interface CampaignProgress {
+    category: string,
+    subcategory: string,
+    campaigns: string[],
+    groups: string[],
+    progress: number[][]
+}
+
+export interface ReportForStatus {
+    campaign: string,
+    status: ReportStatus
+}
+
+export interface ReportStatusForCampaign {
+    group: string,
+    path: string,
+    status: ReportForStatus[]
+}
+
+export interface SubcategoryForComparison {
+    subcategory: string,
+    groups: ReportStatusForCampaign[]
+}
+
+export interface CategoryForComparison {
+    category: string,
+    subcategories: SubcategoryForComparison[]
+}
+
+export interface ReportComparison {
+    regex: string,
+    campaigns: string[],
+    categories: CategoryForComparison[]
+}
