@@ -52,8 +52,8 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
 
     return (
       <Tooltip title={reportStatusStyle[reportStatus].label}>
-        <Box 
-          {...buttonStyle} 
+        <Box
+          {...buttonStyle}
           style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
           onClick={handleTransition}
         >
@@ -69,10 +69,11 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * on the top.
    */
   const renderGroup = (data: CampaignProgress, group: number): ReactElement => {
-    const { progress, groups } = data;
+    const progressData = data.progress;
+    const { groups } = data;
     const currentGroupName = groups[group];
 
-    const groupProgress: ReactElement[] = progress.map((_, index) => {
+    const groupProgress: ReactElement[] = progressData.map((_, index) => {
       return (
         <Box key={`group-${groups[group]}`} padding="0 0 0.5rem" display="flex">
           {renderProgress(data, index, group)}
@@ -102,7 +103,7 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    */
   const renderCampaignNames = (data: CampaignProgress): ReactElement => {
     const { campaigns } = data;
-    
+
     const campaignNames: ReactElement[] = campaigns.map((name) => {
       return (
         <Box key={`campaign-${name}`} padding="0 0 0.75rem" display="flex">
@@ -130,17 +131,17 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
   };
 
   /**
-   * For a chunk of groups, render the campaign column and 
+   * For a chunk of groups, render the campaign column and
    * the progress for the groups related.
    */
   const renderGroupSection = (data: CampaignProgress, groupSection: string[]): ReactElement => {
     return (
       <Box>
-        <Box 
-          width="58px" 
-          fontSize="0.8rem" 
-          display="inline-block" 
-          textAlign="center" 
+        <Box
+          width="58px"
+          fontSize="0.8rem"
+          display="inline-block"
+          textAlign="center"
           marginTop="0.5rem"
           marginRight="1.5rem"
         >
@@ -148,12 +149,12 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
         </Box>
         {groupSection.map((_, index) => {
           return (
-            <Box 
-              width="58px" 
-              fontSize="0.8rem" 
-              display="inline-block" 
-              textAlign="center" 
-              marginTop="0.5rem" 
+            <Box
+              width="58px"
+              fontSize="0.8rem"
+              display="inline-block"
+              textAlign="center"
+              marginTop="0.5rem"
             >
               {renderGroup(data, index)}
             </Box>
@@ -201,7 +202,7 @@ const SubcategoryList = ({ subcategory, index }: { subcategory: SubcategoryForCo
   useEffect(() => {
     computeProgress(subcategory.groups);
   }, [subcategory]);
-  
+
   const computeProgress = async (groups: ReportStatusForCampaign[]) => {
     const result = await parseAsTable(groups);
     setCampaignProgress(result);
@@ -252,7 +253,7 @@ const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement =>
       </Box>
       <strong>{`Comparing ${data.campaigns.length} campaigns`}</strong>
       <Box marginTop="1rem" width="100%">
-        {data.categories.map((category, index) => 
+        {data.categories.map((category, index) =>
           <Box marginBottom="0.5rem" marginTop="0.5rem" key={`category-report-list-${index}`}>
             <CategoryReportList category={category}/>
           </Box>
@@ -272,9 +273,9 @@ export function CampaignReportProgress({ search }: { search: string }): ReactEle
   useEffect(() => {
     loadComparison(search);
   }, [search]);
-  
-  const loadComparison = (search: string) => {
-    campaignService.comparison(search).then(comparisonData => {
+
+  const loadComparison = (searchRegex: string) => {
+    campaignService.comparison(searchRegex).then(comparisonData => {
       setComparison(comparisonData);
     });
   };

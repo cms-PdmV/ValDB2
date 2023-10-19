@@ -1,10 +1,10 @@
 /**
  * This module includes some auxiliary functions
  * related to the campaign comparison table.
- * 
- * Some to parse the group progress per campaign into 
+ *
+ * Some to parse the group progress per campaign into
  * a matrix to build the components easier.
- * 
+ *
  * Some to parse the route for an specific report into a
  * campaign.
  */
