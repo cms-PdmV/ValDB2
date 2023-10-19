@@ -5,7 +5,6 @@
 import {
   Box,
   Grid,
-  Container,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -17,54 +16,186 @@ import {
   CategoryForComparison,
   SubcategoryForComparison,
   ReportStatusForCampaign,
-  ReportForStatus,
   CampaignProgress
 } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretDown,
-  faCheck,
-  faSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { Spacer } from "../components/Spacer";
 import { HorizontalLine } from "./HorizontalLine";
 import { reportStatusStyle } from "../utils/report";
-import { buttonIconStyle, buttonStyle, color } from "../utils/css";
-import { SplitGroup } from "../utils/constant";
-import { parseAsTable } from "../utils/comparison";
-import { useContext, useEffect, useState, ReactElement } from "react";
-import { useHistory } from "react-router";
-import { useParams } from "react-router-dom";
+import { buttonIconStyle, buttonStyle } from "../utils/css";
+import { parseAsTable, retrieveReportPath } from "../utils/comparison";
+import { useEffect, useState, ReactElement } from "react";
+import { useHistory } from 'react-router';
 import { campaignService } from "../services";
 
-
+/**
+ * Display all the progress for one specific subcategory
+ * Plot the categories involved and the progress for each
+ * of the groups included.
+ */
 const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElement => {
-  const renderGroupLabels = (groups: string[]): ReactElement[] => {
-    return groups.map((groupName, index) => <Grid item key={`group-${index}`}>{groupName}</Grid>);
+  const history = useHistory();
+
+  /**
+   * Render the icon to display the report's progress for a
+   * specific group.
+   */
+  const renderProgress = (data: CampaignProgress, campaign: number, group: number): ReactElement => {
+    const reportStatus: ReportStatus = data.progress[campaign][group];
+    const handleTransition = () => {
+      const reportPath: string = retrieveReportPath(data, campaign, group);
+      return history.push(reportPath);
+    }
+
+    return (
+      <Tooltip title={reportStatusStyle[reportStatus].label}>
+        <Box 
+          {...buttonStyle} 
+          style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
+          onClick={handleTransition}
+        >
+          <FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/>
+        </Box>
+      </Tooltip>
+    );
   };
 
-  const renderCampaignProgress = (campaignProgress: number[]): ReactElement[] => {
-    return campaignProgress.map((progress, index) => {
-      const reportStatus: ReportStatus = progress
+  /**
+   * For one specific group, render a column displaying the progress
+   * for each of the campaigns involved and include the group's name
+   * on the top.
+   */
+  const renderGroup = (data: CampaignProgress, group: number): ReactElement => {
+    const { progress, groups } = data;
+    const currentGroupName = groups[group];
+
+    const groupProgress: ReactElement[] = progress.map((_, index) => {
       return (
-        <Grid item key={`report-${index}`}>
-          <Tooltip title={reportStatusStyle[reportStatus].label}>
-            <Box {...buttonStyle} style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}><FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/></Box>
-          </Tooltip>
-        </Grid>
+        <Box key={`group-${groups[group]}`} padding="0 0 0.5rem" display="flex">
+          {renderProgress(data, index, group)}
+        </Box>
       );
     });
+
+    // Render group column.
+    return (
+      <Grid
+        container
+        direction="column"
+        alignItems="baseline"
+        key={`group-${currentGroupName}`}
+      >
+        <Box padding="0.5rem 0">{currentGroupName}</Box>
+        <Grid key={`items-group-${currentGroupName}`} item>
+          {groupProgress}
+        </Grid>
+      </Grid>
+    );
   };
 
+  /**
+   * Render a column to display the campaign names involved
+   * into the comparison for this specific subcategory.
+   */
+  const renderCampaignNames = (data: CampaignProgress): ReactElement => {
+    const { campaigns } = data;
+    
+    const campaignNames: ReactElement[] = campaigns.map((name) => {
+      return (
+        <Box key={`campaign-${name}`} padding="0 0 0.75rem" display="flex">
+          <strong>{name}</strong>
+        </Box>
+      );
+    });
+
+    // Render campaign names.
+    return (
+      <Grid
+        container
+        direction="column"
+        alignItems="baseline"
+        key={`campaign-labels`}
+      >
+        <Box padding="0.5rem 0">
+          <strong>Campaigns</strong>
+        </Box>
+        <Grid item>
+          {campaignNames}
+        </Grid>
+      </Grid>
+    );
+  };
+
+  /**
+   * For a chunk of groups, render the campaign column and 
+   * the progress for the groups related.
+   */
+  const renderGroupSection = (data: CampaignProgress, groupSection: string[]): ReactElement => {
+    return (
+      <Box>
+        <Box 
+          width="58px" 
+          fontSize="0.8rem" 
+          display="inline-block" 
+          textAlign="center" 
+          marginTop="0.5rem"
+          marginRight="1.5rem"
+        >
+          {renderCampaignNames(data)}
+        </Box>
+        {groupSection.map((_, index) => {
+          return (
+            <Box 
+              width="58px" 
+              fontSize="0.8rem" 
+              display="inline-block" 
+              textAlign="center" 
+              marginTop="0.5rem" 
+            >
+              {renderGroup(data, index)}
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  };
+
+  /**
+   * Split the groups into chunks and render each
+   * subgroup into the subcategory detail as a row.
+   */
+  const renderGroupChunks = (data: CampaignProgress): ReactElement[] => {
+    const { groups } = data;
+    const array = groups;
+    const result: ReactElement[] = [];
+    const chunkSize = 12;
+    for (let i = 0; i < array.length; i += chunkSize) {
+        const chunk = array.slice(i, i + chunkSize);
+        const row: ReactElement = renderGroupSection(data, chunk);
+        result.push(row)
+    }
+    return result;
+  };
+
+
+  // Progress list component.
   return (
-    <Grid container spacing={1}>
-      {renderGroupLabels(progress.groups)}
-      {progress.progress.map((campaignProgress) => renderCampaignProgress(campaignProgress))}
-    </Grid>
+    <Box
+      key="group-column-wrapper"
+    >
+      {renderGroupChunks(progress)}
+    </Box>
   );
 };
 
-
+/**
+ * Display the progress for the current subcategory
+ * Cast the progress per group as a matrix
+ * and start rendering the contnet.
+ */
 const SubcategoryList = ({ subcategory, index }: { subcategory: SubcategoryForComparison, index: number }): ReactElement => {
   const [campaignProgress, setCampaignProgress] = useState<CampaignProgress | null>();
   useEffect(() => {
@@ -87,7 +218,12 @@ const SubcategoryList = ({ subcategory, index }: { subcategory: SubcategoryForCo
   );
 };
 
-
+/**
+ * Control if the category accordion is expanded,
+ * display the category label
+ * and display the content related to each of its
+ * subcategories.
+ */
 const CategoryReportList = ({ category }: { category: CategoryForComparison }): ReactElement => {
   const [expanded, setExpanded] = useState<boolean>(false);
   return (
@@ -104,7 +240,10 @@ const CategoryReportList = ({ category }: { category: CategoryForComparison }): 
   );
 };
 
-
+/**
+ * Display the headers and render one accordion per
+ * category.
+ */
 const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement => {
   return (
     <Box>
@@ -123,7 +262,11 @@ const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement =>
   );
 };
 
-
+/**
+ * Display the campaign comparison component
+ * using accordion components. Display one according
+ * per category.
+ */
 export function CampaignReportProgress({ search }: { search: string }): ReactElement | null {
   const [comparison, setComparison] = useState<ReportComparison | null>();
   useEffect(() => {

@@ -1,7 +1,12 @@
 /**
  * This module includes some auxiliary functions
- * to parse the group progress per campaign into 
+ * related to the campaign comparison table.
+ * 
+ * Some to parse the group progress per campaign into 
  * a matrix to build the components easier.
+ * 
+ * Some to parse the route for an specific report into a
+ * campaign.
  */
 import { ReportStatusForCampaign, CampaignProgress, ReportStatus } from "../types";
 import { categoryService } from "../services";
@@ -61,3 +66,15 @@ export const parseAsTable = async (groups: ReportStatusForCampaign[]): Promise<C
     }
     return result;
 }
+
+
+export const retrieveReportPath = (
+    data: CampaignProgress, campaign: number, group: number
+): string => {
+    const { category, subcategory } = data;
+    const campaignName: string = data.campaigns[campaign];
+    const groupName: string = data.groups[group];
+    const reportPath = `${category}.${subcategory}.${groupName}`;
+
+    return `/campaigns/${campaignName}/report/${reportPath}`;
+};
