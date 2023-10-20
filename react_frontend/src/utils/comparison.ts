@@ -8,8 +8,12 @@
  * Some to parse the route for an specific report into a
  * campaign.
  */
-import { ReportStatusForCampaign, CampaignProgress, ReportStatus } from "../types";
-import { categoryService } from "../services";
+import {
+    ReportStatusForCampaign,
+    CampaignProgress,
+    ReportStatus,
+    CategoryHierachy
+} from "../types";
 
 const createMatrix = (x: number, y: number, defaultValue: number): number[][] => {
     const result: number[][] = new Array(x);
@@ -45,12 +49,11 @@ const fillCampaignProgress = (
 };
 
 
-export const parseAsTable = async (groups: ReportStatusForCampaign[]): Promise<CampaignProgress> => {
+export const parseAsTable = (groups: ReportStatusForCampaign[], categoryHierachy: CategoryHierachy): CampaignProgress => {
     const path: string  = groups[0].path;
     const [category, subcategory] = path.split(".");
     const campaigns: string[] = retrieveCampaigns(groups);
-    const categoryResult = await categoryService.getHierachy();
-    const groupsIncluded: string[] = categoryResult[category][subcategory];
+    const groupsIncluded: string[] = categoryHierachy[category][subcategory];
     let progressMatrix: number[][] = createMatrix(
         campaigns.length, groupsIncluded.length, ReportStatus.NOT_YET_DONE
     );

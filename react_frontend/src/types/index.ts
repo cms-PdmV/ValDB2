@@ -157,3 +157,9 @@ export interface ReportComparison {
     campaigns: string[],
     categories: CategoryForComparison[]
 }
+
+export type CategoryHierachy = {
+    [key: string]: {
+        [key: string]: string[]
+    };
+};

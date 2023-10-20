@@ -16,7 +16,8 @@ import {
   CategoryForComparison,
   SubcategoryForComparison,
   ReportStatusForCampaign,
-  CampaignProgress
+  CampaignProgress,
+  CategoryHierachy
 } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,7 +30,7 @@ import { buttonIconStyle, buttonStyle } from "../utils/css";
 import { parseAsTable, retrieveReportPath } from "../utils/comparison";
 import { useEffect, useState, ReactElement } from "react";
 import { useHistory } from 'react-router';
-import { campaignService } from "../services";
+import { campaignService, categoryService } from "../services";
 
 /**
  * Display all the progress for one specific subcategory
@@ -204,14 +205,18 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
  * Cast the progress per group as a matrix
  * and start rendering the contnet.
  */
-const SubcategoryList = ({ subcategory, index }: { subcategory: SubcategoryForComparison, index: number }): ReactElement => {
+const SubcategoryList = (
+  { subcategory, index, categoryHierachy }:
+  { subcategory: SubcategoryForComparison, index: number, categoryHierachy: CategoryHierachy }
+): ReactElement => {
+
   const [campaignProgress, setCampaignProgress] = useState<CampaignProgress | null>();
   useEffect(() => {
-    computeProgress(subcategory.groups);
-  }, [subcategory]);
+    computeProgress(subcategory.groups, categoryHierachy);
+  }, [subcategory, categoryHierachy]);
 
-  const computeProgress = async (groups: ReportStatusForCampaign[]) => {
-    const result = await parseAsTable(groups);
+  const computeProgress = (groups: ReportStatusForCampaign[], hierachyData: CategoryHierachy) => {
+    const result = parseAsTable(groups, hierachyData);
     setCampaignProgress(result);
   };
   return (
@@ -232,7 +237,9 @@ const SubcategoryList = ({ subcategory, index }: { subcategory: SubcategoryForCo
  * and display the content related to each of its
  * subcategories.
  */
-const CategoryReportList = ({ category }: { category: CategoryForComparison }): ReactElement => {
+const CategoryReportList = (
+  { category, categoryHierachy }: { category: CategoryForComparison, categoryHierachy: CategoryHierachy }
+): ReactElement => {
   const [expanded, setExpanded] = useState<boolean>(false);
   return (
     <Accordion expanded={expanded} onChange={(e, isExpanded) => { setExpanded(isExpanded) }}>
@@ -241,7 +248,7 @@ const CategoryReportList = ({ category }: { category: CategoryForComparison }): 
       </AccordionSummary>
       <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
         {category.subcategories.map((subcategory, index) =>
-          <SubcategoryList subcategory={subcategory} index={index}/>
+          <SubcategoryList subcategory={subcategory} index={index} categoryHierachy={categoryHierachy}/>
         )}
       </AccordionDetails>
     </Accordion>
@@ -252,7 +259,9 @@ const CategoryReportList = ({ category }: { category: CategoryForComparison }): 
  * Display the headers and render one accordion per
  * category.
  */
-const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement => {
+const ComparisonReport = (
+  { data, categoryHierachy }: { data: ReportComparison, categoryHierachy: CategoryHierachy }
+): ReactElement => {
   return (
     <Box>
       <Box fontSize="1.5rem" fontWeight="bold" display="flex">
@@ -262,7 +271,7 @@ const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement =>
       <Box marginTop="1rem" width="100%">
         {data.categories.map((category, index) =>
           <Box marginBottom="0.5rem" marginTop="0.5rem" key={`category-report-list-${index}`}>
-            <CategoryReportList category={category}/>
+            <CategoryReportList category={category} categoryHierachy={categoryHierachy}/>
           </Box>
         )}
       </Box>
@@ -277,8 +286,11 @@ const ComparisonReport = ({ data }: { data: ReportComparison }): ReactElement =>
  */
 export function CampaignReportProgress({ search }: { search: string }): ReactElement | null {
   const [comparison, setComparison] = useState<ReportComparison | null>();
+  const [categoryHierachy, setCategoryHierachy] = useState<CategoryHierachy | null>();
+
   useEffect(() => {
     loadComparison(search);
+    loadCategoryHierachy();
   }, [search]);
 
   const loadComparison = (searchRegex: string) => {
@@ -287,5 +299,15 @@ export function CampaignReportProgress({ search }: { search: string }): ReactEle
     });
   };
 
-  return comparison ? <ComparisonReport data={comparison} /> : null;
+  const loadCategoryHierachy = () => {
+    categoryService.getHierachy().then(data => {
+      setCategoryHierachy(data);
+    });
+  };
+
+  return (
+    comparison && categoryHierachy ?
+    <ComparisonReport data={comparison} categoryHierachy={categoryHierachy}/> :
+    null
+  );
 }

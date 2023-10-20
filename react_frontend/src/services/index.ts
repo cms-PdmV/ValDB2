@@ -1,5 +1,15 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Activity, Campaign, Category, Report, User, Attachment, Sorting, ReportComparison } from '../types'
+import {
+    Activity,
+    Campaign,
+    Category,
+    Report,
+    User,
+    Attachment,
+    Sorting,
+    ReportComparison,
+    CategoryHierachy
+} from '../types'
 import { parseSortingParam } from '../utils/request'
 import { Modal } from 'antd'
 
@@ -49,7 +59,7 @@ export const reportService = {
 
 export const categoryService = {
     getAll: (): Promise<Category[]>  => axios.get(`${serverUrl}/groups/`).then(response).catch(error),
-    getHierachy: () => axios.get(`${serverUrl}/groups/hierarchy/`).then(response).catch(error),
+    getHierachy: (): Promise<CategoryHierachy> => axios.get(`${serverUrl}/groups/hierarchy/`).then(response).catch(error),
 }
 
 export const userService = {
