@@ -33,7 +33,7 @@ import { campaignService } from "../services";
 
 /**
  * Display all the progress for one specific subcategory
- * Plot the categories involved and the progress for each
+ * Plot the campaigns involved and the progress for each
  * of the groups included.
  */
 const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElement => {
@@ -134,11 +134,29 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * For a chunk of groups, render the campaign column and
    * the progress for the groups related.
    */
-  const renderGroupSection = (data: CampaignProgress, groupSection: string[]): ReactElement => {
+  const renderGroupSection = (data: CampaignProgress, startIndex: number, endIndex: number): ReactElement => {
+    const renderElement = (elementData: CampaignProgress, groupIndex: number): ReactElement => {
+      return (
+        <Box
+          width="58px"
+          fontSize="0.8rem"
+          display="inline-block"
+          textAlign="center"
+          marginTop="0.5rem"
+        >
+          {renderGroup(elementData, groupIndex)}
+        </Box>
+      );
+    };
+
+    const groupElements: ReactElement[] = [];
+    for (let i = startIndex; i <= endIndex; i++) {
+      groupElements.push(renderElement(data, i));
+    }
+
     return (
       <Box>
         <Box
-          width="58px"
           fontSize="0.8rem"
           display="inline-block"
           textAlign="center"
@@ -147,19 +165,7 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
         >
           {renderCampaignNames(data)}
         </Box>
-        {groupSection.map((_, index) => {
-          return (
-            <Box
-              width="58px"
-              fontSize="0.8rem"
-              display="inline-block"
-              textAlign="center"
-              marginTop="0.5rem"
-            >
-              {renderGroup(data, index)}
-            </Box>
-          );
-        })}
+        {groupElements}
       </Box>
     );
   };
@@ -169,13 +175,14 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * subgroup into the subcategory detail as a row.
    */
   const renderGroupChunks = (data: CampaignProgress): ReactElement[] => {
-    const { groups } = data;
-    const array = groups;
+    const array = data.groups;
     const result: ReactElement[] = [];
-    const chunkSize = 12;
+    const chunkSize = 9;
     for (let i = 0; i < array.length; i += chunkSize) {
         const chunk = array.slice(i, i + chunkSize);
-        const row: ReactElement = renderGroupSection(data, chunk);
+        const startIndex: number = i;
+        const endIndex: number = array.indexOf(chunk[chunk.length - 1]);
+        const row: ReactElement = renderGroupSection(data, startIndex, endIndex);
         result.push(row)
     }
     return result;

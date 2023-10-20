@@ -225,7 +225,7 @@ class CampaignReportComparison(Resource):
             _logger.error(e, stack_info=True)
             return {
                 "message": "Unable to retrieve a comparison from query"
-            }
+            }, 500
 
     def __retrieve_comparison(self, search: str):
         """
