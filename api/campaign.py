@@ -14,6 +14,7 @@ from utils.query import add_skip_and_limit, build_query, build_sort
 from utils.user import require_permission
 from utils.request import parse_list_of_tuple
 from utils.logger import api_logger
+from utils.cache import MemoryCache
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
@@ -28,7 +29,7 @@ api = Namespace(
 )
 _logger = api_logger
 campaign_model = api.model(Campaign)
-
+comparison_cache: MemoryCache = MemoryCache()
 
 @api.route("/")
 class CampaignListAPI(Resource):
@@ -223,7 +224,16 @@ class CampaignReportComparison(Resource):
             _logger.error(cause)
             return {"message": cause}, 400
         try:
-            return self.__retrieve_comparison(search=search_by)
+            # Check if there is a valid response in cache
+            in_cache = comparison_cache[search_by]
+            if in_cache:
+                _logger.info("Comparison '%s' is available in cache", search_by)
+                return in_cache
+
+            # Compute the comparison
+            comparison = self.__retrieve_comparison(search=search_by)
+            comparison_cache[search_by] = comparison
+            return comparison
         except Exception as e:
             _logger.error(e, stack_info=True, exc_info=True)
             return {

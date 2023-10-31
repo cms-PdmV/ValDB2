@@ -45,7 +45,7 @@ const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
   const renderProgress = (data: Comparison, campaign: number, group: number): ReactElement => {
     const reportStatus: ReportStatus = data.progress[campaign][group];
     const reportPath: string = retrieveReportPath(data, campaign, group);
-    
+
     const handleTransition = () => {
       return history.push(reportPath);
     }
@@ -59,7 +59,7 @@ const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
             onClick={handleTransition}
           >
               <FontAwesomeIcon
-                icon={reportStatusStyle[reportStatus].icon} 
+                icon={reportStatusStyle[reportStatus].icon}
                 {...buttonIconStyle}
               />
           </Box>
@@ -246,9 +246,9 @@ const CategoryReportList = (
       </AccordionSummary>
       <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
         {Object.keys(categoryData).map((subcategory, index) =>
-          <SubcategoryList 
-            subcategory={subcategory} 
-            index={index} 
+          <SubcategoryList
+            subcategory={subcategory}
+            index={index}
             data={categoryData}
           />
         )}
@@ -264,7 +264,7 @@ const CategoryReportList = (
 const ComparisonReport = (
   { data }: { data: ReportComparison }
 ): ReactElement => {
-  
+
   const getMessage = (): ReactElement[] => {
     let messages: string[] = [];
     if (data.subset) {
@@ -305,18 +305,17 @@ const ComparisonReport = (
  * per category.
  */
 export function CampaignReportProgress(
-  { search }: 
+  { search }:
   { search: string }
 ): ReactElement | null {
   const [comparison, setComparison] = useState<ReportComparison | null>();
-  
+
   useEffect(() => {
     loadComparison(search);
   }, [search]);
 
   const loadComparison = (searchRegex: string) => {
     campaignService.comparison(searchRegex).then(comparisonData => {
-      console.log(comparisonData);
       setComparison(comparisonData);
     });
   };
