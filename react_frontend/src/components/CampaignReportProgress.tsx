@@ -13,11 +13,8 @@ import {
 import {
   ReportStatus,
   ReportComparison,
-  CategoryForComparison,
-  SubcategoryForComparison,
-  ReportStatusForCampaign,
-  CampaignProgress,
-  CategoryHierachy
+  SubcategoryComparison,
+  Comparison
 } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -25,41 +22,48 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Spacer } from "../components/Spacer";
 import { HorizontalLine } from "./HorizontalLine";
+import { retrieveReportPath } from "../utils/comparison";
 import { reportStatusStyle } from "../utils/report";
 import { buttonIconStyle, buttonStyle } from "../utils/css";
-import { parseAsTable, retrieveReportPath } from "../utils/comparison";
 import { useEffect, useState, ReactElement } from "react";
 import { useHistory } from 'react-router';
-import { campaignService, categoryService } from "../services";
+import { Link } from 'react-router-dom';
+import { campaignService } from "../services";
 
 /**
  * Display all the progress for one specific subcategory
  * Plot the campaigns involved and the progress for each
  * of the groups included.
  */
-const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElement => {
+const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
   const history = useHistory();
 
   /**
    * Render the icon to display the report's progress for a
    * specific group.
    */
-  const renderProgress = (data: CampaignProgress, campaign: number, group: number): ReactElement => {
+  const renderProgress = (data: Comparison, campaign: number, group: number): ReactElement => {
     const reportStatus: ReportStatus = data.progress[campaign][group];
+    const reportPath: string = retrieveReportPath(data, campaign, group);
+    
     const handleTransition = () => {
-      const reportPath: string = retrieveReportPath(data, campaign, group);
       return history.push(reportPath);
     }
 
     return (
       <Tooltip title={reportStatusStyle[reportStatus].label}>
-        <Box
-          {...buttonStyle}
-          style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
-          onClick={handleTransition}
-        >
-          <FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/>
-        </Box>
+        <Link to={reportPath}>
+          <Box
+            {...buttonStyle}
+            style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
+            onClick={handleTransition}
+          >
+              <FontAwesomeIcon
+                icon={reportStatusStyle[reportStatus].icon} 
+                {...buttonIconStyle}
+              />
+          </Box>
+        </Link>
       </Tooltip>
     );
   };
@@ -69,7 +73,7 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * for each of the campaigns involved and include the group's name
    * on the top.
    */
-  const renderGroup = (data: CampaignProgress, group: number): ReactElement => {
+  const renderGroup = (data: Comparison, group: number): ReactElement => {
     const progressData = data.progress;
     const { groups } = data;
     const currentGroupName = groups[group];
@@ -102,7 +106,7 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * Render a column to display the campaign names involved
    * into the comparison for this specific subcategory.
    */
-  const renderCampaignNames = (data: CampaignProgress): ReactElement => {
+  const renderCampaignNames = (data: Comparison): ReactElement => {
     const { campaigns } = data;
 
     const campaignNames: ReactElement[] = campaigns.map((name) => {
@@ -135,8 +139,8 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * For a chunk of groups, render the campaign column and
    * the progress for the groups related.
    */
-  const renderGroupSection = (data: CampaignProgress, startIndex: number, endIndex: number): ReactElement => {
-    const renderElement = (elementData: CampaignProgress, groupIndex: number): ReactElement => {
+  const renderGroupSection = (data: Comparison, startIndex: number, endIndex: number): ReactElement => {
+    const renderElement = (elementData: Comparison, groupIndex: number): ReactElement => {
       return (
         <Box
           width="58px"
@@ -175,7 +179,7 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
    * Split the groups into chunks and render each
    * subgroup into the subcategory detail as a row.
    */
-  const renderGroupChunks = (data: CampaignProgress): ReactElement[] => {
+  const renderGroupChunks = (data: Comparison): ReactElement[] => {
     const array = data.groups;
     const result: ReactElement[] = [];
     const chunkSize = 9;
@@ -206,26 +210,18 @@ const ProgressList = ({ progress }: { progress: CampaignProgress }): ReactElemen
  * and start rendering the contnet.
  */
 const SubcategoryList = (
-  { subcategory, index, categoryHierachy }:
-  { subcategory: SubcategoryForComparison, index: number, categoryHierachy: CategoryHierachy }
+  { subcategory, index, data }:
+  { subcategory: string, index: number, data: SubcategoryComparison }
 ): ReactElement => {
+  const comparisonData: Comparison = data[subcategory];
 
-  const [campaignProgress, setCampaignProgress] = useState<CampaignProgress | null>();
-  useEffect(() => {
-    computeProgress(subcategory.groups, categoryHierachy);
-  }, [subcategory, categoryHierachy]);
-
-  const computeProgress = (groups: ReportStatusForCampaign[], hierachyData: CategoryHierachy) => {
-    const result = parseAsTable(groups, hierachyData);
-    setCampaignProgress(result);
-  };
   return (
-    <Box key={`subcategory-${subcategory.subcategory}-${index}`}>
+    <Box key={`subcategory-${subcategory}-${index}`}>
       <HorizontalLine />
       <Box padding="1rem">
-        <strong>{subcategory.subcategory}</strong>
+        <strong>{subcategory}</strong>
         <Spacer rem={0.5} />
-        {campaignProgress ? <ProgressList progress={campaignProgress} />: null}
+        <ProgressList progress={comparisonData} />
       </Box>
     </Box>
   );
@@ -238,17 +234,23 @@ const SubcategoryList = (
  * subcategories.
  */
 const CategoryReportList = (
-  { category, categoryHierachy }: { category: CategoryForComparison, categoryHierachy: CategoryHierachy }
+  { category, data }: { category: string, data: ReportComparison }
 ): ReactElement => {
   const [expanded, setExpanded] = useState<boolean>(false);
+  const categoryData: SubcategoryComparison = data.categories[category];
+
   return (
     <Accordion expanded={expanded} onChange={(e, isExpanded) => { setExpanded(isExpanded) }}>
       <AccordionSummary expandIcon={<FontAwesomeIcon icon={faCaretDown} />}>
-        <strong>{category.category}</strong>
+        <strong>{category}</strong>
       </AccordionSummary>
       <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
-        {category.subcategories.map((subcategory, index) =>
-          <SubcategoryList subcategory={subcategory} index={index} categoryHierachy={categoryHierachy}/>
+        {Object.keys(categoryData).map((subcategory, index) =>
+          <SubcategoryList 
+            subcategory={subcategory} 
+            index={index} 
+            data={categoryData}
+          />
         )}
       </AccordionDetails>
     </Accordion>
@@ -260,18 +262,36 @@ const CategoryReportList = (
  * category.
  */
 const ComparisonReport = (
-  { data, categoryHierachy }: { data: ReportComparison, categoryHierachy: CategoryHierachy }
+  { data }: { data: ReportComparison }
 ): ReactElement => {
+  
+  const getMessage = (): ReactElement[] => {
+    let messages: string[] = [];
+    if (data.subset) {
+      messages = [
+        "The number of campaigns to compare exceeds the maximum allowed. ",
+        `Comparing the first ${data.campaigns.length} campaigns of ${data.total}. `,
+        "Please use a detailed query if you don't see the campaigns you want to compare. "
+      ];
+    }
+    else {
+      messages = [
+        `Comparing ${data.campaigns.length} campaigns`
+      ];
+    }
+    return messages.map((msg, index) => <strong key={`component-msg-${index}`}>{msg}</strong>);
+  };
+
   return (
     <Box>
       <Box fontSize="1.5rem" fontWeight="bold" display="flex">
         Campaign comparison
       </Box>
-      <strong>{`Comparing ${data.campaigns.length} campaigns`}</strong>
+      {getMessage()}
       <Box marginTop="1rem" width="100%">
-        {data.categories.map((category, index) =>
+        {Object.keys(data.categories).map((category, index) =>
           <Box marginBottom="0.5rem" marginTop="0.5rem" key={`category-report-list-${index}`}>
-            <CategoryReportList category={category} categoryHierachy={categoryHierachy}/>
+            <CategoryReportList category={category} data={data}/>
           </Box>
         )}
       </Box>
@@ -284,30 +304,26 @@ const ComparisonReport = (
  * using accordion components. Display one according
  * per category.
  */
-export function CampaignReportProgress({ search }: { search: string }): ReactElement | null {
+export function CampaignReportProgress(
+  { search }: 
+  { search: string }
+): ReactElement | null {
   const [comparison, setComparison] = useState<ReportComparison | null>();
-  const [categoryHierachy, setCategoryHierachy] = useState<CategoryHierachy | null>();
-
+  
   useEffect(() => {
     loadComparison(search);
-    loadCategoryHierachy();
   }, [search]);
 
   const loadComparison = (searchRegex: string) => {
     campaignService.comparison(searchRegex).then(comparisonData => {
+      console.log(comparisonData);
       setComparison(comparisonData);
     });
   };
 
-  const loadCategoryHierachy = () => {
-    categoryService.getHierachy().then(data => {
-      setCategoryHierachy(data);
-    });
-  };
-
   return (
-    comparison && categoryHierachy ?
-    <ComparisonReport data={comparison} categoryHierachy={categoryHierachy}/> :
+    comparison ?
+    <ComparisonReport data={comparison}/> :
     null
   );
 }

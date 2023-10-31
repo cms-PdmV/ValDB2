@@ -41,6 +41,7 @@ export function AllCampaignPage (): ReactElement {
   const { search }: { search?: string } = useParams()
   const [currentSearch, setCurrentSearch] = useState<string>(search || '')
   const [searchValue, setSearchValue] = useState<string>(search || '')
+
   const user = useContext(UserContext)
   const history = useHistory()
   const [skip, setSkip] = useState<number>(0)
@@ -56,11 +57,11 @@ export function AllCampaignPage (): ReactElement {
   }
 
   useEffect(() => {
-    setCampaigns([])
-    setSkip(0)
-    setIsMaxPage(false)
-    handleLoadCampaign(0, currentSearch, sorting, [])
-  }, [sorting, currentSearch])
+    setCampaigns([]);
+    setSkip(0);
+    setIsMaxPage(false);
+    handleLoadCampaign(0, currentSearch, sorting, []);
+  }, [sorting, currentSearch]);
 
   const handleLoadCampaign = (recordSkip: number, searchKeyword: string, sortingOption: Sorting[], targetCampaigns: Campaign[]) => {
     campaignService.getAll(recordSkip, PageLimit, sortingOption, searchKeyword).then(fetchedCampaings => {

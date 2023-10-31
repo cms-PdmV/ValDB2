@@ -123,43 +123,33 @@ export interface Sorting {
  * Re-arrange the content to include the campaign
  * name at the bottom of the hierarchy.
  */
-export interface CampaignProgress {
-    category: string,
-    subcategory: string,
+export type Comparison = {
+    progress: number[][],
+    metadata: {
+        total_reports: number,
+        total_filled: number,
+        per_status: {
+            [key: number]: number
+        }
+    },
     campaigns: string[],
     groups: string[],
-    progress: number[][]
-}
-
-export interface ReportForStatus {
-    campaign: string,
-    status: ReportStatus
-}
-
-export interface ReportStatusForCampaign {
-    group: string,
-    path: string,
-    status: ReportForStatus[]
-}
-
-export interface SubcategoryForComparison {
-    subcategory: string,
-    groups: ReportStatusForCampaign[]
-}
-
-export interface CategoryForComparison {
     category: string,
-    subcategories: SubcategoryForComparison[]
+    subcategory: string
+}
+
+export type SubcategoryComparison = {
+    [key: string]: Comparison
+}
+
+export type CategoryComparison = {
+    [key: string]: SubcategoryComparison;
 }
 
 export interface ReportComparison {
     regex: string,
     campaigns: string[],
-    categories: CategoryForComparison[]
+    categories: CategoryComparison,
+    total: number,
+    subset: boolean
 }
-
-export type CategoryHierachy = {
-    [key: string]: {
-        [key: string]: string[]
-    };
-};

@@ -7,8 +7,7 @@ import {
     User,
     Attachment,
     Sorting,
-    ReportComparison,
-    CategoryHierachy
+    ReportComparison
 } from '../types'
 import { parseSortingParam } from '../utils/request'
 import { Modal } from 'antd'
@@ -59,7 +58,6 @@ export const reportService = {
 
 export const categoryService = {
     getAll: (): Promise<Category[]>  => axios.get(`${serverUrl}/groups/`).then(response).catch(error),
-    getHierachy: (): Promise<CategoryHierachy> => axios.get(`${serverUrl}/groups/hierarchy/`).then(response).catch(error),
 }
 
 export const userService = {
