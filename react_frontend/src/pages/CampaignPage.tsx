@@ -35,6 +35,9 @@ export function CampaignPage(): ReactElement {
       setCampaign(campaignData)
       setGroups(groupsData)
     })
+    .catch(() => {
+      history.replace("/");
+    });
   }, [])
 
   const handleClickReport = (groupPath: string) => {

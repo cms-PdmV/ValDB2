@@ -27,3 +27,13 @@ class GroupListAPI(Resource):
                 ]
             })
         return groups
+
+
+@api.route("/hierarchy/")
+class GroupAPI(Resource):
+    """
+    Returns all the categories, subcategories
+    and groups into its hierarchical order.
+    """
+    def get(self):
+        return group
