@@ -35,8 +35,7 @@ export function CampaignPage(): ReactElement {
       setCampaign(campaignData)
       setGroups(groupsData)
     })
-    .catch(err => {
-      console.error("Error retrieving campaign: ", err);
+    .catch(() => {
       history.replace("/");
     });
   }, [])
