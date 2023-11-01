@@ -24,6 +24,7 @@ import { Spacer } from "../components/Spacer";
 import { HorizontalLine } from "./HorizontalLine";
 import { retrieveReportPath } from "../utils/comparison";
 import { reportStatusStyle } from "../utils/report";
+import { redirectToPage } from "../utils/events";
 import { buttonIconStyle, buttonStyle } from "../utils/css";
 import { useEffect, useState, ReactElement } from "react";
 import { useHistory } from 'react-router';
@@ -46,17 +47,13 @@ const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
     const reportStatus: ReportStatus = data.progress[campaign][group];
     const reportPath: string = retrieveReportPath(data, campaign, group);
 
-    const handleTransition = () => {
-      return history.push(reportPath);
-    }
-
     return (
       <Tooltip title={reportStatusStyle[reportStatus].label}>
         <Link to={reportPath}>
           <Box
             {...buttonStyle}
             style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
-            onClick={handleTransition}
+            onClick={(ev) => redirectToPage(ev, history, reportPath)}
           >
               <FontAwesomeIcon
                 icon={reportStatusStyle[reportStatus].icon}
@@ -312,6 +309,9 @@ export function CampaignReportProgress(
 
   useEffect(() => {
     loadComparison(search);
+    return () => {
+      setComparison(null);
+    };
   }, [search]);
 
   const loadComparison = (searchRegex: string) => {
