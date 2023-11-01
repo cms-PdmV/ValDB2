@@ -88,10 +88,11 @@ class CampaignGetAPI(Resource):
         Get campaign by id
         """
         campaign = Campaign.get_by_name(campaignname)
-        _logger.info("Retriving campaign: %s", campaign.name)
+        _logger.info("Retriving campaign by pattern: %s", campaignname)
         if not campaign:
-            _logger.error("Campaign %s not found", campaign.name)
-            return {"message": "not found"}, 404
+            msg = f"Campaign '{campaignname}' not found"
+            _logger.error(msg)
+            return {"message": msg}, 404
 
         # report lookup table
         report_table = {}
