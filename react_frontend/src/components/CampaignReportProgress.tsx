@@ -259,12 +259,24 @@ const CategoryReportList = (
  * category.
  */
 const ComparisonReport = (
-  { data }: { data: ReportComparison }
+  { data }: { data: ReportComparison | null }
 ): ReactElement => {
+  /**
+   * Returns a group of messages as <strong> tags
+   * to display into the component.
+   */
+  const getMessages = (messages: string[]): ReactElement[] => {
+    return messages.map((msg, index) => <strong key={`component-msg-${index}`}>{msg}</strong>);
+  };
 
-  const getMessage = (): ReactElement[] => {
+  const getCampaignTitle = (): ReactElement[] => {
     let messages: string[] = [];
-    if (data.subset) {
+    if (!data) {
+      messages = [
+        "Loading comparison, please wait..."
+      ];
+    }
+    else if (data.subset) {
       messages = [
         "The number of campaigns to compare exceeds the maximum allowed. ",
         `Comparing the first ${data.campaigns.length} campaigns of ${data.total}. `,
@@ -276,15 +288,14 @@ const ComparisonReport = (
         `Comparing ${data.campaigns.length} campaigns`
       ];
     }
-    return messages.map((msg, index) => <strong key={`component-msg-${index}`}>{msg}</strong>);
-  };
+    return getMessages(messages);
+  }
 
-  return (
-    <Box>
-      <Box fontSize="1.5rem" fontWeight="bold" display="flex">
-        Campaign comparison
-      </Box>
-      {getMessage()}
+  const loadCategoryReport = (): ReactElement | null => {
+    if (!data) {
+      return null;
+    }
+    return (
       <Box marginTop="1rem" width="100%">
         {Object.keys(data.categories).map((category, index) =>
           <Box marginBottom="0.5rem" marginTop="0.5rem" key={`category-report-list-${index}`}>
@@ -292,6 +303,16 @@ const ComparisonReport = (
           </Box>
         )}
       </Box>
+    );
+  };
+
+  return (
+    <Box>
+      <Box fontSize="1.5rem" fontWeight="bold" display="flex">
+        Campaign comparison
+      </Box>
+      {getCampaignTitle()}
+      {loadCategoryReport()}
     </Box>
   );
 };
@@ -305,7 +326,7 @@ export function CampaignReportProgress(
   { search }:
   { search: string }
 ): ReactElement | null {
-  const [comparison, setComparison] = useState<ReportComparison | null>();
+  const [comparison, setComparison] = useState<ReportComparison | null>(null);
 
   useEffect(() => {
     loadComparison(search);
@@ -316,13 +337,13 @@ export function CampaignReportProgress(
 
   const loadComparison = (searchRegex: string) => {
     campaignService.comparison(searchRegex).then(comparisonData => {
-      setComparison(comparisonData);
+      if (comparisonData) {
+        setComparison(comparisonData);
+      }
     });
   };
 
   return (
-    comparison ?
-    <ComparisonReport data={comparison}/> :
-    null
+    <ComparisonReport data={comparison}/>
   );
 }
