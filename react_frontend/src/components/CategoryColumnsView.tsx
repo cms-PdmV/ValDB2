@@ -1,9 +1,9 @@
 import { Box, List, ListItem, Paper, ListItemText, ListItemSecondaryAction, ListSubheader } from "@material-ui/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faChevronRight, faSquare } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import { ReportStatusLabel } from "./ReportStatusLabel";
-import { ReactElement } from "react";
 import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { Category, ReportStatus, Group } from "../types";
 
@@ -39,7 +39,7 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp): ReactElement
     const renderReportView = (group: Group, groupindex: number): ReactElement => {
       const reportPath: string = prop.retrieveReportPath ? prop.retrieveReportPath(group.path) : "";
       return (
-        <a className="disabled" href={reportPath}>
+        <Link className="inherit" to={reportPath}>
           <ListItem
             button
             style={{height: '48px'}} key={`list-item-${groupindex}`}
@@ -48,7 +48,7 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp): ReactElement
             <Box position="absolute" left="200px"><ReportStatusLabel status={group.report ? group.report.status : ReportStatus.NOT_YET_DONE} /></Box>
             <Box position="absolute" right="1rem"><FontAwesomeIcon icon={faChevronRight} /></Box>
           </ListItem>
-        </a>
+        </Link>
       );
     };
 

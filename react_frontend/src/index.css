@@ -181,7 +181,7 @@ a.load {
   text-decoration: none;
 }
 
-a.disabled {
+.inherit {
   all: inherit
 }
 

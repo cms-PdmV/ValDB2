@@ -1,10 +1,9 @@
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box, TextField } from "@material-ui/core";
-import { ReactElement } from "react";
-import { useContext, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { CampaignStatus } from "../components/CampaignStatus";
 import { Container } from "../components/Container";
 import { DatetimeSpan } from "../components/DatetimeSpan";
@@ -115,9 +114,9 @@ export function AllCampaignPage (): ReactElement {
             {campaigns.map((campaign) => (
               <TableRow key={campaign.id} style={{cursor: 'pointer'}}>
                 <TableCell component="th" scope="row">
-                  <a href={`/campaigns/${campaign.name}`}>
+                  <Link to={`/campaigns/${campaign.name}`}>
                     <strong>{campaign.name}</strong>
-                  </a>
+                  </Link>
                 </TableCell>
                 <TableCell align="left">{getCategoryLabel(campaign.subcategories).map(label => <Chip label={label} style={{marginRight: '0.5rem'}} />)}</TableCell>
                 <TableCell align="right"><CampaignStatus isOpen={campaign.is_open} /></TableCell>

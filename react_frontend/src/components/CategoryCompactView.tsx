@@ -8,6 +8,7 @@ import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { SplitGroup } from "../utils/constant";
 import { useState } from "react";
 import { ReactElement } from "react-markdown";
+import { Link } from 'react-router-dom';
 
 
 interface CategoryCompactViewProp {
@@ -35,9 +36,9 @@ export function CategoryCompactView(prop: CategoryCompactViewProp): ReactElement
           {...buttonStyle}
           style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
         >
-          <a className="disabled" href={reportPath}>
+          <Link className="inherit" to={reportPath}>
             <FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/>
-          </a>
+          </Link>
         </Box>
       </Tooltip>
     );

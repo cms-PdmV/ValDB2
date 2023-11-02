@@ -20,12 +20,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretDown,
 } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState, ReactElement } from "react";
+import { Link } from 'react-router-dom';
 import { Spacer } from "../components/Spacer";
 import { HorizontalLine } from "./HorizontalLine";
 import { retrieveReportPath } from "../utils/comparison";
 import { reportStatusStyle } from "../utils/report";
 import { buttonIconStyle, buttonStyle } from "../utils/css";
-import { useEffect, useState, ReactElement } from "react";
 import { campaignService } from "../services";
 
 /**
@@ -48,12 +49,12 @@ const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
           {...buttonStyle}
           style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
         >
-          <a className="disabled" href={reportPath}>
+          <Link className="inherit" to={reportPath}>
             <FontAwesomeIcon
               icon={reportStatusStyle[reportStatus].icon}
               {...buttonIconStyle}
             />
-          </a>
+          </Link>
         </Box>
       </Tooltip>
     );
