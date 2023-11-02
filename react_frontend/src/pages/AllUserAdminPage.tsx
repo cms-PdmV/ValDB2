@@ -101,7 +101,11 @@ export function AllUserAdminPage(): ReactElement {
                 <TableCell align="left">{userRoleLabel[user.role as UserRole]}</TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={() => { handleLoadUser(skip, currentSearch, sorting, users) }} style={{cursor: 'pointer'}}>
+            { !isMaxPage &&
+              <a
+                className="load"
+                onClick={()=>{handleLoadUser(skip, currentSearch, sorting, users)}}
+              >
               <Box padding="1rem">
                 Load More
               </Box>

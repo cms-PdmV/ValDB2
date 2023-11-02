@@ -40,20 +40,17 @@ export function CampaignPage(): ReactElement {
     });
   }, [])
 
-  const handleClickReport = (groupPath: string) => {
-    openReport(groupPath)
-  }
-
   const handleEditCampaign = () => {
     if (campaign) {
       history.push(`/campaigns/form/edit/${campaign.name}`)
     }
   }
 
-  const openReport = (groupPath: string) => {
+  const openReport = (groupPath: string): string => {
     if (campaign) {
-      history.push(`/campaigns/${campaign.name}/report/${groupPath}`)
+      return `/campaigns/${campaign.name}/report/${groupPath}`;
     }
+    return "/";
   }
 
   const handleCloseCampaign = () => {
@@ -117,7 +114,14 @@ export function CampaignPage(): ReactElement {
       <Spacer rem={2} />
       <HorizontalLine />
       <Spacer rem={2} />
-      { groups && <CategoryView reportView categories={groups} onClickGroup={handleClickReport}/> }
+      { groups
+        &&
+        <CategoryView
+          reportView
+          categories={groups}
+          retrieveReportPath={openReport}
+        />
+      }
     </Container>
   )
 }

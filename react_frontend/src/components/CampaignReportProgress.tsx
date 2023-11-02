@@ -24,11 +24,8 @@ import { Spacer } from "../components/Spacer";
 import { HorizontalLine } from "./HorizontalLine";
 import { retrieveReportPath } from "../utils/comparison";
 import { reportStatusStyle } from "../utils/report";
-import { redirectToPage } from "../utils/events";
 import { buttonIconStyle, buttonStyle } from "../utils/css";
 import { useEffect, useState, ReactElement } from "react";
-import { useHistory } from 'react-router';
-import { Link } from 'react-router-dom';
 import { campaignService } from "../services";
 
 /**
@@ -37,8 +34,6 @@ import { campaignService } from "../services";
  * of the groups included.
  */
 const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
-  const history = useHistory();
-
   /**
    * Render the icon to display the report's progress for a
    * specific group.
@@ -49,18 +44,17 @@ const ProgressList = ({ progress }: { progress: Comparison }): ReactElement => {
 
     return (
       <Tooltip title={reportStatusStyle[reportStatus].label}>
-        <Link to={reportPath}>
-          <Box
-            {...buttonStyle}
-            style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
-            onClick={(ev) => redirectToPage(ev, history, reportPath)}
-          >
-              <FontAwesomeIcon
-                icon={reportStatusStyle[reportStatus].icon}
-                {...buttonIconStyle}
-              />
-          </Box>
-        </Link>
+        <Box
+          {...buttonStyle}
+          style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
+        >
+          <a className="disabled" href={reportPath}>
+            <FontAwesomeIcon
+              icon={reportStatusStyle[reportStatus].icon}
+              {...buttonIconStyle}
+            />
+          </a>
+        </Box>
       </Tooltip>
     );
   };

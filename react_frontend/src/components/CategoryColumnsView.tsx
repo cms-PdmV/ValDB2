@@ -1,27 +1,113 @@
 import { Box, List, ListItem, Paper, ListItemText, ListItemSecondaryAction, ListSubheader } from "@material-ui/core";
-import { Category, ReportStatus } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faChevronRight, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from "react";
 import { ReportStatusLabel } from "./ReportStatusLabel";
-import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { ReactElement } from "react";
+import { buttonIconStyle, buttonStyle, color } from "../utils/css";
+import { Category, ReportStatus, Group } from "../types";
 
 
 interface CategoryColumnsViewProp {
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup?: (groupPathString: string) => void
+  retrieveReportPath?: (groupPathString: string) => string
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
 export function CategoryColumnsView(prop: CategoryColumnsViewProp): ReactElement {
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
-  const [availableSubcategory, setAvailableSubcategory] = useState<string[]>(['All'])
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('All')
-  const [availableList, setAvailableList] = useState<Category[]>(prop.categories)
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [availableSubcategory, setAvailableSubcategory] = useState<string[]>(['All']);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('All');
+  const [availableList, setAvailableList] = useState<Category[]>(prop.categories);
+
+  /**
+   * Render all the groups in the subcategory.
+   * This is the right panel with the group name,
+   * the progress icon and the '>' symbol.
+   * @param groups: Subcategory groups.
+   */
+  const renderSubcategory = (groups: Group[]): ReactElement[] => {
+    /**
+     * Render the elements for the report view,
+     * used in the CampaignPage component.
+     * This is used to compare the report's data for
+     * one campaign.
+     */
+    const renderReportView = (group: Group, groupindex: number): ReactElement => {
+      const reportPath: string = prop.retrieveReportPath ? prop.retrieveReportPath(group.path) : "";
+      return (
+        <a className="disabled" href={reportPath}>
+          <ListItem
+            button
+            style={{height: '48px'}} key={`list-item-${groupindex}`}
+          >
+            {group.path.split('.')[2]}
+            <Box position="absolute" left="200px"><ReportStatusLabel status={group.report ? group.report.status : ReportStatus.NOT_YET_DONE} /></Box>
+            <Box position="absolute" right="1rem"><FontAwesomeIcon icon={faChevronRight} /></Box>
+          </ListItem>
+        </a>
+      );
+    };
+
+    /**
+     * Render the elements for the selected view
+     * used in the UserFormAdminPage.
+     * This is used for assigning roles to users.
+     */
+    const renderSelectableView = (group: Group, groupindex: number): ReactElement => {
+      // Render the selected button
+      const selected = (): ReactElement => {
+        return (
+          <Box
+            {...buttonStyle}
+            onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)}
+            margin="0 1rem 0 0"
+            style={{cursor: 'pointer', background: color.blue, color: 'white'}}
+          >
+            <FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/>
+          </Box>
+        );
+      };
+      // Render the not selected button
+      const notSelected = (): ReactElement => {
+        return (
+          <Box
+            {...buttonStyle}
+            onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)}
+            margin="0 1rem 0 0"
+            style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}
+          >
+            <FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/>
+          </Box>
+        );
+      };
+
+      // Render the view
+      return (
+        <ListItem
+          style={{height: '48px'}}
+          key={`list-item-${groupindex}`}
+        >
+          { group.selected && selected()}
+          { !group.selected && notSelected()}
+          {group.path.split('.')[2]}
+        </ListItem>
+      );
+    };
+
+    // Render the subcategory.
+    return groups.map((group, groupindex) => {
+      return (
+        <>
+          {prop.reportView && renderReportView(group, groupindex)}
+          {prop.selectableView && renderSelectableView(group, groupindex)}
+        </>
+      );
+    });
+  };
 
   useEffect(() => {
     if (selectedCategory !== 'All') {
@@ -71,22 +157,11 @@ export function CategoryColumnsView(prop: CategoryColumnsViewProp): ReactElement
         <Box flexGrow={1} padding="1rem 1rem 1rem 0.5rem" overflow="scroll">
           <List style={{padding: 0}}>
             {availableList.map((category, index) =>
-              category.subcategories.map((subcategory, subindex) => <>
+              category.subcategories.map((subcategory) => <>
                 <ListSubheader style={{margin: '0 0 8px 0 0', padding: 0}} key={`list-header-${index}`}>
                   <Box padding="0rem 1rem" style={{background: '#e0e0e0'}} height="38px" lineHeight="38px" fontWeight="bold" borderRadius="8px" >{category.name} / {subcategory.name}</Box>
                 </ListSubheader>
-                {subcategory.groups.map((group, groupindex) => (<>
-                  { prop.reportView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} button style={{height: '48px'}} key={`list-item-${subindex}-${groupindex}`}>
-                    {group.path.split('.')[2]}
-                    <Box position="absolute" left="200px"><ReportStatusLabel status={group.report ? group.report.status : ReportStatus.NOT_YET_DONE} /></Box>
-                    <Box position="absolute" right="1rem"><FontAwesomeIcon icon={faChevronRight} /></Box>
-                  </ListItem>}
-                  { prop.selectableView && <ListItem onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} style={{height: '48px'}} key={`list-item-${subindex}-${groupindex}`}>
-                    { group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: color.blue, color: 'white'}}><FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/></Box>}
-                    { !group.selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} margin="0 1rem 0 0" style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
-                    {group.path.split('.')[2]}
-                  </ListItem>}
-                </>))}
+                {renderSubcategory(subcategory.groups)}
               </>)
             )}
           </List>

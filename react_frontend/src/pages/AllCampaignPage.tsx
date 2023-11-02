@@ -48,10 +48,6 @@ export function AllCampaignPage (): ReactElement {
   const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
   const [sorting, setSorting] = useState<Sorting[]>(defaultSorting)
 
-  const handleClickCampaign = (campaignName: string) => {
-    history.push(`/campaigns/${campaignName}`)
-  }
-
   const handleCreateCampaign = () => {
     history.push('/campaigns/form/new')
   }
@@ -117,14 +113,24 @@ export function AllCampaignPage (): ReactElement {
           </TableHead>
           <TableBody>
             {campaigns.map((campaign) => (
-              <TableRow key={campaign.id} onClick={() => handleClickCampaign(campaign.name)} style={{cursor: 'pointer'}}>
-                <TableCell component="th" scope="row"><strong>{campaign.name}</strong></TableCell>
+              <TableRow key={campaign.id} style={{cursor: 'pointer'}}>
+                <TableCell component="th" scope="row">
+                  <a href={`/campaigns/${campaign.name}`}>
+                    <strong>{campaign.name}</strong>
+                  </a>
+                </TableCell>
                 <TableCell align="left">{getCategoryLabel(campaign.subcategories).map(label => <Chip label={label} style={{marginRight: '0.5rem'}} />)}</TableCell>
                 <TableCell align="right"><CampaignStatus isOpen={campaign.is_open} /></TableCell>
                 <TableCell align="right"><DatetimeSpan datetime={campaign.created_at} updateDatetime={campaign.updated_at}/></TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={() => { handleLoadCampaign(skip, currentSearch, sorting, campaigns) }} style={{cursor: 'pointer'}}>
+            { !isMaxPage &&
+              <a
+                className="load"
+                onClick={
+                  () => {handleLoadCampaign(skip, currentSearch, sorting, campaigns)}
+                }
+              >
               <Box padding="1rem">
                 Load More
               </Box>
