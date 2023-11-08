@@ -166,12 +166,23 @@ h6 {
 }
 
 a {
-  color: #234df7;
+  color: inherit;
+  text-decoration: underline;
 }
 
 a:hover {
   color: #5678ff;
   text-decoration: underline;
+}
+
+a.load {
+  color: #234df7;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.inherit {
+  all: inherit
 }
 
 pre {

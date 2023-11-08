@@ -8,28 +8,75 @@ import { buttonIconStyle, buttonStyle, color } from "../utils/css";
 import { SplitGroup } from "../utils/constant";
 import { useState } from "react";
 import { ReactElement } from "react-markdown";
+import { Link } from 'react-router-dom';
 
 
 interface CategoryCompactViewProp {
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup?: (groupPathString: string) => void
+  retrieveReportPath?: (groupPathString: string) => string
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
 export function CategoryCompactView(prop: CategoryCompactViewProp): ReactElement {
+  /**
+   * Render the report button
+   * with the report's progress
+   */
+  const reportButton = (group: Group, reportStatus: ReportStatus): ReactElement => {
+    const reportPath: string = (
+      prop.retrieveReportPath ?
+      prop.retrieveReportPath(group.path) :
+      ""
+    );
+    return (
+      <Tooltip title={reportStatusStyle[reportStatus].label}>
+        <Box
+          {...buttonStyle}
+          style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}
+        >
+          <Link className="inherit" to={reportPath}>
+            <FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/>
+          </Link>
+        </Box>
+      </Tooltip>
+    );
+  };
 
-  const reportButton = (group: Group, reportStatus: ReportStatus) => (
-    <Tooltip title={reportStatusStyle[reportStatus].label}>
-      <Box onClick={() => prop.onClickGroup && prop.onClickGroup(group.path)} {...buttonStyle} style={{cursor: 'pointer', ...reportStatusStyle[reportStatus].style}}><FontAwesomeIcon icon={reportStatusStyle[reportStatus].icon} {...buttonIconStyle}/></Box>
-    </Tooltip>
-  )
+  /**
+   * Render the selection button
+   * to assign or remove a permission for a user.
+   */
+  const selectButton = (group: Group, selected: boolean): ReactElement => {
+    // Permission granted
+    const selectedPermission = (): ReactElement => {
+      return (
+        <Box
+          {...buttonStyle}
+          onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)}
+          style={{cursor: 'pointer', background: color.blue, color: 'white'}}
+        >
+          <FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/>
+        </Box>
+      );
+    };
 
-  const selectButton = (group: Group, selected: boolean) => (<>
-    { selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, false)} {...buttonStyle} style={{cursor: 'pointer', background: color.blue, color: 'white'}}><FontAwesomeIcon icon={faCheck} {...buttonIconStyle}/></Box>}
-    { !selected && <Box onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)} {...buttonStyle} style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}><FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/></Box>}
-  </>)
+    const permissionNotGranted = (): ReactElement => {
+      return (
+        <Box
+          {...buttonStyle}
+          onClick={() => prop.onSelectGroup && prop.onSelectGroup(group.path, true)}
+          style={{cursor: 'pointer', background: '#e0e0e0', color: '#e0e0e0'}}
+        >
+          <FontAwesomeIcon icon={faSquare} {...buttonIconStyle}/>
+        </Box>
+      );
+    };
+
+    // Render the component
+    return selected ? selectedPermission() : permissionNotGranted();
+  };
 
   const CategoryReportList = ({ category }: { category: Category }) => {
     const [expanded, setExpanded] = useState<boolean>(false);

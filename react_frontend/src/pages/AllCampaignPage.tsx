@@ -1,10 +1,9 @@
 import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table, TableContainer, TableHead, TableRow, TableCell, Paper, TableBody, Chip, Button, Box, TextField } from "@material-ui/core";
-import { ReactElement } from "react";
-import { useContext, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { CampaignStatus } from "../components/CampaignStatus";
 import { Container } from "../components/Container";
 import { DatetimeSpan } from "../components/DatetimeSpan";
@@ -47,10 +46,6 @@ export function AllCampaignPage (): ReactElement {
   const [skip, setSkip] = useState<number>(0)
   const [isMaxPage, setIsMaxPage] = useState<boolean>(false)
   const [sorting, setSorting] = useState<Sorting[]>(defaultSorting)
-
-  const handleClickCampaign = (campaignName: string) => {
-    history.push(`/campaigns/${campaignName}`)
-  }
 
   const handleCreateCampaign = () => {
     history.push('/campaigns/form/new')
@@ -117,14 +112,24 @@ export function AllCampaignPage (): ReactElement {
           </TableHead>
           <TableBody>
             {campaigns.map((campaign) => (
-              <TableRow key={campaign.id} onClick={() => handleClickCampaign(campaign.name)} style={{cursor: 'pointer'}}>
-                <TableCell component="th" scope="row"><strong>{campaign.name}</strong></TableCell>
+              <TableRow key={campaign.id} style={{cursor: 'pointer'}}>
+                <TableCell component="th" scope="row">
+                  <Link to={`/campaigns/${campaign.name}`}>
+                    <strong>{campaign.name}</strong>
+                  </Link>
+                </TableCell>
                 <TableCell align="left">{getCategoryLabel(campaign.subcategories).map(label => <Chip label={label} style={{marginRight: '0.5rem'}} />)}</TableCell>
                 <TableCell align="right"><CampaignStatus isOpen={campaign.is_open} /></TableCell>
                 <TableCell align="right"><DatetimeSpan datetime={campaign.created_at} updateDatetime={campaign.updated_at}/></TableCell>
               </TableRow>
             ))}
-            { !isMaxPage && <a onClick={() => { handleLoadCampaign(skip, currentSearch, sorting, campaigns) }} style={{cursor: 'pointer'}}>
+            { !isMaxPage &&
+              <a
+                className="load"
+                onClick={
+                  () => {handleLoadCampaign(skip, currentSearch, sorting, campaigns)}
+                }
+              >
               <Box padding="1rem">
                 Load More
               </Box>

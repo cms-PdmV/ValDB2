@@ -11,7 +11,7 @@ interface CategoryView {
   categories: Category[]
   reportView?: boolean
   selectableView?: boolean
-  onClickGroup?: (groupPathString: string) => void
+  retrieveReportPath?: (groupPathString: string) => string
   onSelectGroup?: (groupPathString: string, selected: boolean) => void
 }
 
