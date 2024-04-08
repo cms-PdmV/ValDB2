@@ -22,6 +22,7 @@ def render_template(template_path, **kwargs):
     with open(template_path, encoding="utf-8") as file:
         html_template = file.read()
         for key, value in kwargs.items():
+            value = value or "Not provided"
             html_template = html_template.replace(f"{{{{{key}}}}}", value)
         return html_template
 
