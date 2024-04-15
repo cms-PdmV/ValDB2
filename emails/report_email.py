@@ -15,7 +15,7 @@ from emails.template import (
     format_new_line,
 )
 
-MODIFY_REPORT_TEMPLATE = "emails/templates/modify_report_template.html"
+REPORT_TEMPLATE = "emails/templates/report_template.html"
 NEW_COMMENT_REPORT_TEMPLATE = "emails/templates/new_comment_report_template.html"
 
 
@@ -26,17 +26,19 @@ def group_label(group_path_string):
     return group_path_string.replace(".", " / ")
 
 
-class ModifyReportEmailTemplate(EmailTemplate):
+class ReportEmailTemplate(EmailTemplate):
     """
-    Report of group is modified
+    Report is modified
     Subject: [ValDB][1_2_3_abc] Campaign notification
     Recipients: forum, report's authors
-    Template: modify_report_template.html
+    Template: report_template.html
 
     Use the same subject to group all emails under the same thread
     """
 
-    def build(self, report: Report, report_campaign: Campaign):
+    def build(
+        self, report: Report, previous_status: ReportStatus, report_campaign: Campaign
+    ):
         """
         build email
         """
@@ -44,10 +46,11 @@ class ModifyReportEmailTemplate(EmailTemplate):
         self.subject = f"[ValDB][{report.campaign_name}] Campaign notification"
         content_markdown_no_links = parse_attachment_links(content=report.content)
         self.body = render_template(
-            MODIFY_REPORT_TEMPLATE,
+            REPORT_TEMPLATE,
             campaign_name=report.campaign_name,
             group=group_label(report.group),
-            status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
+            old_status=REPORT_STATUS_LABEL[ReportStatus(previous_status)],
+            new_status=REPORT_STATUS_LABEL[ReportStatus(report.status)],
             authors=", ".join([user.fullname for user in report.authors]),
             updated_at_string=format_datetime(report.updated_at),
             content=format_new_line(markdown.markdown(content_markdown_no_links)),
