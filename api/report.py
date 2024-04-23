@@ -1,13 +1,14 @@
 """
 Report API
 """
+
 import base64
 import pymongo
 from flask.globals import request, session
 from flask_restx import Resource
 from werkzeug.exceptions import Forbidden
 from emails.report_email import (
-    ChangeStatusReportEmailTemplate,
+    ReportEmailTemplate,
 )
 from utils.group import get_subcategory_from_group
 from utils.logger import api_logger
@@ -157,8 +158,7 @@ class ReportAPI(Resource):
             new_authors = [user] + previous_authors
             report.authors = new_authors
             report.save()
-        if "status" in api.payload:
-            ChangeStatusReportEmailTemplate().build(
+            ReportEmailTemplate().build(
                 report=report,
                 previous_status=previous_report_status,
                 report_campaign=report_campaign,
