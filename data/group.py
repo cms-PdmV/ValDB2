@@ -6,9 +6,9 @@ reconstruction_groups = ['Tracker', 'Ecal', 'HGcal', 'Hcal', 'CASTOR', 'DT', 'CS
     'PF'
 ]
 hlt_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet', 'MET', 'bTag', 'Tau', 'SMP',
-    'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN'
+    'Higgs', 'Top', 'NPS', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN'
 ]
-pags_groups = ['SMP', 'Higgs', 'Top', 'Susy', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN']
+pags_groups = ['SMP', 'Higgs', 'Top', 'NPS', 'Exotica', 'B2G', 'B', 'Fwd', 'HIN']
 hin_groups = ['Tracking', 'Electron', 'Photon', 'Muon', 'Jet']
 gen_groups = ['GEN']
 
