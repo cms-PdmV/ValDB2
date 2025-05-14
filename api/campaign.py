@@ -308,8 +308,10 @@ class CampaignReportComparison(Resource):
             campaign_name: str = campaign.name
             for report in campaign.reports:
                 report_category, report_subcategory, report_group = report.get_group_components()
+                if not report_category or not report_subcategory or not report_group:
+                    continue
+
                 campaign_progress = {"campaign": campaign_name, "status": report.status.value}
-                
                 stored_category = category.get(report_category, {})
                 stored_subcategory = stored_category.get(
                     report_subcategory, 
@@ -382,7 +384,11 @@ class CampaignReportComparison(Resource):
 
         # Fill the matrix
         for group_name, statuses in subcategory_reports.items():
-            group_idx = subcategory_groups.index(group_name)
+            try:
+                group_idx = subcategory_groups.index(group_name)
+            except ValueError:
+                continue
+
             for report_status in statuses:
                 campaign_name = report_status["campaign"]
                 status = report_status["status"]
@@ -433,7 +439,11 @@ class CampaignReportComparison(Resource):
             subcategories_data = {}
             for subcategory, status in subcategories.items():
                 # Check the category and subcategory matches
-                if group.get(category).get(subcategory) is None:
+                if group.get(category, {}).get(subcategory) is None:
+                    _logger.warning(
+                        "Category (%s) or subcategory (%s) not available in default groups",
+                        category, subcategory
+                    )
                     continue
                 progress = self.__get_progress_matrix(
                     category=category, 
