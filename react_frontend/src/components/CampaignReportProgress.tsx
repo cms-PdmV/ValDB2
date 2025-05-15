@@ -229,7 +229,49 @@ const CategoryReportList = (
   { category, data }: { category: string, data: ReportComparison }
 ): ReactElement => {
   const [expanded, setExpanded] = useState<boolean>(false);
+  const [subcategoryList, setSubcategoryList] = useState<ReactElement[]>([]);
   const categoryData: SubcategoryComparison = data.categories[category];
+
+  useEffect(() => {
+    if (!expanded || subcategoryList.length > 0) {
+      return;
+    }
+
+    let isMounted = true;
+    const renderElements = async () => {
+      try {
+        const result = await Promise.all(renderAllSubCategories(categoryData));
+        if (isMounted) {
+          setSubcategoryList(result);
+        }
+      }
+      catch (err) {
+        console.error("Unable to render subcategories: ", err);
+      }
+    };
+
+    renderElements();
+
+    return () => {
+      isMounted = false;
+    }
+  }, [expanded, categoryData, subcategoryList.length]);
+
+  const renderAllSubCategories = (data: SubcategoryComparison): Promise<ReactElement>[] => {
+    return Object.keys(data).map((subcategory, index) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            <SubcategoryList
+              subcategory={subcategory}
+              index={index}
+              data={data}
+            />
+          );
+        }, 0);
+      });
+    });
+  };
 
   return (
     <Accordion expanded={expanded} onChange={(e, isExpanded) => { setExpanded(isExpanded) }}>
@@ -237,13 +279,7 @@ const CategoryReportList = (
         <strong>{category}</strong>
       </AccordionSummary>
       <AccordionDetails style={{ padding: '0 1rem', display: 'block' }}>
-        {Object.keys(categoryData).map((subcategory, index) =>
-          <SubcategoryList
-            subcategory={subcategory}
-            index={index}
-            data={categoryData}
-          />
-        )}
+        {!subcategoryList.length ? <p>Loading comparison for category {category}</p>: subcategoryList}
       </AccordionDetails>
     </Accordion>
   );
