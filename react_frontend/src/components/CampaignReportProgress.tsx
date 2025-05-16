@@ -246,6 +246,7 @@ const CategoryReportList = (
         }
       }
       catch (err) {
+        // tslint:disable-next-line:no-console
         console.error("Unable to render subcategories: ", err);
       }
     };
@@ -257,15 +258,15 @@ const CategoryReportList = (
     }
   }, [expanded, categoryData, subcategoryList.length]);
 
-  const renderAllSubCategories = (data: SubcategoryComparison): Promise<ReactElement>[] => {
-    return Object.keys(data).map((subcategory, index) => {
+  const renderAllSubCategories = (subcategoryData: SubcategoryComparison): Promise<ReactElement>[] => {
+    return Object.keys(subcategoryData).map((subcategory, index) => {
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(
             <SubcategoryList
               subcategory={subcategory}
               index={index}
-              data={data}
+              data={subcategoryData}
             />
           );
         }, 0);
