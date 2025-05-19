@@ -1,6 +1,7 @@
 import { Box } from "@material-ui/core";
-import { useState, ReactElement } from "react";
-import Linkify from "react-linkify";
+import { useState } from "react";
+import ReactMarkdown, { ReactElement } from 'react-markdown'
+import gfm from 'remark-gfm'
 
 interface ReadMoreProp {
     length?: number
@@ -24,10 +25,9 @@ export function ReadMore(prop: ReadMoreProp): ReactElement {
     }
     return (
         <Box>
-            <Box color="dimgray" whiteSpace="break-spaces">
-                <Linkify>
-                    {text}{shouldShowReadMore && !showAll && '...'}<br/>
-                </Linkify>
+            <Box margin="1rem 0" style={{overflowWrap: 'break-word'}}>
+                <ReactMarkdown remarkPlugins={[gfm]} children={text} />
+                {shouldShowReadMore && !showAll && '...'}
             </Box>
             {shouldShowReadMore && <a onClick={handleShowHide}>{shouldShowReadMore && (showAll ? 'Show Less' : 'Show More')}</a>}
         </Box>
