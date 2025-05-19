@@ -15,6 +15,7 @@ from utils.user import require_permission
 from utils.request import parse_list_of_tuple
 from utils.logger import api_logger
 from utils.cache import MemoryCache
+from utils.group import get_subcategory_from_group
 from core.database import get_database
 from core import Namespace
 from models.campaign import Campaign
@@ -83,6 +84,31 @@ class CampaignGetAPI(Resource):
     Campaign Get API
     """
 
+    def _get_linked_reports(
+        self,
+        campaign_name: str,
+    ) -> dict[str, list[str]]:
+        """Get all the reports names linked to a campaign grouped by category and subcategory."""
+        cursor = get_database().database[Report.get_collection_name()]
+        query = {
+            "campaign_name": campaign_name,
+            "status": {"$ne": ReportStatus.NOT_YET_DONE.value}
+        }
+        only_retrieve_group = {"_id": 0, "group": 1}
+        content = cursor.find(query, only_retrieve_group)
+        result = {}
+        for value in content:
+            group = value.get("group", "")
+            if not group:
+                continue
+
+            category_subcategory = get_subcategory_from_group(group)
+            subcategory_values = result.get(category_subcategory, [])
+            subcategory_values.append(group)
+            result[category_subcategory] = subcategory_values
+
+        return result
+
     def get(self, campaignname):
         """
         Get campaign by id
@@ -102,6 +128,7 @@ class CampaignGetAPI(Resource):
 
         # get groups form sub categories
         campaign_group = {}
+        campaign_all_groups = self._get_linked_reports(campaignname)
         for category_subcategory in campaign.subcategories:
             category = category_subcategory.split(".")[0]
             if category not in campaign_group:
@@ -112,10 +139,12 @@ class CampaignGetAPI(Resource):
             subcategory = category_subcategory.split(".")[1]
             if subcategory not in group[category]:
                 continue
-            groups = [
+
+            latest_groups = [
                 f"{category_subcategory}.{each_group}"
                 for each_group in group[category][subcategory]
             ]
+            groups = list(set(latest_groups).union(set(campaign_all_groups.get(category_subcategory, []))))
             campaign_group[category]["subcategories"].append(
                 {
                     "name": subcategory,
