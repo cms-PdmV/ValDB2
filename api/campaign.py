@@ -145,7 +145,9 @@ class CampaignGetAPI(Resource):
                 f"{category_subcategory}.{each_group}"
                 for each_group in group[category][subcategory]
             ]
-            groups = list(set(latest_groups).union(set(campaign_all_groups.get(category_subcategory, []))))
+            groups_campaign_category = set(campaign_all_groups.get(category_subcategory, []))
+            remaining_groups = list(groups_campaign_category.difference(set(latest_groups)))
+            groups = latest_groups + remaining_groups
             campaign_group[category]["subcategories"].append(
                 {
                     "name": subcategory,
