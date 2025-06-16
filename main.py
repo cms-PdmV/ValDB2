@@ -2,7 +2,6 @@
 Main module for valdb
 '''
 import os
-from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, request, session, render_template
 from jinja2.exceptions import TemplateNotFound
 from flask_cors import CORS
@@ -12,7 +11,7 @@ from api import api
 from api.static import serve_file
 from database.index import database_index_setup
 from lookup.user_group import UserGroupLookup
-from middlewares.auth import AuthenticationMiddleware
+from core_lib.middlewares.auth import AuthenticationMiddleware
 
 load_dotenv()
 
@@ -30,9 +29,6 @@ app = Flask(__name__,
 # Set secret key for session cookie
 app.secret_key = os.getenv('SECRET_KEY')
 
-# Handle redirections from a reverse proxy
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-
 # Enable CORS
 CORS(
     app,
@@ -41,13 +37,8 @@ CORS(
 )
 
 # Enable OIDC authentication
-auth: AuthenticationMiddleware = AuthenticationMiddleware(
-    app=app,
-    client_id=os.getenv('CLIENT_ID'),
-    client_secret=os.getenv('CLIENT_SECRET'),
-    home_endpoint="catch_all"
-)
-app.before_request(lambda: auth(request=request, session=session))
+auth = AuthenticationMiddleware(app=app)
+app.before_request(lambda: auth.authenticate(request=request, flask_session=session))
 api.init_app(app)
 
 

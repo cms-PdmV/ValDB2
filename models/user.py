@@ -7,6 +7,7 @@ from werkzeug.exceptions import Forbidden
 
 from core.validation import regex, required
 from core import Model
+from core_lib.middlewares.auth import UserInfo as MiddlewareUserInfo
 
 EMAIL_FORMAT = r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 
@@ -49,8 +50,8 @@ class User(Model):
         '''
         Get user from request
         '''
-        email = session.get('user').get('email')
-        return cls.get_by_email(email)
+        user_data: MiddlewareUserInfo = session.get("user")
+        return cls.get_by_email(user_data.email)
 
     def requires(self, roles):
         '''
