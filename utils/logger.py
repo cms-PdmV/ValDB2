@@ -8,6 +8,7 @@ import datetime
 import pathlib
 from logging.handlers import TimedRotatingFileHandler
 from flask import request, session, has_request_context
+from core_lib.middlewares.auth import UserInfo as MiddlewareUserInfo
 
 LOGS_FOLDER: str = os.getenv("LOGS_FOLDER") or f"{os.getcwd()}/logs/"
 
@@ -32,9 +33,9 @@ class UserDataFilter(logging.Filter):
         extra_data: dict = {"origin": "<unknown>", "email": "<unknown>"}
         if has_request_context():
             request_origin = request.remote_addr
-            email = session.get("user", {}).get("email")
+            user_data: MiddlewareUserInfo = session.get("user")
             extra_data["origin"] = request_origin
-            extra_data["email"] = email
+            extra_data["email"] = user_data.email
         return extra_data
 
     def fill_remaining(self, record: logging.LogRecord) -> logging.LogRecord:

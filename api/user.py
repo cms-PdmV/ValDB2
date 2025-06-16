@@ -11,6 +11,7 @@ from utils.request import parse_list_of_tuple
 from utils.logger import LoggerManager
 from core import Namespace
 from core.database import get_database
+from core_lib.middlewares.auth import UserInfo as MiddlewareUserInfo
 from data.group import get_all_groups
 from models.user import User, UserRole
 from lookup.user_group import UserGroupLookup
@@ -81,8 +82,9 @@ class UserInfoAPI(Resource):
         '''
         Get current user info from request
         '''
-        email = session.get('user').get('email')
-        fullname = session.get('user').get('fullname')
+        user_data: MiddlewareUserInfo = session.get("user")
+        email = user_data.email
+        fullname = user_data.fullname
         _logger.info('Checking if user is already registered')
         existed_user = User.get_by_email(email=email)
         if not existed_user:
