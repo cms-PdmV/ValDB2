@@ -12,7 +12,10 @@ jobs:
     name: Check for new commits
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Get the newest hash and latest release hash
         id: tag_and_commit_hash_chech
@@ -93,8 +96,10 @@ jobs:
       with:
         node-version: '14'
 
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
+        submodules: true
         path: ValDB
 
     - name: Save timestamp in release
